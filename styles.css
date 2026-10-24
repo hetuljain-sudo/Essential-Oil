@@ -463,3 +463,9 @@ body.no-scroll { overflow: hidden; }
   background: var(--cream);
   backdrop-filter: none;
 }
+
+/* Single-word wordmark: no second word to carry the accent, so the name
+   earns its presence through size and letter-spacing instead. */
+.logo { font-size: 1.7rem; gap: .5rem; }
+.logo span { letter-spacing: .07em; }
+@media (max-width: 420px) { .logo { font-size: 1.45rem; } }

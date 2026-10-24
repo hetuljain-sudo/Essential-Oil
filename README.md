@@ -1,4 +1,4 @@
-# Sarvha Global — D2C Essential Oils Storefront
+# Sarvha — D2C Essential Oils Storefront
 
 A fast, dependency-free storefront for a direct-to-consumer essential-oil brand.
 No build step, no framework — three files you can host anywhere.
