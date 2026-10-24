@@ -199,7 +199,8 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 .footer { background: var(--ink); color: #b7bfae; padding: 4rem 0 2rem; font-size: .9rem; }
 .footer__inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2rem; }
 .footer h4 { color: #fff; font-family: var(--sans); font-size: .82rem; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 1rem; }
-.footer__inner > div > a:not(.logo) { display: block; text-decoration: none; margin-bottom: .5rem; }
+/* Not `> div > a` — the link columns are <nav> landmarks, not divs. */
+.footer__inner a:not(.logo) { display: block; text-decoration: none; margin-bottom: .5rem; width: fit-content; }
 .footer__inner a:hover { color: #fff; }
 .footer__base { border-top: 1px solid rgba(255,255,255,.1); margin-top: 3rem; padding-top: 1.5rem; font-size: .8rem; }
 
