@@ -23,6 +23,8 @@ import {
   productUrl, categoryUrl,
 } from "./src/templates.mjs";
 
+import { guides } from "./src/content.mjs";
+
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
 
@@ -31,6 +33,49 @@ const page = (path, html) => pages.push({ path, html });
 
 // Counts in page copy come from the data, so they can't drift out of date.
 const count = products.length;
+
+/**
+ * Questions every oil needs answered, written from its own data rather than
+ * repeated by hand 24 times. These are appended after the oil-specific ones.
+ */
+function sharedFaqs(p) {
+  const citrus = p.method === "Cold pressed" && !p.carrier;
+  const out = [];
+
+  out.push({
+    q: "How long does it keep once opened?",
+    a: p.carrier
+      ? `Around a year for a cold-pressed oil like this one — less in a warm bathroom. Keep the cap tight and store it somewhere cool and dark. If it starts to smell like old crayons, it has turned and should not go on skin.`
+      : citrus
+        ? `About a year. Cold-pressed citrus oils oxidise faster than distilled ones, and an oxidised citrus oil is both flatter to smell and more likely to irritate skin.`
+        : `Two to three years stored properly — cool, dark and tightly closed. Distilled oils keep considerably better than cold-pressed citrus.`,
+  });
+
+  out.push({
+    q: p.carrier ? "Do I need to dilute it?" : "What dilution should I use on skin?",
+    a: p.carrier
+      ? `No — this is the carrier. It goes on neat, or it is what you dilute essential oils into. For a 2% blend, add about 12 drops of essential oil per 30 ml.`
+      : p.warning
+        ? `Lower than most. ${p.warning} For general use, dilute into a carrier oil such as jojoba and patch-test on a small area first.`
+        : `Around 2% for the body — roughly 12 drops per 30 ml of carrier oil — and 1% for the face. Always patch-test before wider use, and never apply neat.`,
+  });
+
+  if (!p.carrier) {
+    out.push({
+      q: "Can I take it internally?",
+      a: `No. None of our oils are food grade and none are sold for internal use. Essential oils are extremely concentrated, and advice to add them to water or food is not advice we endorse.`,
+    });
+  }
+
+  out.push({
+    q: "How quickly will it arrive?",
+    a: `Orders are dispatched from Mumbai within two business days and usually arrive within a further three to five, depending on where you are. Shipping is free over ${money(site.freeShippingAt)}.`,
+  });
+
+  return out;
+}
+
+const faqsFor = (p) => [...(guides[p.id]?.faqs || []), ...sharedFaqs(p)];
 
 /* ----------------------------------------------------------------- home */
 
@@ -251,25 +296,41 @@ for (const p of products) {
   const related = inCategory(p.category).filter((x) => x.id !== p.id);
   const v = firstAvailable(p);
   const multi = p.variants.length > 1;
+  const g = guides[p.id] || {};
+  const faqs = faqsFor(p);
 
   page(productUrl(p), layout({
     path: productUrl(p),
     title: p.name,
     description: `${p.tagline} ${p.desc}`.slice(0, 180),
+    // Product and FAQPage together, so the questions are eligible to show
+    // in search results alongside the price.
     jsonLd: {
-      "@context": "https://schema.org", "@type": "Product",
-      name: p.name, description: p.desc, category: cat.label,
-      image: p.image ? [p.image.src] : undefined,
-      additionalProperty: [
-        { "@type": "PropertyValue", name: "Botanical name", value: p.botanical },
-        { "@type": "PropertyValue", name: "Origin", value: p.origin },
-        { "@type": "PropertyValue", name: "Extraction", value: p.method },
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Product",
+          name: p.name, description: p.desc, category: cat.label,
+          image: p.image ? [p.image.src] : undefined,
+          additionalProperty: [
+            { "@type": "PropertyValue", name: "Botanical name", value: p.botanical },
+            { "@type": "PropertyValue", name: "Origin", value: p.origin },
+            { "@type": "PropertyValue", name: "Extraction", value: p.method },
+          ],
+          offers: p.variants.map((x) => ({
+            "@type": "Offer", name: x.size, price: x.price, priceCurrency: "INR",
+            url: site.url + productUrl(p),
+            availability: x.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          })),
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question", name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        },
       ],
-      offers: p.variants.map((x) => ({
-        "@type": "Offer", name: x.size, price: x.price, priceCurrency: "INR",
-        url: site.url + productUrl(p),
-        availability: x.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      })),
     },
     body: `
       <section class="section section--first">
@@ -353,6 +414,47 @@ for (const p of products) {
               <ul class="notes-list">${p.ingredients.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
             </section>
           </div>
+
+          ${g.whoFor ? `
+          <section class="pdp__block">
+            <h2>Who it's for</h2>
+            <div class="whofor">
+              ${g.whoFor.map((w) => `
+                <article><h3>${esc(w.h)}</h3><p>${esc(w.p)}</p></article>`).join("")}
+            </div>
+          </section>` : ""}
+
+          ${g.mistakes ? `
+          <section class="pdp__block">
+            <h2>What people get wrong</h2>
+            <div class="prose prose--wide">
+              ${g.mistakes.map((m) => `<p>${esc(m)}</p>`).join("")}
+            </div>
+          </section>` : ""}
+
+          ${g.limits ? `
+          <section class="pdp__block pdp__block--limits">
+            <h2>What it won't do</h2>
+            <div class="prose prose--wide">
+              ${g.limits.map((l) => `<p>${esc(l)}</p>`).join("")}
+              <p class="muted small">We describe how our oils smell and how people use them. We don't make
+              medical claims, because essential oils aren't medicine.</p>
+            </div>
+          </section>` : ""}
+
+          <section class="pdp__block" id="questions">
+            <h2>Questions about ${esc(p.name)}</h2>
+            <div class="faq__list faq__list--pdp">
+              ${faqs.map((f) => `
+                <details>
+                  <summary>${esc(f.q)}</summary>
+                  <p>${esc(f.a)}</p>
+                </details>`).join("")}
+            </div>
+            <p class="muted small">Something not covered? Write to us at
+              <a href="mailto:${site.email}">${site.email}</a>, or see the
+              <a href="/faq/">full FAQ</a>.</p>
+          </section>
 
           ${related.length ? `
           <div class="related-block">

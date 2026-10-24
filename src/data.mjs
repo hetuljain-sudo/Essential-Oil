@@ -227,7 +227,7 @@ export const products = [
     variants: [{ size: "10 ml", price: 749, stock: 14 }],
   },
   {
-    id: "rosehip-renewal", name: "Rosehip Renewal", botanical: "Rosa canina",
+    id: "rosehip-renewal", carrier: true, name: "Rosehip Renewal", botanical: "Rosa canina",
     category: "skincare", featured: true,
     tagline: "Cold-pressed Chilean rosehip, unrefined and unfiltered.",
     desc: "A carrier oil that behaves like a treatment. Naturally rich in vitamin A and essential fatty acids, it absorbs quickly and leaves skin looking rested rather than greasy.",
@@ -434,7 +434,7 @@ export const products = [
     variants: [{ size: "15 ml", price: 499, stock: 29 }, { size: "30 ml", price: 899, stock: 14 }],
   },
   {
-    id: "jojoba", name: "Jojoba Carrier Oil", short: "Jojoba", botanical: "Simmondsia chinensis",
+    id: "jojoba", carrier: true, name: "Jojoba Carrier Oil", short: "Jojoba", botanical: "Simmondsia chinensis",
     category: "skincare",
     tagline: "Technically a liquid wax, which is why it keeps so well.",
     desc: "Closer to the skin's own sebum than any other carrier, light enough not to sit on the surface, and stable enough that it does not go rancid the way seed oils do. The default base for diluting anything else on this page.",
@@ -450,7 +450,7 @@ export const products = [
     variants: [{ size: "100 ml", price: 649, stock: 30 }, { size: "250 ml", price: 1399, stock: 12 }],
   },
   {
-    id: "sweet-almond", name: "Sweet Almond Carrier Oil", short: "Almond", botanical: "Prunus amygdalus dulcis",
+    id: "sweet-almond", carrier: true, name: "Sweet Almond Carrier Oil", short: "Almond", botanical: "Prunus amygdalus dulcis",
     category: "skincare",
     tagline: "Cold-pressed from sweet almonds — the everyday carrier.",
     desc: "Mild, slightly nutty and inexpensive enough to use generously, which makes it the right choice for full-body massage where jojoba would be extravagant. Heavier than jojoba and slower to absorb.",

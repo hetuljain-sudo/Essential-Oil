@@ -97,6 +97,33 @@ Adding a product to the array creates its page. Adding one to `categories`
 creates a collection page. Adding one to `faqs` adds a question under its
 category heading.
 
+## Editorial content on product pages
+
+Each oil page carries four sections beyond the buy box, written per product in
+[`src/content.mjs`](src/content.mjs):
+
+- **Who it's for** — three situations the oil actually suits
+- **What people get wrong** — the mistakes people make with that specific oil
+- **What it won't do** — limitations, stated plainly
+- **Questions about this oil** — specific questions, plus shared ones the build
+  derives from the product's own data
+
+The derived questions adapt to the product: carriers are asked "do I need to
+dilute it?" while essential oils get a dilution figure and an internal-use
+answer; shelf life differs for cold-pressed citrus; and an oil with a `warning`
+has it folded into its dilution answer. So a new product gets a sensible FAQ
+even with no entry in `content.mjs`.
+
+Every product page emits `Product` and `FAQPage` structured data together in an
+`@graph`, which makes the questions eligible to appear in search results
+alongside the price.
+
+**On what the copy may claim.** The "what it won't do" sections exist partly as
+positioning and partly because India's Drugs and Magic Remedies (Objectionable
+Advertisements) Act 1954 prohibits advertising that claims to treat or cure
+listed conditions, and ASCI polices unsubstantiated health claims. Describe how
+an oil smells and how people use it. Never say what it treats.
+
 ## Where the catalogue came from
 
 24 oils, curated from the ranges our manufacturers actually stock — Katyani
