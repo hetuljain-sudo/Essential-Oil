@@ -125,7 +125,7 @@ page("/", layout({
           <div><p class="eyebrow">Favourites</p><h2>Start here</h2></div>
           <a class="btn btn--ghost" href="/shop/">See all ${products.length} oils</a>
         </div>
-        ${productGrid(products.filter((p) => p.featured))}
+        ${productGrid(products.filter((p) => p.featured).slice(0, 4), "grid--row")}
       </div>
     </section>
 
@@ -293,7 +293,9 @@ for (const c of categories) {
 
 for (const p of products) {
   const cat = categoryOf(p.category);
-  const related = inCategory(p.category).filter((x) => x.id !== p.id);
+  // One row only — the grid is four across, and a fifth card orphaned on its
+  // own row reads as a mistake. "See all" covers the rest of the collection.
+  const related = inCategory(p.category).filter((x) => x.id !== p.id).slice(0, 4);
   const v = firstAvailable(p);
   const multi = p.variants.length > 1;
   const g = guides[p.id] || {};
@@ -462,7 +464,7 @@ for (const p of products) {
               <div><p class="eyebrow">More from this collection</p><h2>${cat.label}</h2></div>
               <a class="btn btn--ghost" href="${categoryUrl(cat)}">See all</a>
             </div>
-            ${productGrid(related)}
+            ${productGrid(related, "grid--row")}
           </div>` : ""}
         </div>
       </section>

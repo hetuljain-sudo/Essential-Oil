@@ -77,8 +77,8 @@ export function productCard(p) {
   </article>`;
 }
 
-export const productGrid = (list) =>
-  `<div class="grid">${list.map(productCard).join("")}</div>`;
+export const productGrid = (list, mod = "") =>
+  `<div class="grid${mod ? " " + mod : ""}">${list.map(productCard).join("")}</div>`;
 
 export function breadcrumbs(trail) {
   return `<nav class="crumbs" aria-label="Breadcrumb"><ol>

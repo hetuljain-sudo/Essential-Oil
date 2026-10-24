@@ -657,6 +657,15 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   .pdp__block--limits { padding: 1.5rem 1.3rem 1.2rem; }
 }
 
+/* Single-row product strips — the homepage "Start here" block and the related
+   oils on a product page. They hold four cards, but the grid drops to three
+   columns at 1024px, which would leave the fourth orphaned on its own row.
+   Trim it there so the row is always full. At 860px the grid is two columns,
+   where four cards make two complete rows and nothing needs hiding. */
+@media (min-width: 861px) and (max-width: 1024px) {
+  .grid--row > .card:nth-child(n + 4) { display: none; }
+}
+
 .related-block { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--line); }
 .specs { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
 
