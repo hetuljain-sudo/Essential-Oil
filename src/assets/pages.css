@@ -254,6 +254,12 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .faq__group { margin-bottom: 2.5rem; scroll-margin-top: 100px; }
 .faq__cat { font-size: 1.5rem; margin-bottom: .6rem; }
 
+/* Contact details in the footer's brand column */
+.footer__brand > p { margin-bottom: 1.4rem; }
+.footer__contact { font-style: normal; display: grid; gap: .45rem; font-size: .86rem; }
+.footer__contact a { width: fit-content; }
+.footer__contact span { line-height: 1.6; margin-top: .4rem; opacity: .85; }
+
 /* Journal — index listing */
 .post-list { display: grid; gap: 1.2rem; }
 .post-list--row { grid-template-columns: repeat(2, 1fr); }

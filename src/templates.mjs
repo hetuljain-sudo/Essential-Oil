@@ -126,9 +126,17 @@ function header(current) {
 function footer() {
   return `<footer class="footer">
     <div class="container footer__inner">
-      <div>
+      <div class="footer__brand">
         <a href="/" class="logo logo--light"><span>${site.name}</span></a>
         <p>${esc(site.tagline)}. Shipped across India.</p>
+        <address class="footer__contact">
+          <a href="mailto:${site.email}">${site.email}</a>
+          ${site.phones.map((n) =>
+            `<a href="tel:${n.replace(/\s/g, "")}">${n}</a>`).join("")}
+          <span>${site.address.lines.join("<br />")}<br />
+          ${site.address.city} &ndash; ${site.address.postcode}<br />
+          ${site.address.country}</span>
+        </address>
       </div>
       <nav aria-label="Shop links">
         <h4>Shop</h4>
