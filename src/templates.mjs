@@ -8,7 +8,7 @@ import {
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-const shortLabel = (p) => p.name.split(" ")[0];
+const shortLabel = (p) => p.short || p.name.split(" ")[0];
 
 /** Generated bottle artwork — the fallback when photography fails to load. */
 export function bottleSVG([light, dark], label = "") {
@@ -40,6 +40,10 @@ export function productMedia(p, sizes = "(max-width: 860px) 50vw, 25vw", eager =
     sizes="${sizes}" data-pid="${p.id}" onerror="artFallback(this)" />`;
 }
 
+/** Products with no photography render the generated art, which needs the
+ *  same sizing the runtime fallback applies. */
+export const mediaClass = (p) => (p.image ? "" : " has-art");
+
 export const productUrl = (p) => `/oils/${p.id}/`;
 export const categoryUrl = (c) => `/collections/${c.id}/`;
 
@@ -50,7 +54,7 @@ export function productCard(p) {
   const sold = !inStock(p);
   const low = !sold && v.stock > 0 && v.stock <= 8;
   return `<article class="card${sold ? " is-sold" : ""}">
-    <a class="card__media" style="background:${p.bg}" href="${productUrl(p)}" aria-label="View ${esc(p.name)}">
+    <a class="card__media${mediaClass(p)}" style="background:${p.bg}" href="${productUrl(p)}" aria-label="View ${esc(p.name)}">
       ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
       ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
       ${productMedia(p)}

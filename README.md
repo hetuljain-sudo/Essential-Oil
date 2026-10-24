@@ -97,6 +97,37 @@ Adding a product to the array creates its page. Adding one to `categories`
 creates a collection page. Adding one to `faqs` adds a question under its
 category heading.
 
+## Where the catalogue came from
+
+24 oils, curated from the ranges our manufacturers actually stock — Katyani
+Exports, India Aroma Oils and Shiva Exports. Those are bulk export catalogues
+running to roughly 570 SKUs between them, so this is a deliberate selection
+rather than a straight import.
+
+**Deliberately excluded.** Aroma chemicals, oleoresins and perfumery raw
+materials, which are industrial feedstock rather than retail products. Also
+anything unsafe to sell to a consumer in a dropper bottle: calamus
+(β-asarone), costus root (IFRA-prohibited sensitiser), thuja (thujone), birch
+(methyl salicylate), bitter almond, and civet absolute, which is animal-derived
+and would break the cruelty-free claim on every page.
+
+Where a supplier offers both bark and leaf oil of the same plant — cinnamon,
+for instance — we list the leaf. Bark oil is a severe skin sensitiser.
+
+**Pricing** is derived from the suppliers' published wholesale rates (India
+Aroma Oils quotes in INR from 50 ml upward) scaled to retail volumes with a
+retail margin. Treat the numbers as a starting point, not a decision: they do
+not yet account for your bottling, labelling, packaging or payment-gateway
+costs.
+
+**Copy is ours.** None of the product descriptions are copied from supplier
+sites — reusing them would be an infringement, and duplicate text would be
+penalised in search.
+
+Products carrying a `warning` field render a safety note on their page. This is
+set for phototoxic oils (bergamot, grapefruit) and strong sensitisers (clove
+bud, cinnamon leaf), and for oils to avoid in pregnancy.
+
 ## Product photography
 
 Swap a product's `image.src` for your own file and it is used immediately. If an

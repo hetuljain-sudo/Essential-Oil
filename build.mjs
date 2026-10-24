@@ -18,7 +18,7 @@ import {
 } from "./src/data.mjs";
 
 import {
-  layout, esc, productGrid, productCard, productMedia, bottleSVG, breadcrumbs,
+  layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
   newsletter, trustBar, categoryTiles, oilLibrary, safetyNote,
   productUrl, categoryUrl,
 } from "./src/templates.mjs";
@@ -28,6 +28,9 @@ const dist = join(root, "dist");
 
 const pages = [];
 const page = (path, html) => pages.push({ path, html });
+
+// Counts in page copy come from the data, so they can't drift out of date.
+const count = products.length;
 
 /* ----------------------------------------------------------------- home */
 
@@ -45,13 +48,13 @@ page("/", layout({
         <div class="hero__copy">
           <p class="eyebrow">Small batch · Single origin · Shipped across India</p>
           <h1>Nature, bottled<br /><em>at its purest.</em></h1>
-          <p class="lead">Twelve oils, bought from growers and distillers we can name, decanted into amber glass and sent straight to you.</p>
+          <p class="lead">${count} oils, bought from growers and distillers we can name, decanted into amber glass and sent straight to you.</p>
           <div class="hero__ctas">
             <a href="/shop/" class="btn btn--primary">Shop all oils</a>
             <a href="/collections/" class="btn btn--ghost">Browse collections</a>
           </div>
           <ul class="hero__stats">
-            <li><strong>12</strong><span>Oils in the range</span></li>
+            <li><strong>${products.length}</strong><span>Oils in the range</span></li>
             <li><strong>100%</strong><span>Pure &amp; undiluted</span></li>
             <li><strong>48h</strong><span>Dispatch from Mumbai</span></li>
           </ul>
@@ -75,7 +78,7 @@ page("/", layout({
       <div class="container">
         <div class="section__head">
           <div><p class="eyebrow">Favourites</p><h2>Start here</h2></div>
-          <a class="btn btn--ghost" href="/shop/">See all 12 oils</a>
+          <a class="btn btn--ghost" href="/shop/">See all ${products.length} oils</a>
         </div>
         ${productGrid(products.filter((p) => p.featured))}
       </div>
@@ -129,7 +132,7 @@ page("/shop/", layout({
         <div class="page-head">
           <p class="eyebrow">The collection</p>
           <h1>Every oil we make</h1>
-          <p class="lead">Twelve bottles in four collections. Each one single-origin, undiluted, and sold in the sizes we actually use ourselves.</p>
+          <p class="lead">${products.length} bottles across ${categories.length} collections. Each one single-origin, undiluted, and sold in the sizes we actually use ourselves.</p>
         </div>
 
         <div class="filters" data-filters role="group" aria-label="Filter by collection">
@@ -279,7 +282,7 @@ for (const p of products) {
           ])}
 
           <div class="pdp" data-pdp="${p.id}">
-            <div class="pdp__media" style="background:${p.bg}">
+            <div class="pdp__media${mediaClass(p)}" style="background:${p.bg}">
               ${productMedia(p, "(max-width: 860px) 100vw, 45vw", true)}
               ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
             </div>
@@ -319,6 +322,15 @@ for (const p of products) {
                 ${inStock(p) ? "Add to cart" : "Sold out"}
               </button>
               <p class="muted small pdp__ship">Free shipping over ${money(site.freeShippingAt)} · Dispatched within 48 hours</p>
+
+              ${p.warning ? `
+              <div class="warn" role="note">
+                <svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true">
+                  <path d="M10 2.5L18.5 17.5H1.5L10 2.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <path d="M10 8v4M10 14.5v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                <p><strong>Safety note.</strong> ${esc(p.warning)}</p>
+              </div>` : ""}
 
               <dl class="specs">
                 <dt>Origin</dt><dd>${esc(p.origin)}</dd>
@@ -511,7 +523,7 @@ const catalog = {
   currency: site.currency, locale: site.locale, freeShippingAt: site.freeShippingAt,
   categories: categories.map(({ id, label }) => ({ id, label })),
   products: products.map((p) => ({
-    id: p.id, name: p.name, botanical: p.botanical, category: p.category,
+    id: p.id, name: p.name, short: p.short || null, botanical: p.botanical, category: p.category,
     tagline: p.tagline, notes: p.notes, featured: !!p.featured, badge: p.badge || null,
     bg: p.bg, swatch: p.swatch, url: productUrl(p),
     image: p.image || null,

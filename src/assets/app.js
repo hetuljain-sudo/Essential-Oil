@@ -19,7 +19,7 @@ const firstAvailable = (p) => p.variants.find((v) => v.stock > 0) || p.variants[
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const shortLabel = (p) => p.name.split(" ")[0];
+const shortLabel = (p) => p.short || p.name.split(" ")[0];
 
 function bottleSVG([light, dark], label = "") {
   const uid = "g" + Math.random().toString(36).slice(2, 8);

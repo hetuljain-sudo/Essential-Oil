@@ -626,6 +626,17 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .related-block { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--line); }
 .specs { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
 
+/* Safety note on oils that are phototoxic or strong sensitisers */
+.warn {
+  display: flex; gap: .7rem; align-items: flex-start;
+  margin-top: 1.5rem; padding: .9rem 1.1rem;
+  background: #fbf0e6; border: 1px solid #e3c3a4; border-left: 3px solid var(--terracotta);
+  border-radius: 10px; color: #6b4428;
+}
+.warn svg { flex: none; margin-top: .15rem; color: var(--terracotta); }
+.warn p { margin: 0; font-size: .86rem; line-height: 1.5; }
+.card .stock-note + .card__foot { margin-top: .4rem; }
+
 /* Oil library */
 .library { display: flex; gap: 6px; height: 460px; }
 .lib {
