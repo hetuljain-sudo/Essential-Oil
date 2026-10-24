@@ -1,10 +1,10 @@
-# Verdana Botanics — D2C Essential Oils Storefront
+# Sarvha Global — D2C Essential Oils Storefront
 
 A fast, dependency-free storefront for a direct-to-consumer essential-oil brand.
 No build step, no framework — three files you can host anywhere.
 
-> **Note:** "Verdana Botanics" is a placeholder brand. Swap in the real brand name,
-> products and prices before launch.
+> **Note:** The product names, prices, stock counts and review quotes are still
+> placeholders. Swap them for real data before launch.
 
 ## Running it locally
 

@@ -1,5 +1,5 @@
 /* =========================================================
-   Verdana Botanics — storefront
+   Sarvha Global — storefront
    All product data lives in PRODUCTS below. Edit that list
    to change what the shop sells; everything else follows.
    ========================================================= */
@@ -340,7 +340,7 @@ $("[data-moods]").addEventListener("click", (e) => {
 
 // ---------- Cart ----------
 // Cart keys are "<productId>::<size>" so sizes are tracked separately.
-const CART_KEY = "vb-cart-v2";
+const CART_KEY = "sg-cart-v1";
 
 const lineProduct = (key) => byId(key.split("::")[0]);
 function lineVariant(key) {
