@@ -41,6 +41,12 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .prose h2 { margin-top: 2.2rem; font-size: 1.9rem; }
 .prose a { color: var(--terracotta); }
 
+/* On the shop page the chips stand alone rather than inside .section__head,
+   so they carry their own spacing above the search row. */
+.filters { margin-bottom: 1.4rem; }
+.toolbar { padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.toolbar, .toolbar__right { row-gap: .9rem; }
+
 /* Collection tiles are links now, and there are four of them */
 .moods { grid-template-columns: repeat(4, 1fr); }
 .mood { text-decoration: none; color: inherit; }
