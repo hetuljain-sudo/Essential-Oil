@@ -21,11 +21,12 @@ export const site = {
   freeShippingAt: 999,
 };
 
+/** Header navigation. The FAQ lives in the footer only — it is a reference
+ *  page people go looking for, not somewhere to send a browsing shopper. */
 export const nav = [
   { href: "/shop/", label: "Shop" },
   { href: "/collections/", label: "Collections" },
   { href: "/about/", label: "Our story" },
-  { href: "/faq/", label: "FAQ" },
   { href: "/contact/", label: "Contact" },
 ];
 
