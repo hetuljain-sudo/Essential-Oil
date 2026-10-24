@@ -272,6 +272,46 @@ export const oilLibrary = () => `
     </div>
   </section>`;
 
+/* -------------------------------------------------------------- the blog */
+
+export const postUrl = (post) => `/blog/${post.slug}/`;
+
+export const postDate = (iso) =>
+  new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+
+/** Renders a post's block list. Block kinds are documented in posts.mjs. */
+export function renderBlocks(body) {
+  return body.map(([kind, value]) => {
+    switch (kind) {
+      case "h2": return `<h2>${esc(value)}</h2>`;
+      case "ul": return `<ul>${value.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+      case "ol": return `<ol>${value.map((i) => `<li>${i}</li>`).join("")}</ol>`;
+      case "note": return `<aside class="post__note"><p>${value}</p></aside>`;
+      case "table": {
+        const [head, ...rows] = value;
+        return `<div class="post__table"><table>
+          <thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
+          <tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>
+        </table></div>`;
+      }
+      default: return `<p>${value}</p>`;
+    }
+  }).join("");
+}
+
+export const postCard = (post, mins) => `
+  <article class="post-card">
+    <a href="${postUrl(post)}">
+      <p class="post-card__meta">${esc(post.category)} · ${mins} min read</p>
+      <h2>${esc(post.title)}</h2>
+      <p class="post-card__excerpt">${esc(post.excerpt)}</p>
+      <span class="post-card__more">Read it</span>
+    </a>
+    <time datetime="${post.date}">${postDate(post.date)}</time>
+  </article>`;
+
 export const safetyNote = () => `
   <p class="note">Always dilute before topical use and patch-test first. Not for internal use.
   Consult a doctor if pregnant, nursing or under medical care.</p>`;

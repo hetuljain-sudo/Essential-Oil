@@ -14,16 +14,17 @@ import { fileURLToPath } from "node:url";
 
 import {
   site, categories, products, faqs, steps,
-  inCategory, fromPrice, inStock, firstAvailable, categoryOf, money,
+  inCategory, bySlug, fromPrice, inStock, firstAvailable, categoryOf, money,
 } from "./src/data.mjs";
 
 import {
   layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
   newsletter, trustBar, categoryTiles, oilLibrary, safetyNote,
-  productUrl, categoryUrl,
+  productUrl, categoryUrl, postUrl, postDate, postCard, renderBlocks,
 } from "./src/templates.mjs";
 
 import { guides } from "./src/content.mjs";
+import { postsNewestFirst, readingTime } from "./src/posts.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -465,6 +466,108 @@ for (const p of products) {
               <a class="btn btn--ghost" href="${categoryUrl(cat)}">See all</a>
             </div>
             ${productGrid(related, "grid--row")}
+          </div>` : ""}
+        </div>
+      </section>
+      ${newsletter()}`,
+  }));
+}
+
+/* ----------------------------------------------------------------- blog */
+
+const blogPosts = postsNewestFirst();
+
+page("/blog/", layout({
+  path: "/blog/",
+  title: "Journal",
+  description: `Notes on buying, using and storing essential oils, from the ${site.name} team.`,
+  jsonLd: blogPosts.length ? {
+    "@context": "https://schema.org", "@type": "Blog",
+    name: `${site.name} Journal`, url: site.url + "/blog/",
+    blogPost: blogPosts.map((post) => ({
+      "@type": "BlogPosting", headline: post.title, datePublished: post.date,
+      url: site.url + postUrl(post), description: post.excerpt,
+    })),
+  } : undefined,
+  body: `
+    <section class="section section--first">
+      <div class="container">
+        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "Journal" }])}
+        <div class="page-head">
+          <p class="eyebrow">Journal</p>
+          <h1>Notes from the bench</h1>
+          <p class="lead">What we've learned about buying, using and storing essential oils —
+          written plainly, with no claims we can't stand behind.</p>
+        </div>
+
+        ${blogPosts.length ? `
+          <div class="post-list">
+            ${blogPosts.map((post) => postCard(post, readingTime(post))).join("")}
+          </div>`
+        : `
+          <div class="no-results">
+            <p><strong>Nothing published yet.</strong></p>
+            <p class="muted">The first pieces are being written. In the meantime, every oil's
+            own page covers how to use it, what people get wrong, and what it won't do.</p>
+            <a class="btn btn--ghost" href="/shop/">Browse the oils</a>
+          </div>`}
+      </div>
+    </section>
+    ${newsletter()}`,
+}));
+
+for (const post of blogPosts) {
+  const mins = readingTime(post);
+  const more = blogPosts.filter((x) => x.slug !== post.slug).slice(0, 2);
+  const oils = (post.related || []).map(bySlug).filter(Boolean).slice(0, 4);
+
+  page(postUrl(post), layout({
+    path: postUrl(post),
+    title: post.title,
+    description: post.excerpt,
+    jsonLd: {
+      "@context": "https://schema.org", "@type": "BlogPosting",
+      headline: post.title, description: post.excerpt,
+      datePublished: post.date, dateModified: post.date,
+      author: { "@type": "Organization", name: site.name },
+      publisher: { "@type": "Organization", name: site.name },
+      mainEntityOfPage: site.url + postUrl(post),
+    },
+    body: `
+      <section class="section section--first">
+        <div class="container">
+          ${breadcrumbs([
+            { href: "/", label: "Home" },
+            { href: "/blog/", label: "Journal" },
+            { label: post.title },
+          ])}
+          <article class="post">
+            <header class="post__head">
+              <p class="eyebrow">${esc(post.category)}</p>
+              <h1>${esc(post.title)}</h1>
+              <p class="post__meta">
+                <time datetime="${post.date}">${postDate(post.date)}</time> · ${mins} min read
+              </p>
+              <p class="post__excerpt">${esc(post.excerpt)}</p>
+            </header>
+            <div class="post__body">${renderBlocks(post.body)}</div>
+          </article>
+
+          ${oils.length ? `
+          <div class="related-block">
+            <div class="section__head">
+              <div><p class="eyebrow">Mentioned above</p><h2>Oils from this piece</h2></div>
+              <a class="btn btn--ghost" href="/shop/">See all ${count} oils</a>
+            </div>
+            ${productGrid(oils, "grid--row")}
+          </div>` : ""}
+
+          ${more.length ? `
+          <div class="related-block">
+            <div class="section__head"><div><p class="eyebrow">Keep reading</p><h2>More from the journal</h2></div></div>
+            <div class="post-list post-list--row">
+              ${more.map((x) => postCard(x, readingTime(x))).join("")}
+            </div>
           </div>` : ""}
         </div>
       </section>

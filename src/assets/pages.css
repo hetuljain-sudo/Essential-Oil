@@ -254,6 +254,63 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .faq__group { margin-bottom: 2.5rem; scroll-margin-top: 100px; }
 .faq__cat { font-size: 1.5rem; margin-bottom: .6rem; }
 
+/* Journal — index listing */
+.post-list { display: grid; gap: 1.2rem; }
+.post-list--row { grid-template-columns: repeat(2, 1fr); }
+.post-card {
+  background: var(--paper); border: 1px solid #efe7d7; border-radius: var(--radius);
+  padding: 1.8rem 2rem; transition: border-color .2s, transform .2s;
+  display: flex; flex-direction: column; gap: .6rem;
+}
+.post-card:hover { border-color: var(--terracotta); transform: translateY(-2px); }
+.post-card a { text-decoration: none; display: block; }
+.post-card__meta {
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .12em;
+  font-weight: 600; color: var(--sage); margin: 0 0 .5rem;
+}
+.post-card h2 { font-size: 1.7rem; margin: 0 0 .5rem; }
+.post-card:hover h2 { color: var(--terracotta); }
+.post-card__excerpt { color: var(--muted); margin: 0 0 .9rem; font-size: .95rem; }
+.post-card__more { font-weight: 600; font-size: .88rem; color: var(--terracotta); }
+.post-card__more::after { content: " →"; }
+.post-card time { font-size: .78rem; color: var(--muted); margin-top: auto; }
+
+/* Journal — a single post */
+.post { max-width: 44rem; margin: 0 auto; }
+.post__head { margin-bottom: 2.5rem; }
+.post__head h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); margin-bottom: .6rem; }
+.post__meta { font-size: .84rem; color: var(--muted); margin: 0 0 1.2rem; }
+.post__excerpt {
+  font-family: var(--serif); font-size: 1.35rem; line-height: 1.4; color: var(--ink);
+  margin: 0; padding-top: 1.2rem; border-top: 1px solid var(--line);
+}
+.post__body { font-size: 1.05rem; }
+.post__body p { margin: 0 0 1.2rem; }
+.post__body h2 { font-size: 1.8rem; margin: 2.4rem 0 .9rem; }
+.post__body ul, .post__body ol { margin: 0 0 1.3rem; padding-left: 1.3rem; }
+.post__body li { margin-bottom: .6rem; }
+.post__body strong { font-weight: 600; }
+.post__note {
+  background: var(--sand); border-left: 3px solid var(--terracotta);
+  border-radius: 0 10px 10px 0; padding: 1rem 1.3rem; margin: 0 0 1.4rem;
+}
+.post__note p { margin: 0; font-size: .95rem; }
+.post__table { overflow-x: auto; margin: 0 0 1.5rem; }
+.post__table table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.post__table th, .post__table td { text-align: left; padding: .65rem .8rem; border-bottom: 1px solid var(--line); }
+.post__table th {
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--sage); border-bottom-color: var(--forest);
+}
+.post__table tbody tr:hover { background: var(--cream); }
+
+@media (max-width: 860px) {
+  .post-list--row { grid-template-columns: 1fr; }
+  .post-card { padding: 1.4rem 1.5rem; }
+  .post-card h2 { font-size: 1.45rem; }
+  .post__excerpt { font-size: 1.15rem; }
+}
+
 /* Contact page */
 .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
 .contact__details { display: grid; grid-template-columns: auto 1fr; gap: .6rem 1.5rem; margin: 2rem 0 1rem; font-size: .92rem; }

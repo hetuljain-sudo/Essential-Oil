@@ -27,6 +27,7 @@ export const nav = [
   { href: "/shop/", label: "Shop" },
   { href: "/collections/", label: "Collections" },
   { href: "/about/", label: "Our story" },
+  { href: "/blog/", label: "Journal" },
   { href: "/contact/", label: "Contact" },
 ];
 
