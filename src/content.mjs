@@ -499,4 +499,235 @@ export const guides = {
       { q: "Is it safe in pregnancy?", a: "It is one of the oils commonly advised against during pregnancy. Speak to a doctor before using it, and err towards leaving it out." },
     ],
   },
+
+  "clary-sage": {
+    whoFor: [
+      { h: "Evening blends", p: "Warm and dry rather than sweet, which makes it a good alternative when lavender starts to feel predictable." },
+      { h: "Perfume blenders", p: "A classic bridge note that sits comfortably between citrus above and wood below." },
+      { h: "People who dislike florals", p: "Herbaceous and nutty, with none of the powdery quality that puts some people off." },
+    ],
+    mistakes: [
+      "Buying it expecting garden sage. Clary is a different species and smells almost nothing like the culinary herb — softer, nuttier, faintly winey. People who want the kitchen smell are usually disappointed.",
+      "Using it during pregnancy. Clary sage is one of the oils most consistently advised against, and it is widely assumed to be gentle because it smells so mild.",
+    ],
+    limits: ["It is not a sedative and we make no claims about what it does. It is a warm, slightly unusual scent that many people find pleasant in the evening."],
+    faqs: [
+      { q: "Is clary sage the same as common sage?", a: "No. Common or culinary sage is Salvia officinalis, which is high in thujone and generally avoided in aromatherapy. Clary is Salvia sclarea, a different species with a very different smell and a much better safety profile." },
+      { q: "Why does it smell slightly like wine?", a: "Clary sage contains sclareol and a group of related compounds also found in some wines and in muscatel grapes. The association is real, not imagined, and is why it is sometimes described as muscatel-like." },
+    ],
+  },
+
+  "patchouli": {
+    whoFor: [
+      { h: "Base-note blenders", p: "Few materials anchor a blend as effectively, and very little is needed to do it." },
+      { h: "Anyone who finds most oils fleeting", p: "Patchouli outlasts almost everything else on skin and on fabric." },
+      { h: "People revisiting it", p: "If you decided you hated patchouli in your twenties, a well-aged oil at one drop is a different experience entirely." },
+    ],
+    mistakes: [
+      "Using it at the same rate as everything else. Two drops is a diffuser's worth. Patchouli's reputation for being overpowering is almost entirely a dosing problem, not a property of the oil.",
+      "Judging a young bottle. Unlike nearly every other oil, patchouli improves with age — a fresh one can smell green and harsh where a matured one is smooth and sweet. Give a new bottle a few months before deciding.",
+    ],
+    limits: ["It is tenacious to the point of being difficult to remove. Spilled patchouli on fabric or wood is a smell you will live with for a long time."],
+    faqs: [
+      { q: "Does patchouli really get better with age?", a: "Yes, and it is one of the very few essential oils for which that is true. Most oils oxidise and deteriorate. Patchouli's heavier compounds mellow instead, which is why aged stock commands a premium." },
+      { q: "Why is it associated with the sixties?", a: "It was widely used in the counterculture of the period and the association stuck. It is worth separating that from the material itself, which is a serious perfumery base note used across the fragrance industry." },
+    ],
+  },
+
+  "marjoram": {
+    whoFor: [
+      { h: "Massage blends", p: "Long used in body oils for its warmth, and gentle enough to use at an ordinary dilution." },
+      { h: "Anyone who finds oregano too harsh", p: "The same family, far softer — warm rather than medicinal." },
+      { h: "Simple evening diffusing", p: "Pairs naturally with lavender and needs no skill to blend." },
+    ],
+    mistakes: [
+      "Confusing it with oregano. They are close relatives, but oregano is far higher in carvacrol, much harsher on skin, and needs a lower dilution. The names are sometimes used loosely by suppliers.",
+      "Using it in pregnancy. Marjoram appears on most avoid lists, and its mildness makes people assume otherwise.",
+    ],
+    limits: ["Sweet marjoram and Spanish marjoram are different plants — the latter is a thyme species. Check the botanical name if you have bought marjoram before."],
+    faqs: [
+      { q: "Is marjoram the same as oregano?", a: "They are related and sometimes confused, including by suppliers. Sweet marjoram is Origanum majorana, soft and warm. Oregano is Origanum vulgare, much sharper and a far stronger skin irritant." },
+      { q: "Can I use it in cooking?", a: "No. None of our oils are food grade or sold for internal use. Use the dried or fresh herb." },
+    ],
+  },
+
+  "jasmine-sambac": {
+    whoFor: [
+      { h: "Anyone who grew up with mogra", p: "The smell of jasmine garlands, concentrated to the point of being almost overwhelming." },
+      { h: "Perfume blenders", p: "A heart note of real depth, and one drop is enough to change an entire blend." },
+      { h: "Occasion rather than everyday", p: "Priced and concentrated as something you reach for deliberately, not daily." },
+    ],
+    mistakes: [
+      "Using more than one drop. This is the most concentrated material we sell. At two drops a blend stops smelling of jasmine and starts smelling of too much jasmine, and there is no recovering it.",
+      "Expecting an essential oil. Jasmine cannot be steam distilled without destroying the scent, so every jasmine on the market is an absolute, extracted with solvents. That is inherent to the material, not a shortcut.",
+    ],
+    limits: [
+      "As an absolute it carries trace solvent residue by nature of the process. If you only use steam-distilled oils, this is not for you.",
+      "Jasmine sambac, grandiflorum and auriculatum are three different species sold under one name, and they smell meaningfully different.",
+    ],
+    faqs: [
+      { q: "Why is jasmine an absolute rather than an essential oil?", a: "The flowers are too delicate for steam distillation — the heat destroys exactly the compounds you want. Solvent extraction is the only way to capture the scent, which is why all jasmine is sold as an absolute." },
+      { q: "Is this the same as mogra?", a: "Yes. Mogra is the common Indian name for Jasminum sambac, the species used in garlands across the country. Grandiflorum is the species more often used in European perfumery and smells greener." },
+      { q: "Why is it so expensive?", a: "The flowers are picked by hand at night, when the scent peaks, and must be processed within hours. It takes an enormous quantity of flowers to produce a few millilitres of absolute." },
+    ],
+  },
+
+  "mandarin": {
+    whoFor: [
+      { h: "Households with children", p: "The gentlest citrus we carry, and the one least likely to cause a problem on skin." },
+      { h: "Evening use", p: "Soft enough that it does not read as stimulating the way lemon or grapefruit do." },
+      { h: "Skin blends in daylight", p: "Unusually for a cold-pressed citrus oil, it is not meaningfully phototoxic." },
+    ],
+    mistakes: [
+      "Assuming it is phototoxic because it is citrus. Mandarin is one of the two cold-pressed citrus oils — sweet orange is the other — that does not carry a meaningful sunlight risk.",
+      "Keeping it too long. It is still a citrus peel oil and still has about a year in it from opening.",
+    ],
+    limits: ["It is soft and short-lived. In a blend it is gone within the hour unless something slower holds it in place."],
+    faqs: [
+      { q: "Is mandarin phototoxic?", a: "Not meaningfully. Along with sweet orange it is the exception among cold-pressed citrus oils, which makes it the easiest one to put in a daytime skin blend." },
+      { q: "How is it different from sweet orange?", a: "Softer and slightly more floral, with less of the candied sweetness. Orange is the more obvious of the two; mandarin is the subtler." },
+    ],
+  },
+
+  "lime": {
+    whoFor: [
+      { h: "Kitchens", p: "The sharpest, cleanest citrus we carry, and the best at cutting through a heavy room." },
+      { h: "Cleaning blends", p: "Excellent in a vinegar spray, where the bitterness works in its favour." },
+      { h: "Morning diffusing", p: "Bracing in a way orange and mandarin are not." },
+    ],
+    mistakes: [
+      "Putting it on skin before going outside. Cold-pressed lime is one of the most phototoxic oils there is — more so than lemon — and the reaction can leave marks that take months to fade.",
+      "Assuming distilled lime behaves the same way. Distilled lime is not phototoxic, but it also smells quite different, flatter and more candied. Ours is cold-pressed.",
+    ],
+    limits: ["A short-lived top note with about a year in it. Oxidised lime is flat and more irritating than fresh."],
+    faqs: [
+      { q: "How phototoxic is lime compared with bergamot?", a: "Comparable, and more so than lemon. Keep cold-pressed lime below about 0.7% on skin that will see sun within twelve hours. Diffusing is unaffected." },
+      { q: "What is the difference between cold-pressed and distilled lime?", a: "Cold-pressed keeps the bright, green character of the peel, along with the compounds that make it phototoxic. Distilled lime loses both — safer in daylight, but noticeably less interesting." },
+    ],
+  },
+
+  "spearmint": {
+    whoFor: [
+      { h: "Anyone who finds peppermint too cold", p: "Recognisably mint, without the menthol bite that makes peppermint uncomfortable for some." },
+      { h: "Households where peppermint is unsuitable", p: "Much lower in menthol, which makes it the more sensible mint when there are children around — though still ask a doctor." },
+      { h: "Daytime diffusing", p: "Fresh without being sharp, and easier to live with over a long session." },
+    ],
+    mistakes: [
+      "Expecting peppermint. Spearmint is sweeter and softer, and people who want the cooling sensation will not find it here — that comes from menthol, which spearmint has very little of.",
+      "Using it at bedtime. It is milder than peppermint but still reads as fresh and waking for most people.",
+    ],
+    limits: ["It will not produce the cooling effect peppermint does. That is a menthol property, and spearmint is low in menthol by nature."],
+    faqs: [
+      { q: "How is spearmint different from peppermint?", a: "Chemistry. Peppermint is high in menthol, which is what creates the cold sensation. Spearmint is high in carvone instead — sweeter, greener, and with no real cooling effect." },
+      { q: "Is it safer around children than peppermint?", a: "It is lower in menthol, which is the compound of concern, but we are not in a position to advise on children without knowing ages and circumstances. Ask a doctor." },
+    ],
+  },
+
+  "black-pepper": {
+    whoFor: [
+      { h: "Warming massage blends", p: "A standard component in body oils for cold weather and after exercise." },
+      { h: "Spice blenders", p: "Drier than clove or cinnamon, so it adds warmth without sweetness." },
+      { h: "Anyone bored of citrus and lavender", p: "Genuinely unusual in a diffuser, and more interesting than it sounds." },
+    ],
+    mistakes: [
+      "Expecting it to smell like a pepper mill. Ground pepper smells dusty and makes you sneeze; the distilled oil is woody and resinous, with the heat present as warmth rather than irritation.",
+      "Using too much in a blend. Two drops is plenty. It is assertive and will take over a diffuser blend at three or four.",
+    ],
+    limits: ["It is warming on skin at the dilutions people usually find pleasant, which is not the same as being hot. If you are looking for a strong heating effect, this is not it."],
+    faqs: [
+      { q: "Will it make me sneeze?", a: "No. The sneeze from ground pepper comes from piperine in the dust, which is not volatile and does not carry across in distillation. The oil is the aromatic part only." },
+      { q: "Can I use it in cooking?", a: "No. None of our oils are food grade or sold for internal use." },
+    ],
+  },
+
+  "juniper-berry": {
+    whoFor: [
+      { h: "People who like resinous scents", p: "Crisp and piney, and a natural partner for cedarwood and cypress." },
+      { h: "Post-exercise blends", p: "Common in body oils after exertion, usually at 2% in a carrier." },
+      { h: "Gin drinkers", p: "Instantly recognisable, though drier and more resinous than the spirit." },
+    ],
+    mistakes: [
+      "Buying juniper berry and getting juniper wood or needle oil. They are distilled from different parts of the same tree, smell different and are priced differently. Check what the label says.",
+      "Using it in pregnancy. Juniper appears on most avoid lists.",
+    ],
+    limits: ["We make no claims about what it does. It is a clean, resinous scent that many people like after exercise, and that is as far as we will go."],
+    faqs: [
+      { q: "Is this the same juniper used in gin?", a: "Same species, Juniperus communis, and the same berries. The oil is more concentrated and drier than the spirit, where the juniper is one botanical among many." },
+      { q: "What is the difference between berry and needle oil?", a: "Berry oil is softer and fruitier; needle and wood oils are sharper and more turpentine-like, and considerably cheaper. Suppliers do not always distinguish them clearly." },
+    ],
+  },
+
+  "thyme": {
+    whoFor: [
+      { h: "Cleaning blends", p: "Where its strength is an advantage rather than a hazard, and skin contact is not a factor." },
+      { h: "Seasonal diffusing", p: "Two drops alongside eucalyptus and lemon when the weather turns." },
+      { h: "Experienced users only", p: "Not a beginner's oil. It needs careful dilution and there is little margin for approximation." },
+    ],
+    mistakes: [
+      "Using it at ordinary dilutions. Half a per cent is the ceiling on skin. Thyme is among the most irritating oils in common use and people routinely treat it like rosemary.",
+      "Buying without checking the chemotype. Thymol thyme is the hot, harsh one. Linalool and geraniol chemotypes are far gentler and are what most people actually want.",
+    ],
+    limits: [
+      "It is a strong irritant and sensitiser, and we would rather you used something else unless you specifically want thyme.",
+      "Avoid during pregnancy, avoid if you have high blood pressure, and keep it away from children entirely.",
+    ],
+    faqs: [
+      { q: "Why is thyme treated as a difficult oil?", a: "Thymol content. It is a potent antimicrobial compound, which also makes it a potent skin irritant. The margin between a useful dilution and an uncomfortable one is narrower than for most oils." },
+      { q: "Which chemotype is this?", a: "Thymol type, the standard commercial thyme. If you want something gentler, the linalool chemotype is the one to look for — ask us and we will tell you what we can source." },
+    ],
+  },
+
+  "palmarosa": {
+    whoFor: [
+      { h: "Daily facial oils", p: "One of the gentlest oils we carry on skin, and widely used in skincare formulation." },
+      { h: "Anyone who likes rose but not the price", p: "Shares geraniol with rose, at a fraction of the cost." },
+      { h: "Humid weather", p: "Light and fresh in a way the heavier florals are not." },
+    ],
+    mistakes: [
+      "Assuming it is related to roses. It is a grass, closely related to lemongrass and citronella. The rose character comes from shared chemistry, not shared botany.",
+      "Overlooking it because it is inexpensive. Palmarosa is one of the better-value oils in skincare and tends to get passed over in favour of pricier florals that do much the same job.",
+    ],
+    limits: ["It is not rose, and in a side-by-side comparison nobody would confuse the two. It is rose-adjacent at a tenth of the price, which is a different proposition."],
+    faqs: [
+      { q: "Is palmarosa related to rose?", a: "Not at all. It is a grass in the same genus as lemongrass and citronella. The rose-like smell comes from geraniol, a compound it shares with rose oil." },
+      { q: "Is it gentle enough for the face?", a: "It is among the milder oils we carry and is widely used in facial formulations, typically at around 1%. Patch-test first, as with anything new." },
+    ],
+  },
+
+  "carrot-seed": {
+    whoFor: [
+      { h: "Mature or dry skin", p: "A long-standing component of facial oil blends, usually at 1% or less." },
+      { h: "People who like earthy scents", p: "Dry and rooty, with nothing sweet about it." },
+      { h: "Blenders who want an unusual base", p: "Distinctive enough that one drop changes the character of a blend entirely." },
+    ],
+    mistakes: [
+      "Expecting it to smell of carrots. It is distilled from the seed of wild carrot, not the root, and smells of dry earth and hay instead.",
+      "Using too much. The smell is strong and earthy, and at more than a drop or two it dominates everything else in a facial oil.",
+    ],
+    limits: ["Carrot seed essential oil and carrot-infused carrier oil are different products sold under similar names. This is the distilled essential oil, used by the drop."],
+    faqs: [
+      { q: "Is this the same as carrot oil for skin?", a: "No. Carrot-infused oil is a carrier, usually sunflower or coconut, with carrot root steeped in it — used by the spoonful. This is the distilled essential oil from the seeds, used by the drop." },
+      { q: "Why does it smell earthy rather than sweet?", a: "Because it comes from the seed of wild carrot rather than the cultivated root. None of the sugars that make a carrot sweet are volatile, so none of them carry across in distillation." },
+    ],
+  },
+
+  "argan": {
+    whoFor: [
+      { h: "Hair ends and frizz", p: "The use it is best known for, and a few drops through damp ends is usually enough." },
+      { h: "Faces that find other carriers heavy", p: "Lighter and faster-absorbing than sweet almond, without jojoba's waxiness." },
+      { h: "Anyone who wants one carrier for face and hair", p: "It handles both comfortably, which is not true of most." },
+    ],
+    mistakes: [
+      "Buying the culinary grade by mistake. Roasted argan is a food oil with a strong nutty smell. The cosmetic grade is pressed from unroasted kernels and is nearly odourless. If your argan smells strongly of nuts, it is the wrong one.",
+      "Using too much on hair. Three or four drops through the ends is plenty; more reads as greasy rather than conditioned.",
+    ],
+    limits: [
+      "It is a carrier, not an essential oil — no aroma to speak of, and nothing to diffuse.",
+      "Pressed from tree nut kernels, so it is not suitable if there is a nut allergy. Jojoba is the alternative.",
+    ],
+    faqs: [
+      { q: "What is the difference between cosmetic and culinary argan?", a: "Roasting. Culinary argan is pressed from roasted kernels and smells strongly nutty. Cosmetic argan uses unroasted kernels and is nearly odourless, which is what you want on skin and hair." },
+      { q: "Is it safe with a nut allergy?", a: "No. Argan is pressed from the kernels of a tree nut and should be avoided. Jojoba comes from a shrub seed rather than a nut and is the straightforward substitute." },
+    ],
+  },
 };

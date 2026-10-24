@@ -126,7 +126,7 @@ an oil smells and how people use it. Never say what it treats.
 
 ## Where the catalogue came from
 
-24 oils, curated from the ranges our manufacturers actually stock — Katyani
+37 oils, curated from the ranges our manufacturers actually stock — Katyani
 Exports, India Aroma Oils and Shiva Exports. Those are bulk export catalogues
 running to roughly 570 SKUs between them, so this is a deliberate selection
 rather than a straight import.
