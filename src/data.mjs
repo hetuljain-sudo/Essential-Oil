@@ -13,8 +13,13 @@ export const site = {
   description:
     "Single-origin essential oils and cold-pressed carriers, bottled in small batches and shipped across India.",
   email: "hello@sarvha.com",
-  phone: "+91 00000 00000",
-  address: ["Mumbai, Maharashtra", "India"],
+  phones: ["+91 93154 13515", "+91 98735 44554"],
+  address: {
+    lines: ["B-13, Rana Pratap Bagh", "Nr. GT Road Industrial Area"],
+    city: "New Delhi",
+    postcode: "110007",
+    country: "India",
+  },
   url: "https://sarvha.com",
   currency: "₹",
   locale: "en-IN",
@@ -781,7 +786,7 @@ export const steps = [
   { n: "01", h: "Sourced", p: "Bought from a small number of growers and distillers we can name." },
   { n: "02", h: "Checked", p: "We ask for the documentation that comes with every batch." },
   { n: "03", h: "Bottled", p: "Decanted into amber glass in small batches, labelled by hand." },
-  { n: "04", h: "Shipped", p: "Packed and dispatched from Mumbai within two business days." },
+  { n: "04", h: "Shipped", p: "Packed and dispatched from Delhi within two business days." },
 ];
 
 // ---------- Derived helpers, shared by the build and the browser ----------

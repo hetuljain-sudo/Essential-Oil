@@ -32,6 +32,13 @@ const dist = join(root, "dist");
 const pages = [];
 const page = (path, html) => pages.push({ path, html });
 
+/** The postal address as display lines. */
+const addressLines = () => [
+  ...site.address.lines,
+  `${site.address.city} – ${site.address.postcode}`,
+  site.address.country,
+];
+
 // Counts in page copy come from the data, so they can't drift out of date.
 const count = products.length;
 
@@ -70,7 +77,7 @@ function sharedFaqs(p) {
 
   out.push({
     q: "How quickly will it arrive?",
-    a: `Orders are dispatched from Mumbai within two business days and usually arrive within a further three to five, depending on where you are. Shipping is free over ${money(site.freeShippingAt)}.`,
+    a: `Orders are dispatched from Delhi within two business days and usually arrive within a further three to five, depending on where you are. Shipping is free over ${money(site.freeShippingAt)}.`,
   });
 
   return out;
@@ -87,6 +94,14 @@ page("/", layout({
   jsonLd: {
     "@context": "https://schema.org", "@type": "Store",
     name: site.name, description: site.description, url: site.url, email: site.email,
+    telephone: site.phones,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: site.address.lines.join(", "),
+      addressLocality: site.address.city,
+      postalCode: site.address.postcode,
+      addressCountry: "IN",
+    },
   },
   body: `
     <section class="hero">
@@ -102,7 +117,7 @@ page("/", layout({
           <ul class="hero__stats">
             <li><strong>${products.length}</strong><span>Oils in the range</span></li>
             <li><strong>100%</strong><span>Pure &amp; undiluted</span></li>
-            <li><strong>48h</strong><span>Dispatch from Mumbai</span></li>
+            <li><strong>48h</strong><span>Dispatch from Delhi</span></li>
           </ul>
         </div>
         <div class="hero__art" aria-hidden="true">
@@ -674,8 +689,10 @@ page("/contact/", layout({
             </div>
             <dl class="contact__details">
               <dt>Email</dt><dd><a href="mailto:${site.email}">${site.email}</a></dd>
-              <dt>Phone</dt><dd>${site.phone}</dd>
-              <dt>Address</dt><dd>${site.address.join("<br />")}</dd>
+              <dt>Phone</dt>
+              <dd>${site.phones.map((n) =>
+                `<a href="tel:${n.replace(/\s/g, "")}">${n}</a>`).join("<br />")}</dd>
+              <dt>Address</dt><dd>${addressLines().join("<br />")}</dd>
               <dt>Hours</dt><dd>Monday to Friday, 10am – 6pm IST</dd>
             </dl>
             <p class="muted small">We read everything and usually reply within a day or two.</p>
