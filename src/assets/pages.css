@@ -1,0 +1,197 @@
+/* =========================================================
+   Multi-page layer — product photography, breadcrumbs,
+   collection pages, product pages, FAQ and contact.
+   Concatenated after styles.css by the build.
+   ========================================================= */
+
+/* Product photography replaces the generated bottle art */
+.card__media, .pdp__media { overflow: hidden; position: relative; }
+.card__media img, .pdp__media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.card__media { display: block; padding: 0; border: 0; }
+.card:hover .card__media img { transform: scale(1.04); }
+.card__media.has-art { display: grid; place-items: center; }
+.card__media.has-art .bottle { width: 42%; }
+.card__latin { font-style: italic; font-size: .8rem; color: var(--muted); margin: 0; }
+.card__title a { text-decoration: none; }
+.card__title a:hover { color: var(--terracotta); }
+a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
+.line__thumb { display: grid; place-items: center; text-decoration: none; }
+
+/* Page scaffolding */
+.section--first { padding-top: 2rem; }
+.narrow { width: min(760px, 100% - 32px); }
+.center { text-align: center; }
+.center.hero__ctas { justify-content: center; }
+.page-head { max-width: 46rem; margin-bottom: 2.5rem; }
+.page-head h1 { font-size: clamp(2.4rem, 5vw, 3.8rem); margin-bottom: .4rem; }
+.page-head .lead { margin-top: 1rem; }
+
+.crumbs { margin-bottom: 1.6rem; font-size: .82rem; color: var(--muted); }
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0; }
+.crumbs li + li::before { content: "/"; margin-right: .5rem; opacity: .5; }
+.crumbs a { color: var(--muted); }
+.crumbs a:hover { color: var(--terracotta); }
+.crumbs [aria-current] { color: var(--ink); }
+
+.prose { max-width: 42rem; }
+.prose p { margin-bottom: 1.1rem; }
+.prose h2 { margin-top: 2.2rem; font-size: 1.9rem; }
+.prose a { color: var(--terracotta); }
+
+/* Collection tiles are links now, and there are four of them */
+.moods { grid-template-columns: repeat(4, 1fr); }
+.mood { text-decoration: none; color: inherit; }
+.mood__label, .mood__note { text-decoration: none; }
+
+/* Collections index */
+.coll-list { display: grid; gap: 1.6rem; }
+.coll {
+  display: grid; grid-template-columns: 300px 1fr;
+  background: var(--paper); border: 1px solid #efe7d7; border-radius: var(--radius); overflow: hidden;
+}
+.coll__head { padding: 2.2rem; display: flex; flex-direction: column; justify-content: center; }
+.coll__icon { font-size: 1.8rem; margin-bottom: .6rem; }
+.coll__icon--lg { font-size: 2.4rem; display: block; margin-bottom: .6rem; }
+.coll__head h2 { margin: 0 0 .3rem; font-size: 2rem; }
+.coll__head h2 a { text-decoration: none; }
+.coll__head p { margin: 0; font-size: .9rem; color: var(--muted); }
+.coll__body { padding: 2.2rem; }
+.coll__body > p { margin-top: 0; color: var(--muted); }
+.coll__oils { list-style: none; padding: 0; margin: 1.2rem 0 1.6rem; columns: 2; }
+.coll__oils li { margin-bottom: .45rem; break-inside: avoid; font-size: .92rem; }
+.coll__oils a { text-decoration: none; font-weight: 500; }
+.coll__oils a:hover { color: var(--terracotta); }
+
+.page-head--coll { padding: 2rem; background: var(--tint); border-radius: var(--radius); max-width: none; }
+.coll-next { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.coll-next h3 { font-size: 1.3rem; }
+.coll-next__row { display: flex; gap: .7rem; flex-wrap: wrap; }
+.coll-next__item {
+  display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.2rem;
+  border-radius: 999px; text-decoration: none; font-weight: 500; font-size: .9rem;
+}
+.coll-next__item:hover { outline: 1px solid var(--forest); }
+
+/* Product page */
+.pdp { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: start; }
+.pdp__media { border-radius: var(--radius); aspect-ratio: 4 / 5; position: sticky; top: 100px; }
+.pdp__media.has-art { display: grid; place-items: center; }
+.pdp__media.has-art .bottle { width: 38%; }
+.pdp__info h1 { font-size: clamp(2.2rem, 4vw, 3.2rem); margin-bottom: .2rem; }
+.pdp__info .eyebrow a { text-decoration: none; }
+.pdp__info .latin { font-style: italic; color: var(--muted); margin: 0 0 1rem; }
+.pdp__tagline { font-family: var(--serif); font-size: 1.35rem; line-height: 1.3; margin: 0 0 1rem; }
+.pdp__desc { color: var(--muted); }
+.pdp__single { font-size: .9rem; color: var(--muted); margin: 1.2rem 0; }
+.pdp__buy { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.4rem 0 1rem; }
+.pdp__price .price { font-size: 1.8rem; }
+.pdp__ship { text-align: center; margin: .9rem 0 1.8rem; }
+.pdp__detail {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+  margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--line);
+}
+.pdp__detail h2 { font-size: 1.6rem; }
+.pdp__detail section > h2:not(:first-child) { margin-top: 2rem; }
+.notes-list { list-style: none; padding: 0; margin: 0 0 1rem; }
+.notes-list li { padding: .5rem 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.related-block { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--line); }
+.specs { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+
+/* Oil library */
+.library { display: flex; gap: 6px; height: 460px; }
+.lib {
+  position: relative; flex: 1; border-radius: 12px; overflow: hidden; cursor: pointer;
+  transition: flex .5s cubic-bezier(.2,.8,.2,1);
+}
+.lib.is-open { flex: 3.4; cursor: default; }
+.lib__img { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.lib__veil { position: absolute; inset: 0; transition: background .5s;
+  background: linear-gradient(180deg, rgba(20,26,19,.78), rgba(20,26,19,.9)); }
+.lib.is-open .lib__veil {
+  background: linear-gradient(180deg, rgba(20,26,19,.72), rgba(20,26,19,.45) 45%, rgba(20,26,19,.88)); }
+.lib__toggle {
+  position: absolute; inset: 0; width: 100%; background: none; border: 0; color: #fff;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 1.6rem;
+}
+.lib__name {
+  font-family: var(--serif); font-size: 1.5rem; letter-spacing: .04em; white-space: nowrap;
+  writing-mode: vertical-rl; transform: rotate(180deg); transition: .45s;
+}
+.lib.is-open .lib__name { writing-mode: horizontal-tb; transform: none; opacity: 0; }
+.lib__panel {
+  position: absolute; inset: auto 0 0 0; padding: 1.8rem; color: #fff;
+  opacity: 0; transform: translateY(14px); pointer-events: none; transition: .45s .1s;
+}
+.lib.is-open .lib__panel { opacity: 1; transform: none; pointer-events: auto; }
+.lib__story { font-family: var(--serif); font-size: 2rem; line-height: 1.1; margin: 0 0 .4rem; }
+.lib__story em { color: #e0a57f; }
+.lib__latin { font-size: .78rem; opacity: .75; margin: 0 0 .6rem; font-style: italic; }
+.lib__blurb { font-size: .92rem; opacity: .9; max-width: 30rem; margin: 0 0 1.2rem; }
+.btn--light { background: #fff; color: var(--ink); }
+.btn--light:hover { background: var(--terracotta); color: #fff; }
+
+.steps--light { color: var(--ink); border-top-color: var(--line); }
+.steps--light span { color: var(--terracotta); }
+.steps--light h4 { color: var(--ink); }
+.steps--light p { color: var(--muted); }
+
+/* FAQ page */
+.faq-layout { display: grid; grid-template-columns: 240px 1fr; gap: 3rem; align-items: start; }
+.faq-jump { position: sticky; top: 100px; }
+.faq-jump h2 { font-size: 1.1rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: .1em; }
+.faq-jump a { display: block; padding: .5rem 0; font-size: .9rem; text-decoration: none; color: var(--muted); border-bottom: 1px solid var(--line); }
+.faq-jump a:hover { color: var(--terracotta); }
+.faq__group { margin-bottom: 2.5rem; scroll-margin-top: 100px; }
+.faq__cat { font-size: 1.5rem; margin-bottom: .6rem; }
+
+/* Contact page */
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.contact__details { display: grid; grid-template-columns: auto 1fr; gap: .6rem 1.5rem; margin: 2rem 0 1rem; font-size: .92rem; }
+.contact__details dt { font-weight: 600; }
+.contact__details dd { margin: 0; color: var(--muted); }
+.contact__form { background: var(--paper); border: 1px solid #efe7d7; border-radius: var(--radius); padding: 2rem; }
+.contact__form h2 { font-size: 1.6rem; margin-bottom: 1.2rem; }
+.contact__form label { display: block; margin-bottom: 1rem; font-size: .86rem; font-weight: 500; }
+.contact__form input, .contact__form select, .contact__form textarea {
+  width: 100%; margin-top: .35rem; padding: .7rem .9rem; font: inherit; font-size: .92rem;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--cream); color: var(--ink);
+}
+.contact__form textarea { resize: vertical; }
+.contact__form input:focus, .contact__form select:focus, .contact__form textarea:focus {
+  outline: 2px solid var(--terracotta); outline-offset: 1px; border-color: transparent;
+}
+.contact__form .muted { margin-top: .8rem; text-align: center; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .library { height: 400px; }
+  .faq-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+  .faq-jump { position: static; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .faq-jump h2 { width: 100%; margin-bottom: .3rem; }
+  .faq-jump a { border: 1px solid var(--line); border-radius: 999px; padding: .4rem .9rem; }
+}
+@media (max-width: 860px) {
+  .pdp { grid-template-columns: 1fr; gap: 2rem; }
+  /* relative, not static — the badge is absolutely positioned inside it */
+  .pdp__media { position: relative; top: auto; aspect-ratio: 1; }
+  .pdp__detail, .contact { grid-template-columns: 1fr; gap: 2rem; }
+  .coll { grid-template-columns: 1fr; }
+  .coll__head, .coll__body { padding: 1.8rem; }
+  .library { flex-direction: column; height: auto; gap: 10px; }
+  .lib { flex: none; height: 92px; }
+  .lib.is-open { flex: none; height: 330px; }
+  .lib__toggle { align-items: center; padding: 0 1.4rem; justify-content: flex-start; }
+  .lib__name { writing-mode: horizontal-tb; transform: none; }
+  .lib.is-open .lib__toggle { align-items: flex-start; padding-top: 1.3rem; }
+  .lib.is-open .lib__name { opacity: 1; font-size: 1.1rem; }
+  .lib__panel { padding: 1.4rem; }
+  .lib__story { font-size: 1.5rem; }
+}
+@media (max-width: 520px) {
+  .coll__oils { columns: 1; }
+  .card__latin { display: none; }
+  .moods { grid-template-columns: repeat(2, 1fr); }
+}

@@ -1,5 +1,5 @@
 node_modules/
-dist/
+# dist/ is committed so the site can be deployed straight from the repo
 .DS_Store
 Thumbs.db
 *.log

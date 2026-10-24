@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sarvha.com/sitemap.xml
