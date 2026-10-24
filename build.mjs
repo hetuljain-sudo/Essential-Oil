@@ -144,14 +144,15 @@ page("/shop/", layout({
           </div>
           <div class="toolbar__right">
             <span class="toolbar__count" data-result-count aria-live="polite"></span>
-            <label class="sort">Sort
-              <select data-sort>
+            <span class="sort">
+              <span class="sort__label">Sort</span>
+              <select data-sort aria-label="Sort oils">
                 <option value="featured">Featured</option>
                 <option value="price-asc">Price: low to high</option>
                 <option value="price-desc">Price: high to low</option>
                 <option value="name">Name A–Z</option>
               </select>
-            </label>
+            </span>
           </div>
         </div>
 

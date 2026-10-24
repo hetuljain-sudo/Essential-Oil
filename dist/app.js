@@ -398,6 +398,144 @@ if (pdp) {
   refresh();
 }
 
+/* --------------------------------------------------------- custom select */
+/**
+ * A browser draws a <select>'s open option list itself, so CSS can't reach it
+ * and it arrives in OS chrome — square corners, system blue highlight. This
+ * upgrades each <select> into a button + listbox we can style, keeping the
+ * original element in the DOM (hidden) as the value and firing its `change`
+ * event, so every listener elsewhere keeps working untouched.
+ */
+function enhanceSelect(select) {
+  if (select.dataset.enhanced) return;
+  select.dataset.enhanced = "1";
+
+  const id = "sel" + Math.random().toString(36).slice(2, 8);
+  const options = [...select.options].map((o) => ({ value: o.value, label: o.textContent.trim() }));
+  const labelEl = select.closest("label");
+  const name = select.getAttribute("aria-label")
+    || (labelEl ? labelEl.childNodes[0].textContent.trim() : "")
+    || "Select an option";
+
+  const wrap = document.createElement("div");
+  wrap.className = "select";
+  wrap.innerHTML = `
+    <button type="button" class="select__btn" id="${id}-btn"
+      aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(name)}">
+      <span class="select__value">${esc(options.find((o) => o.value === select.value)?.label || options[0].label)}</span>
+      <svg class="select__chev" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M4 6.5L8 10.5L12 6.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <ul class="select__menu" role="listbox" tabindex="-1" aria-labelledby="${id}-btn" hidden>
+      ${options.map((o, i) => `
+        <li class="select__opt" role="option" id="${id}-o${i}" data-value="${esc(o.value)}"
+            aria-selected="${o.value === select.value}">
+          <svg class="select__tick" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+            <path d="M3 8.5L6.5 12L13 4.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>${esc(o.label)}</span>
+        </li>`).join("")}
+    </ul>`;
+
+  select.parentNode.insertBefore(wrap, select);
+  wrap.appendChild(select);
+  select.hidden = true;
+  select.setAttribute("aria-hidden", "true");
+  select.tabIndex = -1;
+
+  const btn = $(".select__btn", wrap);
+  const menu = $(".select__menu", wrap);
+  const opts = $$(".select__opt", wrap);
+  let active = Math.max(0, options.findIndex((o) => o.value === select.value));
+
+  const setActive = (i) => {
+    active = (i + opts.length) % opts.length;
+    opts.forEach((o, n) => o.classList.toggle("is-active", n === active));
+    menu.setAttribute("aria-activedescendant", opts[active].id);
+    opts[active].scrollIntoView({ block: "nearest" });
+  };
+
+  const open = () => {
+    menu.hidden = false;
+    wrap.classList.add("is-open");
+    btn.setAttribute("aria-expanded", "true");
+    // Flip above the button when there isn't room below.
+    const room = window.innerHeight - btn.getBoundingClientRect().bottom;
+    wrap.classList.toggle("is-up", room < menu.offsetHeight + 24);
+    setActive(active);
+    menu.focus();
+  };
+
+  const close = (refocus = true) => {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    wrap.classList.remove("is-open", "is-up");
+    btn.setAttribute("aria-expanded", "false");
+    if (refocus) btn.focus();
+  };
+
+  const choose = (i) => {
+    const o = options[i];
+    select.value = o.value;
+    $(".select__value", wrap).textContent = o.label;
+    opts.forEach((el, n) => el.setAttribute("aria-selected", String(n === i)));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    close();
+  };
+
+  // preventDefault matters inside a <label>: without it the label forwards the
+  // click to its control, which toggles the menu a second time and reopens it.
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    menu.hidden ? open() : close();
+  });
+
+  btn.addEventListener("keydown", (e) => {
+    if (["ArrowDown", "ArrowUp", "Enter", " "].includes(e.key)) { e.preventDefault(); open(); }
+  });
+
+  menu.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowDown": e.preventDefault(); return setActive(active + 1);
+      case "ArrowUp": e.preventDefault(); return setActive(active - 1);
+      case "Home": e.preventDefault(); return setActive(0);
+      case "End": e.preventDefault(); return setActive(opts.length - 1);
+      case "Enter": case " ": e.preventDefault(); return choose(active);
+      case "Escape": e.preventDefault(); return close();
+      case "Tab": return close(false);
+      default: {
+        // Type-ahead, the way a native select behaves.
+        if (e.key.length !== 1) return;
+        const from = active + 1;
+        const found = options.findIndex((o, i) =>
+          o.label.toLowerCase().startsWith(e.key.toLowerCase()) && i >= from);
+        const idx = found !== -1 ? found
+          : options.findIndex((o) => o.label.toLowerCase().startsWith(e.key.toLowerCase()));
+        if (idx !== -1) setActive(idx);
+      }
+    }
+  });
+
+  menu.addEventListener("click", (e) => {
+    const li = e.target.closest(".select__opt");
+    if (!li) return;
+    e.preventDefault();
+    choose(opts.indexOf(li));
+  });
+
+  menu.addEventListener("mousemove", (e) => {
+    const li = e.target.closest(".select__opt");
+    if (li && opts.indexOf(li) !== active) setActive(opts.indexOf(li));
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!wrap.contains(e.target)) close(false);
+  });
+}
+
+$$("select").forEach(enhanceSelect);
+
 /* ---------------------------------------------------------------- events */
 
 document.addEventListener("click", (e) => {
