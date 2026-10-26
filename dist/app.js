@@ -718,6 +718,40 @@ if (libraryEl && C.library && C.library.length) {
   paintLibrary(libraryEl);
 }
 
+/* ------------------------------------------------------- signed-in hint */
+/* The header has to show whether you are signed in, on a static page, without
+   asking the server on every visit. So a hint is kept in localStorage: your
+   first name and nothing else. It is a display hint and never a permission —
+   every endpoint checks the session cookie regardless, and editing this value
+   grants exactly nothing. Pages that do talk to the server correct it. */
+
+const SIGNED_IN_KEY = "sarvha-account-v1";
+
+function setSignedIn(name) {
+  try {
+    if (name) localStorage.setItem(SIGNED_IN_KEY, name);
+    else localStorage.removeItem(SIGNED_IN_KEY);
+  } catch {}
+  paintAccountLink();
+}
+
+function paintAccountLink() {
+  const link = $("[data-account-link]");
+  if (!link) return;
+
+  let name = null;
+  try { name = localStorage.getItem(SIGNED_IN_KEY); } catch {}
+
+  const dot = $("[data-account-dot]", link);
+  if (dot) dot.hidden = !name;
+  link.setAttribute(
+    "aria-label",
+    name ? `Your account — signed in as ${name}` : "Log in or create an account",
+  );
+}
+
+paintAccountLink();
+
 /* ------------------------------------------------------------- accounts */
 /* Progressive enhancement: these pages are plain forms. Without JavaScript
    they do nothing useful, which is why nothing else on the site depends on
@@ -762,6 +796,8 @@ if (authForm) {
         return;
       }
 
+      setSignedIn(data.customer?.name ?? "");
+
       // `next` lets checkout send someone here and get them back afterwards.
       // safeNext comes from src/redirect.mjs, prepended by the build.
       location.href = safeNext(new URLSearchParams(location.search).get("next"));
@@ -786,6 +822,8 @@ if (accountPanel) {
     try {
       const res = await fetch("/api/auth/me", { credentials: "same-origin" });
       const data = await res.json();
+
+      setSignedIn(data.customer?.name ?? null);
 
       if (!data.customer) {
         accountPanel.innerHTML = `
@@ -820,6 +858,7 @@ if (accountPanel) {
   accountPanel.addEventListener("click", async (e) => {
     if (!e.target.closest("[data-logout]")) return;
     await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
+    setSignedIn(null);
     location.href = "/";
   });
 }
@@ -897,6 +936,8 @@ if (checkoutGate) {
       checkoutGate.innerHTML = `<p class="muted">We couldn't reach the server. Please refresh.</p>`;
       return;
     }
+
+    setSignedIn(me?.name ?? null);
 
     if (!me) {
       checkoutGate.innerHTML = `

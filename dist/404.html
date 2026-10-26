@@ -54,6 +54,15 @@
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       </a>
 
+      <!-- Goes to /account/, which shows a dashboard or a login prompt
+           depending on the session. Deciding that here would mean asking the
+           server who you are on every page of a static site; the label is
+           corrected client-side once we know. -->
+      <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8zM9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
         <span class="cart-count" data-cart-count hidden>0</span>
