@@ -1133,6 +1133,107 @@ page("/contact/", layout({
     </section>`,
 }));
 
+/* ------------------------------------------------------------- accounts */
+
+/* Accounts are optional throughout. Checkout never requires one, and these
+   pages are noindex: a login form in search results is noise, and an account
+   page in an index would be a mistake waiting to happen. */
+
+const authTrail = (label) => [HOME, { label }];
+
+/** The shared chrome for the three narrow account pages. */
+const accountPage = ({ path, title, description, label, body }) =>
+  page(path, layout({
+    path, title, description,
+    noindex: true,
+    breadcrumb: authTrail(label),
+    body: `
+    <section class="section section--first">
+      <div class="container container--narrow">
+        ${breadcrumbs(authTrail(label))}
+        ${body}
+      </div>
+    </section>`,
+  }));
+
+accountPage({
+  path: "/account/register/",
+  title: "Create an Account",
+  description: "Create a Sarvha account to keep your delivery details and see past orders. You can also check out without one.",
+  label: "Create account",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Accounts</p>
+      <h1>Create an account</h1>
+      <p class="lead">Keeps your delivery details for next time and shows you what you've ordered before. You don't need one to buy — checkout works perfectly well without.</p>
+    </div>
+
+    <form class="auth-form" data-auth-form="register" novalidate>
+      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
+
+      <label>Your name
+        <input type="text" name="name" autocomplete="name" required />
+      </label>
+      <label>Email
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+      <label>Mobile <span class="muted">(optional)</span>
+        <input type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" />
+      </label>
+      <label>Password
+        <input type="password" name="password" autocomplete="new-password" required minlength="10" />
+      </label>
+      <p class="muted small">At least 10 characters. Length does more for you than punctuation does.</p>
+
+      <button class="btn btn--primary btn--block" type="submit">Create account</button>
+      <p class="muted small">Already have one? <a href="/account/login/">Log in</a>.</p>
+    </form>`,
+});
+
+accountPage({
+  path: "/account/login/",
+  title: "Log In",
+  description: "Log in to your Sarvha account to see past orders and saved delivery details.",
+  label: "Log in",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Accounts</p>
+      <h1>Log in</h1>
+    </div>
+
+    <form class="auth-form" data-auth-form="login" novalidate>
+      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
+
+      <label>Email
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+      <label>Password
+        <input type="password" name="password" autocomplete="current-password" required />
+      </label>
+
+      <button class="btn btn--primary btn--block" type="submit">Log in</button>
+      <p class="muted small">No account yet? <a href="/account/register/">Create one</a>.</p>
+    </form>`,
+});
+
+accountPage({
+  path: "/account/",
+  title: "Your Account",
+  description: "Your Sarvha account: past orders and saved details.",
+  label: "Your account",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Accounts</p>
+      <h1>Your account</h1>
+    </div>
+
+    <!-- Filled by /api/auth/me. Rendered server-side it would be a page that
+         must never be cached, for one small panel of content. -->
+    <div data-account-panel>
+      <p class="muted">Loading your account…</p>
+    </div>`,
+});
+
 /* ------------------------------------------------------------- 404 page */
 
 page("/404.html", layout({
@@ -1205,9 +1306,13 @@ const css = await Promise.all(
 await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 await copyFile(join(root, "src/assets/app.js"), join(dist, "app.js"));
 
-// A sitemap, so the pages are discoverable. The 404 is left out — it is
-// marked noindex and should not be submitted.
-const indexable = pages.filter((p) => !p.path.endsWith("404.html"));
+// A sitemap, so the pages are discoverable.
+//
+// Driven off the page's own robots meta rather than a list of paths to skip.
+// Submitting a noindex page asks Google to index something we have just told
+// it not to, and the previous version of this line only knew about the 404,
+// so the account pages walked straight into the sitemap.
+const indexable = pages.filter((p) => !/content="noindex/.test(p.html));
 const sitemapEntry = ({ path }) => {
   // The catalogue moves; the story and policy pages do not.
   const priority = path === "/" ? "1.0"

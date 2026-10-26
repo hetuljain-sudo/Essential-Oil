@@ -81,3 +81,48 @@ create table if not exists webhook_events (
   processed_at  timestamptz,
   error         text
 );
+
+-- ---------------------------------------------------------------- accounts
+--
+-- Accounts are optional. Checkout works without one, and must keep working
+-- without one: forcing registration on a first-time buyer is the most
+-- reliable way to lose the sale.
+
+create table if not exists customers (
+  id             uuid primary key default gen_random_uuid(),
+  -- Stored already lowercased by the application. The unique index is on the
+  -- plain column because two rows differing only in case would otherwise be
+  -- two accounts for one person.
+  email          text not null unique,
+  -- scrypt$N$r$p$salt$hash. Never a password.
+  password_hash  text not null,
+  name           text not null,
+  phone          text,
+
+  -- Crude throttle against guessing. Locking is per-account, which does mean
+  -- someone can lock a known email out for fifteen minutes by failing to log
+  -- in as them; that is a worse trade at scale, and the right fix is
+  -- per-IP limiting at the edge.
+  failed_logins  integer not null default 0,
+  locked_until   timestamptz,
+
+  created_at     timestamptz not null default now(),
+  last_login_at  timestamptz
+);
+
+create table if not exists sessions (
+  -- SHA-256 of the token the browser holds. The token itself is never stored,
+  -- so a copy of this table cannot be used to sign in as anyone.
+  token_hash   text primary key,
+  customer_id  uuid not null references customers (id) on delete cascade,
+  expires_at   timestamptz not null,
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists sessions_customer_idx on sessions (customer_id);
+create index if not exists sessions_expiry_idx on sessions (expires_at);
+
+-- Orders may belong to an account, or to nobody. Null is a guest order and
+-- is a perfectly normal row, not a missing value to be backfilled.
+alter table orders add column if not exists customer_id uuid references customers (id) on delete set null;
+create index if not exists orders_customer_idx on orders (customer_id);

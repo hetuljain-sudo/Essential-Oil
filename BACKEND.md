@@ -71,6 +71,50 @@ select id, status, total_paise, created_at from orders order by created_at desc 
 select sku, quantity from stock where quantity < 10;
 ```
 
+## Accounts
+
+Optional, and they stay optional: checkout never asks for one. Forcing
+registration on a first-time buyer is the most reliable way to lose the sale,
+so `orders.customer_id` is nullable and a null is a perfectly ordinary guest
+order.
+
+```
+api/auth/register.js   create an account, sign in
+api/auth/login.js      sign in
+api/auth/logout.js     delete the session, clear the cookie
+api/auth/me.js         who is signed in, and their past orders
+```
+
+Pages: `/account/register/`, `/account/login/`, `/account/` — all noindex, and
+the sitemap now excludes anything noindex rather than skipping a hardcoded
+list, so they cannot drift back into it.
+
+### Where the data lives
+
+The same Postgres database as orders, in two new tables.
+
+| Table | Holds |
+| --- | --- |
+| `customers` | email, name, optional phone, scrypt password hash, lockout counters |
+| `sessions` | SHA-256 of the session token, its customer, its expiry |
+
+Two things are deliberately *not* stored:
+
+- **The password.** Only a scrypt hash with a random per-password salt. If the
+  database is ever copied, the attacker has hashes that cost real money to
+  attack one at a time, not a list of credentials to try on everyone's email.
+- **The session token.** The browser holds the token; we hold its SHA-256. A
+  leaked `sessions` table therefore cannot be used to sign in as anyone.
+
+The token travels in a cookie that is `HttpOnly` (script cannot read it, so an
+XSS bug cannot steal it), `Secure` (never sent over plain http) and
+`SameSite=Lax` (not attached to cross-site POSTs, which is what makes CSRF
+against these endpoints a non-event).
+
+Nothing about an account is stored in the browser beyond that cookie. The cart
+remains in `localStorage` and is not tied to an account — logging in on another
+device does not bring your cart with you.
+
 ## Known trade-offs
 
 **Stock is not reserved between checkout and payment.** Two shoppers can both
@@ -101,3 +145,15 @@ These are not optional, and two of them are legal requirements in India:
 - **Confirm the shipping fee.** `site.shippingFlat` is set to ₹79 below the
   ₹999 free-shipping threshold. That number was chosen as a placeholder — the
   site had never stated a fee — and should be a decision, not an inheritance.
+
+**Accounts have no password reset.** Someone who forgets their password
+cannot get back in without us editing the database by hand. That needs an
+email sender, which the order confirmation needs too — one piece of work
+covering both.
+
+**Email addresses are not verified.** Anyone can register with an address they
+do not own. That matters more once email is being sent to it.
+
+**Login lockout is per account, not per IP.** Ten failures locks that email for
+fifteen minutes, which also means someone can deliberately lock out an address
+they know. The real fix is rate limiting at the edge, by IP.

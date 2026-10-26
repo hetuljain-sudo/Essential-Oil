@@ -688,3 +688,111 @@ if (libraryEl && C.library && C.library.length) {
 
   paintLibrary(libraryEl);
 }
+
+/* ------------------------------------------------------------- accounts */
+/* Progressive enhancement: these pages are plain forms. Without JavaScript
+   they do nothing useful, which is why nothing else on the site depends on
+   having an account. */
+
+const authForm = $("[data-auth-form]");
+
+if (authForm) {
+  const errorBox = $("[data-auth-error]", authForm);
+  const submit = $("button[type=submit]", authForm);
+
+  const showError = (message) => {
+    errorBox.textContent = message;
+    errorBox.hidden = false;
+    errorBox.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  };
+
+  authForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.hidden = true;
+
+    const kind = authForm.dataset.authForm; // "login" | "register"
+    const body = Object.fromEntries(new FormData(authForm));
+
+    submit.disabled = true;
+    const label = submit.textContent;
+    submit.textContent = kind === "login" ? "Logging in…" : "Creating account…";
+
+    try {
+      const res = await fetch(`/api/auth/${kind}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        // The session cookie is HttpOnly; this is what lets the browser
+        // store the one the server sets.
+        credentials: "same-origin",
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        showError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      // `next` lets checkout send someone here and get them back afterwards.
+      // Only a path is honoured: an absolute URL here would be an open
+      // redirect, handing anyone a sarvha.com link that lands elsewhere.
+      const next = new URLSearchParams(location.search).get("next");
+      location.href = next && next.startsWith("/") && !next.startsWith("//") ? next : "/account/";
+    } catch {
+      showError("We couldn't reach the server. Check your connection and try again.");
+    } finally {
+      submit.disabled = false;
+      submit.textContent = label;
+    }
+  });
+}
+
+const accountPanel = $("[data-account-panel]");
+
+if (accountPanel) {
+  const orderStatus = (o) =>
+    o.status === "oversold"
+      ? `<p class="account__flag">We're short on part of this order and will be in touch.</p>`
+      : "";
+
+  (async () => {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+      const data = await res.json();
+
+      if (!data.customer) {
+        accountPanel.innerHTML = `
+          <p>You're not logged in.</p>
+          <p class="muted"><a class="btn btn--primary" href="/account/login/">Log in</a></p>`;
+        return;
+      }
+
+      const orders = data.orders ?? [];
+      accountPanel.innerHTML = `
+        <p>Signed in as <strong>${esc(data.customer.name)}</strong> — ${esc(data.customer.email)}</p>
+        <h2>Your orders</h2>
+        ${orders.length
+          ? `<ul class="account__orders">${orders.map((o) => `
+              <li class="account__order">
+                <div>
+                  <strong>${new Date(o.created_at).toLocaleDateString("en-IN",
+                    { day: "numeric", month: "long", year: "numeric" })}</strong>
+                  <ul>${o.items.map((i) =>
+                    `<li>${esc(i.name)} ${esc(i.size)} × ${i.qty}</li>`).join("")}</ul>
+                  ${orderStatus(o)}
+                </div>
+                <strong>${money(o.total_paise / 100)}</strong>
+              </li>`).join("")}</ul>`
+          : `<p class="muted">Nothing yet. <a href="/shop/">Have a look around</a>.</p>`}
+        <p class="muted"><button class="btn btn--ghost" data-logout>Log out</button></p>`;
+    } catch {
+      accountPanel.innerHTML = `<p class="muted">We couldn't load your account just now. Please refresh.</p>`;
+    }
+  })();
+
+  accountPanel.addEventListener("click", async (e) => {
+    if (!e.target.closest("[data-logout]")) return;
+    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
+    location.href = "/";
+  });
+}

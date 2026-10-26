@@ -994,3 +994,40 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
    at 60 still wins, and the header drops back when the menu closes so the
    cart's overlay can dim it as before. */
 body.menu-open .header { z-index: 56; }
+
+/* ------------------------------------------------------------- accounts */
+
+.container--narrow { width: min(34rem, 100% - 32px); }
+
+/* Same field treatment as the contact form — one form language across the
+   site — but centred and on its own, since these pages are nothing else. */
+.auth-form {
+  background: var(--paper); border: 1px solid #efe7d7;
+  border-radius: var(--radius); padding: 2rem;
+}
+.auth-form label { display: block; margin-bottom: 1rem; font-size: .86rem; font-weight: 500; }
+.auth-form input {
+  width: 100%; margin-top: .35rem; padding: .7rem .9rem; font: inherit; font-size: .92rem;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--cream); color: var(--ink);
+}
+.auth-form input:focus {
+  outline: 2px solid var(--terracotta); outline-offset: 1px; border-color: transparent;
+}
+.auth-form .btn { margin-top: .6rem; }
+.auth-form .muted { margin-top: .9rem; text-align: center; }
+
+/* Errors from the server. role="alert" announces them, so they must not be
+   in the DOM until there is something to say. */
+.auth-form__error {
+  margin-bottom: 1.2rem; padding: .8rem 1rem;
+  background: #fbf0e6; border: 1px solid #e3c3a4; border-left: 3px solid var(--terracotta);
+  border-radius: 10px; color: #6b4428; font-size: .88rem;
+}
+
+.account__orders { list-style: none; padding: 0; margin: 1.5rem 0 0; }
+.account__order {
+  padding: 1.1rem 0; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; gap: 1rem; align-items: baseline;
+}
+.account__order ul { list-style: none; padding: 0; margin: .35rem 0 0; color: var(--muted); font-size: .86rem; }
+.account__flag { color: var(--terracotta); font-size: .82rem; }

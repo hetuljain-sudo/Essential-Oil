@@ -213,6 +213,10 @@ function footer() {
         { href: "/about/", label: "Our story" },
         { href: "/collections/", label: "Collections" },
         { href: "/contact/", label: "Contact us" },
+        // The footer is the whole way in to an account. Deliberately not in
+        // the header: an account is optional here, and putting "Log in"
+        // beside the cart implies you need one to buy.
+        { href: "/account/", label: "Your account" },
       ])}
     </div>
     <div class="container footer__base">© <span data-year></span> ${site.name}. All rights reserved.</div>
