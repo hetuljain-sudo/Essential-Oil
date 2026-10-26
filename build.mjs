@@ -13,7 +13,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  site, categories, products, faqs, steps,
+  site, categories, products, library, faqs, steps,
   inCategory, bySlug, fromPrice, inStock, firstAvailable, categoryOf, money,
 } from "./src/data.mjs";
 
@@ -1146,6 +1146,17 @@ page("/404.html", layout({
 const catalog = {
   currency: site.currency, locale: site.locale, freeShippingAt: site.freeShippingAt,
   categories: categories.map(({ id, label }) => ({ id, label })),
+  // The library rotates daily, so the browser needs all twelve entries.
+  library: library.map((e) => {
+    const p = bySlug(e.id);
+    return {
+      ...e,
+      botanical: p.botanical,
+      origin: p.origin,
+      image: p.image.src,
+      url: productUrl(p),
+    };
+  }),
   products: products.map((p) => ({
     id: p.id, name: p.name, short: p.short || null, botanical: p.botanical, category: p.category,
     tagline: p.tagline, notes: p.notes, featured: !!p.featured, badge: p.badge || null,

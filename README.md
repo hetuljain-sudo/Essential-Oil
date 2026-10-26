@@ -297,3 +297,17 @@ warnings matching their data.
 carry it — "Why we won't say therapeutic grade" and "How to read an essential
 oil label" — carried over when the separate journal section was folded into
 guides. Clearing the flag publishes one.
+
+### The Oil Library rotation
+
+The homepage shows five of the twelve photographed oils, changing daily.
+
+A window of five slides along the list by five each day. Because 5 + 5 is less
+than 12, the windows for any two consecutive days cannot overlap — no oil ever
+appears two days running. The day is counted in IST so every visitor sees the
+same five.
+
+The build renders whichever five were current when it ran; `app.js` recomputes
+on load and swaps them if the page has since gone stale, which matters because
+a static page can sit on a CDN for months. Only oils with photography are
+eligible — the columns are full-bleed background images.

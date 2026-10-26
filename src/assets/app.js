@@ -633,3 +633,44 @@ if (footerCols.length) {
   sync();
   narrow.addEventListener("change", sync);
 }
+
+/* ------------------------------------------------------- the oil library */
+/**
+ * The build renders whichever five oils were current on the day it ran. A
+ * static page can sit on a CDN for months, so recompute on load and swap if
+ * the day has moved on.
+ *
+ * The window of five slides along the twelve entries by five a day. Since
+ * 5 + 5 is less than 12, two consecutive days can never share an oil.
+ */
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+const libraryDay = (now = Date.now()) => Math.floor((now + IST_OFFSET_MS) / 86400000);
+
+function libraryFor(day, entries) {
+  const size = Math.min(5, entries.length);
+  const start = ((day * size) % entries.length + entries.length) % entries.length;
+  return Array.from({ length: size }, (_, n) => entries[(start + n) % entries.length]);
+}
+
+const libraryEl = $("[data-library]");
+if (libraryEl && C.library && C.library.length) {
+  const todays = libraryFor(libraryDay(), C.library);
+  const shown = [...libraryEl.querySelectorAll("[data-lib]")]
+    .map((el) => $(".lib__name", el).textContent.trim());
+
+  // Only touch the DOM when the build is out of date.
+  if (shown.join("|") !== todays.map((e) => e.name).join("|")) {
+    libraryEl.innerHTML = todays.map((e, i) => `
+      <article class="lib${i === 0 ? " is-open" : ""}" data-lib="${i}">
+        <div class="lib__img" style="background-image:url('${e.image}')" role="img" aria-label="${esc(e.name)}"></div>
+        <div class="lib__veil"></div>
+        <button class="lib__toggle" aria-expanded="${i === 0}"><span class="lib__name">${esc(e.name)}</span></button>
+        <div class="lib__panel">
+          <p class="lib__story">${esc(e.name)} is a <em>${esc(e.story)}</em> story</p>
+          <p class="lib__latin">${esc(e.botanical)} · ${esc(e.origin)}</p>
+          <p class="lib__blurb">${esc(e.blurb)}</p>
+          <a class="btn btn--light" href="${e.url}">View oil</a>
+        </div>
+      </article>`).join("");
+  }
+}

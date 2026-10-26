@@ -974,23 +974,42 @@ export const products = [
 ];
 
 /** The homepage "Oil Library" — five columns that expand on click. */
+/**
+ * The homepage Oil Library. The page shows five of these a day, chosen by a
+ * rotating window in app.js — with twelve entries and a stride of five, no oil
+ * can appear on two consecutive days.
+ *
+ * Only oils with photography belong here: the columns are background images,
+ * and the generated bottle art does not carry a full-bleed panel.
+ * `story` completes the phrase "<name> is a … story".
+ */
 export const library = [
   { id: "lavender-fields", name: "Lavender", story: "sleep",
-    blurb: "Cut at first bloom and distilled the same day. Softly floral, with a green herbaceous edge.",
-    image: "https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=1000" },
+    blurb: "Cut at first bloom and distilled the same day. Softly floral, with a green herbaceous edge." },
   { id: "eucalyptus-clearing", name: "Eucalyptus", story: "breath",
-    blurb: "Sharp and camphorous at the top. The oil that makes a room feel like it has windows open.",
-    image: "https://images.unsplash.com/photo-1605039982749-c2fe1dd2a588?auto=format&fit=crop&q=70&w=1000" },
+    blurb: "Sharp and camphorous at the top. The oil that makes a room feel like it has windows open." },
   { id: "sweet-orange-sunrise", name: "Orange", story: "morning",
-    blurb: "Cold-pressed peel with a trace of neroli absolute: bright citrus, then white blossom.",
-    image: "https://images.unsplash.com/photo-1633423411797-9a7317784d2b?auto=format&fit=crop&q=70&w=1000" },
+    blurb: "Cold-pressed peel, juicy and immediate. The easiest way to lift a room before anyone is properly awake." },
   { id: "cedarwood-grounding", name: "Cedar", story: "quiet",
-    blurb: "Dry cedar heartwood over damp vetiver root. The note that stays in the room longest.",
-    image: "https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=1000" },
+    blurb: "Dry cedar heartwood over damp root. The note that stays in the room longest." },
   { id: "peppermint-spark", name: "Peppermint", story: "focus",
-    blurb: "Steam-distilled from first-cut leaf. Cold, clean and immediate.",
-    image: "https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=1000" },
+    blurb: "Steam-distilled from first-cut leaf. Cold, clean and immediate." },
+  { id: "roman-chamomile", name: "Chamomile", story: "patience",
+    blurb: "Two hundred kilograms of flowers for a single kilogram of oil. Apple-sweet, and nothing like the tea." },
+  { id: "frankincense-quiet", name: "Frankincense", story: "stillness",
+    blurb: "Resin tapped from a tree that grows where almost nothing else will. Warm, dry, faintly citrus." },
+  { id: "lemon-clarity", name: "Lemon", story: "clean",
+    blurb: "Pressed at peak acidity, green rather than candied. The oil that cuts through a closed room." },
+  { id: "tea-tree-shield", name: "Tea Tree", story: "practical",
+    blurb: "Medicinal, green and useful. The one bottle people keep long after the pretty ones run out." },
+  { id: "ginger-warmth", name: "Ginger", story: "warming",
+    blurb: "Distilled from fresh rhizome, which keeps the bright lemony top the dried spice loses entirely." },
+  { id: "rosehip-renewal", name: "Rosehip", story: "repair",
+    blurb: "Cold-pressed from the seed, unrefined and orange. A carrier that behaves like a treatment." },
+  { id: "geranium-balance", name: "Geranium", story: "rose",
+    blurb: "The most rose-adjacent oil we carry, grown for scent rather than flower, at a tenth of the cost." },
 ];
+
 
 /**
  * Carried over from the previous build. The enquiry-specific questions were

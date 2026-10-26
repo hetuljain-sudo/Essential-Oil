@@ -359,28 +359,51 @@ export const categoryTiles = () => `
       </a>`).join("")}
   </div>`;
 
+/**
+ * Which five oils the library shows today.
+ *
+ * A window of five slides along the twelve entries by five a day. Because
+ * 5 + 5 is less than 12, the window on any two consecutive days cannot
+ * overlap — so no oil ever repeats from the day before.
+ *
+ * The day number is counted in IST, so everyone sees the same five regardless
+ * of where they are.
+ */
+export const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+export const libraryDay = (now = Date.now()) =>
+  Math.floor((now + IST_OFFSET_MS) / 86400000);
+
+export function libraryFor(day, entries = library) {
+  const size = Math.min(5, entries.length);
+  const start = ((day * size) % entries.length + entries.length) % entries.length;
+  return Array.from({ length: size }, (_, n) => entries[(start + n) % entries.length]);
+}
+
+export const libraryColumn = (e, p, i) => `
+  <article class="lib${i === 0 ? " is-open" : ""}" data-lib="${i}">
+    <div class="lib__img" style="background-image:url('${p.image.src}')" role="img" aria-label="${esc(e.name)}"></div>
+    <div class="lib__veil"></div>
+    <button class="lib__toggle" aria-expanded="${i === 0}"><span class="lib__name">${esc(e.name)}</span></button>
+    <div class="lib__panel">
+      <p class="lib__story">${esc(e.name)} is a <em>${esc(e.story)}</em> story</p>
+      <p class="lib__latin">${esc(p.botanical)} \u00b7 ${esc(p.origin)}</p>
+      <p class="lib__blurb">${esc(e.blurb)}</p>
+      <a class="btn btn--light" href="${productUrl(p)}">View oil</a>
+    </div>
+  </article>`;
+
 export const oilLibrary = () => `
   <section class="section section--dark" data-reveal>
     <div class="container">
       <div class="section__head section__head--center">
         <p class="eyebrow eyebrow--light">The oil library</p>
         <h2>Five distillations, five stories</h2>
+        <p class="lib__note">Five of our twelve photographed oils, changing every day.</p>
       </div>
       <div class="library" data-library>
-        ${library.map((e, i) => {
-          const p = products.find((x) => x.id === e.id);
-          return `<article class="lib${i === 0 ? " is-open" : ""}" data-lib="${i}">
-            <div class="lib__img" style="background-image:url('${e.image}')" role="img" aria-label="${esc(e.name)}"></div>
-            <div class="lib__veil"></div>
-            <button class="lib__toggle" aria-expanded="${i === 0}"><span class="lib__name">${e.name}</span></button>
-            <div class="lib__panel">
-              <p class="lib__story">${e.name} is a <em>${e.story}</em> story</p>
-              <p class="lib__latin">${esc(p.botanical)} · ${esc(p.origin)}</p>
-              <p class="lib__blurb">${esc(e.blurb)}</p>
-              <a class="btn btn--light" href="${productUrl(p)}">View oil</a>
-            </div>
-          </article>`;
-        }).join("")}
+        ${libraryFor(libraryDay())
+          .map((e, i) => libraryColumn(e, products.find((x) => x.id === e.id), i))
+          .join("")}
       </div>
     </div>
   </section>`;

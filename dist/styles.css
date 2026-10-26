@@ -956,3 +956,4 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   .card__latin { display: none; }
   .moods { grid-template-columns: repeat(2, 1fr); }
 }
+.lib__note { font-size: .84rem; color: #a8b79c; margin: .6rem 0 0; }
