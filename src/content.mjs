@@ -730,4 +730,241 @@ export const guides = {
       { q: "Is it safe with a nut allergy?", a: "No. Argan is pressed from the kernels of a tree nut and should be avoided. Jojoba comes from a shrub seed rather than a nut and is the straightforward substitute." },
     ],
   },
+
+  "rose-absolute": {
+    whoFor: [
+      { h: "One special bottle", p: "Almost nobody buys rose as an everyday oil. It is bought for an occasion, or as a gift." },
+      { h: "Serious blenders", p: "A heart note nothing else substitutes for, used a drop at a time." },
+      { h: "Facial oils at very low dilution", p: "Long used in skincare, though at 0.5% or below rather than anything higher." },
+    ],
+    mistakes: [
+      "Comparing it to rose scent you already know. Soap, candle and most perfume rose is synthetic, built mostly from a handful of compounds. The real thing is darker, greener and far less sweet, and people are often surprised rather than delighted on first smell.",
+      "Using more than a drop. It is the most concentrated thing we sell, and a second drop does not double the effect — it buries whatever else was in the blend.",
+    ],
+    limits: [
+      "An absolute, so solvent extracted. Rose otto, the steam-distilled version, smells lighter and costs more again; if you specifically want otto, this is not it.",
+      "We are not going to pretend the price is anything other than what it is. Roughly three thousand rose petals go into a single gram.",
+    ],
+    faqs: [
+      { q: "What is the difference between rose absolute and rose otto?", a: "Extraction. Otto is steam distilled and smells lighter, fresher and more lemony. Absolute is solvent extracted, keeps more of the deep honeyed character, and gives a higher yield — which is why otto costs even more than this does." },
+      { q: "Why is real rose so expensive?", a: "Yield. It takes several thousand hand-picked petals to produce one gram of absolute, and they have to be picked at dawn and processed within hours. No amount of efficiency changes that arithmetic." },
+      { q: "Is this Kannauj rose?", a: "It comes through our Kannauj supply chain, which has distilled roses for centuries. Ask us about a specific batch and we will tell you what we hold on it." },
+    ],
+  },
+
+  "tuberose-absolute": {
+    whoFor: [
+      { h: "People who love heavy florals", p: "If jasmine and ylang ylang appeal, tuberose is the furthest point in that direction." },
+      { h: "Anyone who grew up with rajnigandha", p: "The flower sold on every Indian street corner, concentrated to an extraordinary degree." },
+      { h: "Perfume blenders", p: "A heart note with genuine weight, used in trace amounts." },
+    ],
+    mistakes: [
+      "Treating it like a floral essential oil. Tuberose is unusually heavy even among absolutes, and a blend that smells balanced in the bottle can be overwhelming an hour later.",
+      "Buying it as a gift without checking. It is among the most polarising scents in perfumery — people either adore it or find it suffocating, and there is rarely a middle position.",
+    ],
+    limits: [
+      "An absolute, solvent extracted, so trace residue is inherent to the process. Tuberose cannot be steam distilled at all — the heat destroys it.",
+      "It is not a subtle material and no dilution makes it subtle. It makes it bearable.",
+    ],
+    faqs: [
+      { q: "Is rajnigandha the same as tuberose?", a: "Yes. Rajnigandha is the Indian name for Polianthes tuberosa, the flower sold in garlands and bunches across the country. The absolute is extracted from those same blooms." },
+      { q: "Why is there no tuberose essential oil?", a: "The flower cannot survive distillation — heat destroys the compounds that make it smell the way it does. Solvent extraction is the only method that captures it, which is why every tuberose on the market is an absolute." },
+    ],
+  },
+
+  "davana": {
+    whoFor: [
+      { h: "Anyone bored of the usual range", p: "Genuinely unlike anything else we carry. Fruity and boozy where most oils are floral, green or woody." },
+      { h: "Perfume blenders", p: "A prized and unusual material, used in trace amounts to add depth that is hard to place." },
+      { h: "People who like sweet scents", p: "Jammy and sweet without being sickly, which is a difficult combination to find." },
+    ],
+    mistakes: [
+      "Expecting it to smell the same on everyone. Davana famously shifts with skin chemistry more than almost any other oil — the version you smell on a friend may not be the version you get.",
+      "Using it like a top note. It is sweet and persistent, and at more than a drop or two it takes over whatever it was meant to support.",
+    ],
+    limits: ["It is an Artemisia, the same genus as wormwood and mugwort, and it is best avoided in pregnancy."],
+    faqs: [
+      { q: "Why does davana smell different on different people?", a: "Its compounds interact with individual skin chemistry more noticeably than most. It is a well-documented quirk of the material and part of why perfumers value it." },
+      { q: "What does it blend with?", a: "Citrus, where it adds body and a jammy depth; sandalwood, where it warms the wood; and rose, where it amplifies the fruitier side." },
+    ],
+  },
+
+  "cypress": {
+    whoFor: [
+      { h: "People who want outdoors indoors", p: "Few oils smell as convincingly of actually being outside." },
+      { h: "Post-exercise blends", p: "A common component in body oils after exertion, usually at 2%." },
+      { h: "Anyone who finds pine too sweet", p: "Drier and cleaner, with a faint smokiness pine does not have." },
+    ],
+    mistakes: [
+      "Confusing it with blue cypress, which is a different tree from Australia, deep blue in colour and several times the price.",
+      "Expecting a Christmas-tree smell. That is fir or spruce. Cypress is drier, greener and more austere.",
+    ],
+    limits: ["It is a clean, green scent and nothing more. We make no claims about circulation or anything else attributed to it online."],
+    faqs: [
+      { q: "Is this the same as blue cypress?", a: "No. Blue cypress is Callitris intratropica from northern Australia, naturally deep blue from guaiazulene and considerably more expensive. Ours is Cupressus sempervirens, the Mediterranean cypress." },
+      { q: "How is it different from pine or fir?", a: "Drier and less sweet. Pine is resinous and sharp, fir is sweeter and more Christmassy, cypress sits between them with a faint smoky quality neither has." },
+    ],
+  },
+
+  "sweet-basil": {
+    whoFor: [
+      { h: "Desk and study blends", p: "Pairs naturally with rosemary and peppermint, and adds a green sharpness neither has." },
+      { h: "Cooks", p: "The smell of the herb, concentrated — recognisable immediately to anyone who cooks with it." },
+      { h: "Anyone who found holy basil too spicy", p: "Brighter and greener, with anise rather than clove underneath." },
+    ],
+    mistakes: [
+      "Assuming it is interchangeable with holy basil. Sweet basil is Ocimum basilicum and smells of the culinary herb. Holy basil is Ocimum sanctum and is peppery and clove-like. Suppliers list both simply as basil.",
+      "Using it at a standard dilution. Sweet basil is relatively high in methyl chavicol, so 1.5% is a sensible ceiling rather than the usual 2%.",
+    ],
+    limits: ["Avoid during pregnancy. Also worth knowing that basil chemotypes vary a great deal — the linalool type is gentler than the methyl chavicol type."],
+    faqs: [
+      { q: "Is this the basil used in cooking?", a: "Same species, Ocimum basilicum, distilled rather than dried. It smells immediately familiar if you cook with fresh basil, though far more concentrated." },
+      { q: "How is it different from tulsi?", a: "Different species. Sweet basil is green and anise-like; holy basil, or tulsi, is peppery with a clove warmth. They are not substitutes for each other in a blend." },
+    ],
+  },
+
+  "citronella": {
+    whoFor: [
+      { h: "Outdoor evenings", p: "The classic summer-evening scent, and the reason most people buy it." },
+      { h: "Cleaning blends", p: "Cheap enough to use generously in a surface or floor spray." },
+      { h: "Large or stale rooms", p: "Carries further than most oils and clears heavy air quickly." },
+    ],
+    mistakes: [
+      "Using it at lemongrass dilutions. Citronella is a known sensitiser and one per cent is the ceiling on skin — people assume it is mild because it smells fresh and lemony.",
+      "Buying it expecting lemongrass. They are related grasses and smell similar, but citronella is rougher, greener and has a woody rasp that lemongrass does not.",
+    ],
+    limits: ["We make no repellent claims. It is a common ingredient in outdoor blends and people like the smell on a summer evening — that is the whole of what we will say."],
+    faqs: [
+      { q: "Does citronella keep mosquitoes away?", a: "We are not going to make that claim. It is widely used in outdoor candles and sprays, and many people like it for that reason, but selling an essential oil on a repellent claim is not something we will do." },
+      { q: "What is the difference between Java and Ceylon citronella?", a: "Different species. Java citronella is Cymbopogon winterianus, higher in citronellal and the one usually sold. Ceylon is C. nardus and is softer and less sharp. Ours is Java." },
+    ],
+  },
+
+  "niaouli": {
+    whoFor: [
+      { h: "People who dislike tea tree", p: "The same family, far sweeter, without the sharp medicinal edge." },
+      { h: "Seasonal steam inhalation", p: "A gentler alternative to eucalyptus for a steam bowl." },
+      { h: "Blenders working with camphorous oils", p: "Rounds out a sharp blend without flattening it." },
+    ],
+    mistakes: [
+      "Treating it as interchangeable with cajuput. They come from closely related Melaleuca species and are often conflated by suppliers, but niaouli is noticeably sweeter.",
+      "Diffusing it around babies. Like eucalyptus it is high in 1,8-cineole, which is the compound of concern in the very young.",
+    ],
+    limits: ["Not for babies or young children, for the same reason eucalyptus is not. If you have a small child at home, ask a doctor before diffusing it at all."],
+    faqs: [
+      { q: "How is niaouli different from tea tree?", a: "Same genus, different species, and considerably sweeter. Tea tree is sharp and medicinal; niaouli is softer and more camphorous, which makes it easier to live with in a diffuser." },
+      { q: "Is it safe around children?", a: "Not for babies and young children. Cineole-rich oils can affect breathing in the very young, and niaouli is high in cineole." },
+    ],
+  },
+
+  "ravensara": {
+    whoFor: [
+      { h: "Gentle seasonal blends", p: "Milder than eucalyptus, and easier to tolerate over a long diffusing session." },
+      { h: "Steam inhalation", p: "Three drops in a bowl of hot water, usually alongside eucalyptus or niaouli." },
+      { h: "People who find camphor harsh", p: "Sweeter and softer than most oils in this group." },
+    ],
+    mistakes: [
+      "Buying ravintsara by mistake, or the reverse. Ravensara aromatica and Ravintsara (Cinnamomum camphora) are different plants with similar names, routinely mislabelled across the industry. Check the botanical name.",
+      "Expecting it to be strong. It is one of the milder oils in this category, which is the point, but people who want eucalyptus should buy eucalyptus.",
+    ],
+    limits: ["Not for babies or young children. And given how often ravensara and ravintsara are confused in the supply chain, ask us what we hold if it matters to you."],
+    faqs: [
+      { q: "Is ravensara the same as ravintsara?", a: "No, and it is one of the most persistent mix-ups in the industry. Ravensara aromatica is in the Lauraceae family from Madagascar; ravintsara is a Cinnamomum camphora chemotype. The names are close enough that mislabelling is common." },
+      { q: "How does it compare to eucalyptus?", a: "Milder and sweeter, with a faint aniseed note eucalyptus lacks. If eucalyptus feels too sharp, this is the gentler option." },
+    ],
+  },
+
+  "fennel": {
+    whoFor: [
+      { h: "People who like liquorice", p: "The most straightforwardly aniseed scent we carry, and divisive because of it." },
+      { h: "Warming massage blends", p: "Long used in abdominal massage oils at low dilution." },
+      { h: "Winter diffuser blends", p: "Two drops with orange and ginger makes a recognisably seasonal blend." },
+    ],
+    mistakes: [
+      "Using it at an ordinary dilution. Fennel is high in trans-anethole and one per cent is the ceiling. It is also one of the oils with the longest list of people who should avoid it entirely.",
+      "Confusing sweet and bitter fennel. Bitter fennel is higher in estragole and carries more restrictions. Ours is the sweet variety.",
+    ],
+    limits: [
+      "This oil has more contraindications than almost anything else we sell. Avoid in pregnancy and while breastfeeding, avoid with oestrogen-sensitive conditions, and keep it away from children.",
+      "If any of that applies to you, buy coriander seed instead — it is warm and sweet without the same list.",
+    ],
+    faqs: [
+      { q: "Why does fennel have so many warnings?", a: "Trans-anethole, the compound that makes it smell of liquorice, is structurally oestrogen-like. That is the reason for the caution around pregnancy, breastfeeding and oestrogen-sensitive conditions." },
+      { q: "Is this sweet or bitter fennel?", a: "Sweet fennel, Foeniculum vulgare var. dulce. Bitter fennel is higher in estragole and carries tighter restrictions still." },
+    ],
+  },
+
+  "coriander-seed": {
+    whoFor: [
+      { h: "People who dislike coriander leaf", p: "The seed oil shares none of the soapy quality that divides opinion about the herb." },
+      { h: "Warming blends without the heat", p: "Sweet and woody rather than hot, so it warms a blend gently." },
+      { h: "Anyone wanting fennel's warmth without its warnings", p: "A far more straightforward oil to use safely." },
+    ],
+    mistakes: [
+      "Expecting it to smell like fresh coriander. The leaf and the seed are chemically very different, and the oil is distilled from the seed. It is sweet and faintly floral, not green or soapy.",
+      "Overlooking it. It is one of the more useful mid-priced oils and tends to be passed over for showier things.",
+    ],
+    limits: ["It is a pleasant, warm scent with no particular reputation attached to it, and we are not going to invent one."],
+    faqs: [
+      { q: "Will it smell soapy like fresh coriander?", a: "No. The soapy perception comes from aldehydes in the leaf, which are not what the seed produces. Plenty of people who cannot eat coriander leaf like the seed oil." },
+      { q: "How does it compare to fennel?", a: "Similar warmth, far fewer restrictions. If fennel's contraindications rule it out for you, coriander seed is the sensible alternative." },
+    ],
+  },
+
+  "coconut": {
+    whoFor: [
+      { h: "Hair oiling", p: "The traditional Indian hair oil, and still the one most households reach for." },
+      { h: "Body use after a bath", p: "Rich enough to work on dry skin, and it melts on contact." },
+      { h: "Anyone who likes the smell", p: "Unlike our other carriers this one has a scent, and it is a large part of the appeal." },
+    ],
+    mistakes: [
+      "Expecting it to stay liquid. It sets solid below roughly 24°C, which in a Delhi winter means a cloudy, hard bottle. Warming it in your hands or in a bowl of hot water is all it needs.",
+      "Using it on acne-prone skin without testing. Coconut oil is comedogenic for a meaningful number of people — fine on bodies and hair, less reliably fine on faces.",
+    ],
+    limits: [
+      "It has a definite coconut smell, so it is not neutral the way jojoba is. In a blend it contributes rather than just carrying.",
+      "We do not stock the fractionated version, which stays liquid and is odourless. This is the ordinary cold-pressed oil.",
+    ],
+    faqs: [
+      { q: "Why does it go solid?", a: "Coconut oil is high in saturated fats with a melting point around 24°C. Below that it crystallises. It is not a fault and it does not affect the oil — warm the bottle and it returns to liquid." },
+      { q: "Can I use it on my face?", a: "Some people can, some cannot. It is rated fairly high for comedogenicity, so patch-test over a few days before using it broadly. Jojoba or grapeseed is the safer facial choice." },
+    ],
+  },
+
+  "grapeseed": {
+    whoFor: [
+      { h: "Oily or combination skin", p: "The lightest carrier we stock and the one least likely to feel like a layer." },
+      { h: "Massage", p: "Spreads easily, absorbs fast, and is inexpensive enough to use generously." },
+      { h: "Hot and humid weather", p: "Where jojoba and almond start to feel heavy, this does not." },
+    ],
+    mistakes: [
+      "Keeping it in a warm bathroom. It is high in polyunsaturated fats and turns faster than any carrier we sell. Refrigerate it and use it within about six months.",
+      "Expecting it to be nourishing in the way heavier carriers are. It is light precisely because it is low in the richer fats, which is a trade-off rather than a free win.",
+    ],
+    limits: ["A carrier, not an essential oil — no aroma, nothing to diffuse. And it has the shortest shelf life of anything in our range."],
+    faqs: [
+      { q: "How long does it last?", a: "About six months from opening, refrigerated. It is high in polyunsaturated fats, which oxidise quickly. If it smells sharp or like old crayons, it has turned." },
+      { q: "Is it better than jojoba for the face?", a: "Different rather than better. Grapeseed is lighter and absorbs faster; jojoba is more stable and closer to skin's own sebum. People with oily skin often prefer grapeseed, but it will not keep as long." },
+    ],
+  },
+
+  "neem": {
+    whoFor: [
+      { h: "Scalp and hair routines", p: "The traditional use, almost always blended into a milder carrier rather than used alone." },
+      { h: "Anyone who already knows the smell", p: "If you grew up with neem you know what you are buying. If you did not, buy a small bottle first." },
+      { h: "Blenders making targeted treatments", p: "At five to ten per cent it contributes without dominating." },
+    ],
+    mistakes: [
+      "Using it neat and undiluted. Not because it is unsafe at that strength, but because the smell is genuinely difficult and most people only make that mistake once.",
+      "Buying a large bottle before trying it. This is the one oil in our range where we would actively suggest starting small.",
+    ],
+    limits: [
+      "We are not going to describe the smell as anything other than what it is: bitter, garlicky and sulphurous. There is no blend that fully hides it.",
+      "Avoid during pregnancy and while trying to conceive, and do not use it on babies or young children.",
+    ],
+    faqs: [
+      { q: "Does it really smell that bad?", a: "Yes. Bitter, garlicky, faintly sulphurous. Anyone who grew up in India knows it immediately. Blending it at five to ten per cent into a milder carrier makes it manageable, not pleasant." },
+      { q: "Why does it go thick in winter?", a: "Neem solidifies at cool temperatures, much like coconut oil. Warm the bottle between your hands or stand it in hot water for a few minutes." },
+    ],
+  },
 };
