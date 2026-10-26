@@ -20,11 +20,10 @@ import {
 import {
   layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
   newsletter, trustBar, categoryTiles, oilLibrary, safetyNote,
-  productUrl, categoryUrl, postUrl, postDate, postCard, renderBlocks, clamp,
+  productUrl, categoryUrl, postDate, clamp,
 } from "./src/templates.mjs";
 
 import { guides } from "./src/content.mjs";
-import { postsNewestFirst, readingTime } from "./src/posts.mjs";
 import { hubs } from "./src/collections.mjs";
 import { guidePages } from "./src/guides.mjs";
 
@@ -132,7 +131,6 @@ function productDescription(p) {
 const HOME = { href: "/", label: "Home" };
 const shopTrail        = [HOME, { label: "Shop" }];
 const collectionsTrail = [HOME, { label: "Collections" }];
-const journalTrail     = [HOME, { label: "Journal" }];
 const aboutTrail       = [HOME, { label: "Our story" }];
 const faqTrail         = [HOME, { label: "FAQ" }];
 const contactTrail     = [HOME, { label: "Contact" }];
@@ -779,114 +777,12 @@ ${breadcrumbs(trail)}
   }));
 }
 
-/* ----------------------------------------------------------------- blog */
-
-const blogPosts = postsNewestFirst();
-
-page("/blog/", layout({
-  path: "/blog/",
-  title: "Journal — Notes on Using Essential Oils",
-  description: `Practical notes on buying, diluting, using and storing essential oils — written plainly by the ${site.name} team, with no claims we can't stand behind.`,
-  breadcrumb: journalTrail,
-  ogImage: defaultOg,
-  jsonLd: blogPosts.length ? {
-    "@context": "https://schema.org", "@type": "Blog",
-    name: `${site.name} Journal`, url: site.url + "/blog/",
-    blogPost: blogPosts.map((post) => ({
-      "@type": "BlogPosting", headline: post.title, datePublished: post.date,
-      url: site.url + postUrl(post), description: post.excerpt,
-    })),
-  } : undefined,
-  body: `
-    <section class="section section--first">
-      <div class="container">
-        ${breadcrumbs(journalTrail)}
-        <div class="page-head">
-          <p class="eyebrow">Journal</p>
-          <h1>Notes from the bench</h1>
-          <p class="lead">What we've learned about buying, using and storing essential oils —
-          written plainly, with no claims we can't stand behind.</p>
-        </div>
-
-        ${blogPosts.length ? `
-          <div class="post-list">
-            ${blogPosts.map((post) => postCard(post, readingTime(post))).join("")}
-          </div>`
-        : `
-          <div class="no-results">
-            <p><strong>Nothing published yet.</strong></p>
-            <p class="muted">The first pieces are being written. In the meantime, every oil's
-            own page covers how to use it, what people get wrong, and what it won't do.</p>
-            <a class="btn btn--ghost" href="/shop/">Browse the oils</a>
-          </div>`}
-      </div>
-    </section>
-    ${newsletter()}`,
-}));
-
-for (const post of blogPosts) {
-  const mins = readingTime(post);
-  const more = blogPosts.filter((x) => x.slug !== post.slug).slice(0, 2);
-  const oils = (post.related || []).map(bySlug).filter(Boolean).slice(0, 4);
-
-  page(postUrl(post), layout({
-    path: postUrl(post),
-    title: post.title,
-    description: post.excerpt,
-    jsonLd: {
-      "@context": "https://schema.org", "@type": "BlogPosting",
-      headline: post.title, description: post.excerpt,
-      datePublished: post.date, dateModified: post.date,
-      author: { "@type": "Organization", name: site.name },
-      publisher: { "@type": "Organization", name: site.name },
-      mainEntityOfPage: site.url + postUrl(post),
-    },
-    body: `
-      <section class="section section--first">
-        <div class="container">
-          ${breadcrumbs([
-            { href: "/", label: "Home" },
-            { href: "/blog/", label: "Journal" },
-            { label: post.title },
-          ])}
-          <article class="post">
-            <header class="post__head">
-              <p class="eyebrow">${esc(post.category)}</p>
-              <h1>${esc(post.title)}</h1>
-              <p class="post__meta">
-                <time datetime="${post.date}">${postDate(post.date)}</time> · ${mins} min read
-              </p>
-              <p class="post__excerpt">${esc(post.excerpt)}</p>
-            </header>
-            <div class="post__body">${renderBlocks(post.body)}</div>
-          </article>
-
-          ${oils.length ? `
-          <div class="related-block">
-            <div class="section__head">
-              <div><p class="eyebrow">Mentioned above</p><h2>Oils from this piece</h2></div>
-              <a class="btn btn--ghost" href="/shop/">See all ${count} oils</a>
-            </div>
-            ${productGrid(oils, "grid--row")}
-          </div>` : ""}
-
-          ${more.length ? `
-          <div class="related-block">
-            <div class="section__head"><div><p class="eyebrow">Keep reading</p><h2>More from the journal</h2></div></div>
-            <div class="post-list post-list--row">
-              ${more.map((x) => postCard(x, readingTime(x))).join("")}
-            </div>
-          </div>` : ""}
-        </div>
-      </section>
-      ${newsletter()}`,
-  }));
-}
-
-
 /* --------------------------------------------------------------- guides */
 
 const guideUrl = (g) => `/guides/${g.slug}/`;
+
+/** `draft: true` keeps a guide out of the build and off the index. */
+const liveGuides = guidePages.filter((g) => !g.draft);
 
 /** Oils carrying a given safety flag, alphabetically. */
 const flagged = (key) =>
@@ -990,7 +886,7 @@ page("/guides/", layout({
     name: "Essential oil guides",
     url: site.url + "/guides/",
     isPartOf: { "@id": site.url + "/#website" },
-    hasPart: guidePages.map((g) => ({
+    hasPart: liveGuides.map((g) => ({
       "@type": "Article", headline: g.title, url: site.url + guideUrl(g),
     })),
   },
@@ -1006,7 +902,7 @@ page("/guides/", layout({
           step with what we sell.</p>
         </div>
         <div class="post-list">
-          ${guidePages.map((g) => `
+          ${liveGuides.map((g) => `
             <article class="post-card">
               <a href="${guideUrl(g)}">
                 <p class="post-card__meta">Guide</p>
@@ -1021,9 +917,9 @@ page("/guides/", layout({
     ${newsletter()}`,
 }));
 
-for (const g of guidePages) {
+for (const g of liveGuides) {
   const trail = [HOME, { href: "/guides/", label: "Guides" }, { label: g.nav }];
-  const others = guidePages.filter((x) => x.slug !== g.slug);
+  const others = liveGuides.filter((x) => x.slug !== g.slug);
   page(guideUrl(g), layout({
     path: guideUrl(g),
     title: g.title,

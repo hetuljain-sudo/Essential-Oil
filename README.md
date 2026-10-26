@@ -191,34 +191,6 @@ The cart itself is real — it persists in `localStorage` across pages and reloa
 `dist/` is a plain static folder. Drop it on Netlify, Vercel, Cloudflare Pages or
 GitHub Pages. Set `/404.html` as the not-found page if your host asks.
 
-## The journal
-
-`/blog/` plus a page per post, generated from [`src/posts.mjs`](src/posts.mjs).
-
-Posts carry `draft: true` until they are ready; the build skips them, and the
-index renders an empty state when nothing is published. The four entries in
-there now are unpublished examples of shape — replace or delete them.
-
-A post's `body` is a list of blocks, so there is no Markdown step:
-
-```js
-body: [
-  ["p", "A paragraph."],
-  ["h2", "A heading"],
-  ["ul", ["a bullet", "another"]],
-  ["ol", ["first step", "second step"]],
-  ["note", "A highlighted aside."],
-  ["table", [["Header", "Header"], ["cell", "cell"]]],
-]
-```
-
-Reading time is calculated from the word count — don't set it by hand. Listing
-product ids in `related` puts those oils in a card row at the foot of the post.
-Each post emits `BlogPosting` structured data, and the index emits `Blog`.
-
-Same rule as the product pages: describe how oils smell and how people use
-them, never what they treat.
-
 ## SEO
 
 ```bash
@@ -318,3 +290,10 @@ cold-pressed lemon was phototoxic with no warning, peppermint and eucalyptus
 said "not for young children" only in their guide text, and tea tree's FAQ
 called it toxic to cats and dogs while its page said nothing. All now carry
 warnings matching their data.
+
+### Guide drafts
+
+`draft: true` keeps a guide out of the build and off the index. Two entries
+carry it — "Why we won't say therapeutic grade" and "How to read an essential
+oil label" — carried over when the separate journal section was folded into
+guides. Clearing the flag publishes one.
