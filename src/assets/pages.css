@@ -254,6 +254,11 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .faq__group { margin-bottom: 2.5rem; scroll-margin-top: 100px; }
 .faq__cat { font-size: 1.5rem; margin-bottom: .6rem; }
 
+/* Standalone safety line between sections. It needs its own vertical space —
+   as a bare paragraph it ended up flush against the next band. */
+.safety-band { padding: 3rem 0 3.5rem; border-top: 1px solid var(--line); }
+.safety-band .note { margin: 0 auto; line-height: 1.7; }
+
 /* Contact details in the footer's brand column */
 .footer__brand > p { margin-bottom: 1.4rem; }
 .footer__contact { font-style: normal; display: grid; gap: .45rem; font-size: .86rem; }

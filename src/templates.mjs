@@ -320,8 +320,14 @@ export const postCard = (post, mins) => `
     <time datetime="${post.date}">${postDate(post.date)}</time>
   </article>`;
 
+/** Sits between sections, so it needs its own band — a bare <p> here ends up
+ *  flush against whatever follows. */
 export const safetyNote = () => `
-  <p class="note">Always dilute before topical use and patch-test first. Not for internal use.
-  Consult a doctor if pregnant, nursing or under medical care.</p>`;
+  <section class="safety-band">
+    <div class="container">
+      <p class="note">Always dilute before topical use and patch-test first. Not for internal use.
+      Consult a doctor if pregnant, nursing or under medical care.</p>
+    </div>
+  </section>`;
 
 export { site, nav, categories, products, library, faqs, steps, money, fromPrice, inStock, firstAvailable, categoryOf };
