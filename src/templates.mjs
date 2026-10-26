@@ -381,7 +381,7 @@ export function libraryFor(day, entries = library) {
 
 export const libraryColumn = (e, p, i) => `
   <article class="lib${i === 0 ? " is-open" : ""}" data-lib="${i}">
-    <div class="lib__img" style="background-image:url('${p.image.src}')" role="img" aria-label="${esc(e.name)}"></div>
+    <div class="lib__img" data-bg="${p.image.src}" role="img" aria-label="${esc(e.name)}"></div>
     <div class="lib__veil"></div>
     <button class="lib__toggle" aria-expanded="${i === 0}"><span class="lib__name">${esc(e.name)}</span></button>
     <div class="lib__panel">

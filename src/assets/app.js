@@ -642,6 +642,10 @@ if (footerCols.length) {
  *
  * The window of five slides along the twelve entries by five a day. Since
  * 5 + 5 is less than 12, two consecutive days can never share an oil.
+ *
+ * Backgrounds are carried as data-bg and applied here rather than inlined by
+ * the build. A stale build would otherwise start fetching five images the
+ * visitor never sees — about 340 KB — before this code replaces them.
  */
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 const libraryDay = (now = Date.now()) => Math.floor((now + IST_OFFSET_MS) / 86400000);
@@ -651,6 +655,12 @@ function libraryFor(day, entries) {
   const start = ((day * size) % entries.length + entries.length) % entries.length;
   return Array.from({ length: size }, (_, n) => entries[(start + n) % entries.length]);
 }
+
+/** Only the columns actually on screen ever request an image. */
+const paintLibrary = (root) => $$(".lib__img[data-bg]", root).forEach((el) => {
+  el.style.backgroundImage = `url('${el.dataset.bg}')`;
+  el.removeAttribute("data-bg");
+});
 
 const libraryEl = $("[data-library]");
 if (libraryEl && C.library && C.library.length) {
@@ -662,7 +672,7 @@ if (libraryEl && C.library && C.library.length) {
   if (shown.join("|") !== todays.map((e) => e.name).join("|")) {
     libraryEl.innerHTML = todays.map((e, i) => `
       <article class="lib${i === 0 ? " is-open" : ""}" data-lib="${i}">
-        <div class="lib__img" style="background-image:url('${e.image}')" role="img" aria-label="${esc(e.name)}"></div>
+        <div class="lib__img" data-bg="${e.image}" role="img" aria-label="${esc(e.name)}"></div>
         <div class="lib__veil"></div>
         <button class="lib__toggle" aria-expanded="${i === 0}"><span class="lib__name">${esc(e.name)}</span></button>
         <div class="lib__panel">
@@ -673,4 +683,6 @@ if (libraryEl && C.library && C.library.length) {
         </div>
       </article>`).join("");
   }
+
+  paintLibrary(libraryEl);
 }

@@ -311,3 +311,9 @@ The build renders whichever five were current when it ran; `app.js` recomputes
 on load and swaps them if the page has since gone stale, which matters because
 a static page can sit on a CDN for months. Only oils with photography are
 eligible — the columns are full-bleed background images.
+
+Those backgrounds are carried as `data-bg` and applied by `app.js` once the
+day is decided, not inlined by the build. Otherwise a stale build would start
+fetching five images the visitor never sees — about 340 KB at 68 KB each —
+before the swap replaced them. Without JavaScript the columns render with
+their text on the dark panel and no photograph.
