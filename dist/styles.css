@@ -666,7 +666,11 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   padding: 2rem 2rem 1.6rem;
 }
 
-.faq__list--pdp { max-width: 54rem; }
+/* Full width, so the rules and the + run to the same edge as the rest of
+   the page. The answers keep a measure of their own — a line of prose that
+   wide is hard to read, but a one-line question is not. */
+.faq__list--pdp { max-width: none; }
+.faq__list--pdp p { max-width: 58rem; }
 .faq__list--pdp + .muted { margin-top: 1.2rem; }
 .faq__list--pdp + .muted a { color: var(--terracotta); }
 
