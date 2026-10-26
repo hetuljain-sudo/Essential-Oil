@@ -25,6 +25,7 @@ import {
 
 import { guides } from "./src/content.mjs";
 import { postsNewestFirst, readingTime } from "./src/posts.mjs";
+import { hubs } from "./src/collections.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -43,6 +44,8 @@ const addressLines = () => [
 const count = products.length;
 
 /* ------------------------------------------------------------------- SEO */
+
+const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 /** Offers need a price validity date; a year out is the usual convention. */
@@ -408,6 +411,17 @@ page("/collections/", layout({
 
 for (const c of categories) {
   const items = inCategory(c.id);
+  const hub = hubs[c.id] || {};
+  const startHere = hub.startHere ? bySlug(hub.startHere.id) : null;
+  // Sub-group the collection by scent family, biggest group first.
+  const families = Object.entries(
+    items.reduce((acc, p) => { (acc[p.family] ||= []).push(p); return acc; }, {})
+  ).sort((a, b) => b[1].length - a[1].length);
+  const sizeRange = [...new Set(items.flatMap((p) => p.variants.map((v) => v.size)))]
+    .sort((a, b) => parseFloat(a) - parseFloat(b));
+  const sizeLabel = sizeRange.length > 1
+    ? sizeRange[0] + " to " + sizeRange[sizeRange.length - 1]
+    : (sizeRange[0] || "");
   const catTrail = [HOME, { href: "/collections/", label: "Collections" }, { label: c.label }];
   page(categoryUrl(c), layout({
     path: categoryUrl(c),
@@ -429,6 +443,13 @@ for (const c of categories) {
           "@type": "ListItem", position: i + 1, url: site.url + productUrl(p), name: p.name,
         })),
       },
+      ...(hub.faqs ? [{
+        "@type": "FAQPage",
+        mainEntity: hub.faqs.map((f) => ({
+          "@type": "Question", name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      }] : []),
     ],
     body: `
       <section class="section section--first">
@@ -437,16 +458,100 @@ for (const c of categories) {
           <div class="page-head page-head--coll" style="--tint:${c.color}">
             <span class="coll__icon coll__icon--lg" aria-hidden="true">${c.icon}</span>
             <p class="eyebrow">Collection</p>
-            <h1>${c.label}</h1>
-            <p class="lead">${esc(c.intro)}</p>
+            <h1>${c.label} essential oils</h1>
+            <p class="lead">${esc(hub.lede || c.intro)}</p>
+            <dl class="coll-facts">
+              <div><dt>Oils</dt><dd>${items.length}</dd></div>
+              <div><dt>From</dt><dd>${money(Math.min(...items.map(fromPrice)))}</dd></div>
+              <div><dt>Sizes</dt><dd>${sizeLabel}</dd></div>
+              <div><dt>Dispatch</dt><dd>48 hrs</dd></div>
+            </dl>
           </div>
-          ${productGrid(items)}
+
+          ${startHere ? `
+          <section class="start-here">
+            <div class="start-here__media${startHere.image ? "" : " has-art"}" style="background:${startHere.bg}">
+              ${productMedia(startHere, "(max-width: 860px) 100vw, 32vw")}
+            </div>
+            <div class="start-here__copy">
+              <p class="eyebrow">Start here</p>
+              <h2><a href="${productUrl(startHere)}">${esc(startHere.name)}</a></h2>
+              <p class="latin">${esc(startHere.botanical)}</p>
+              <p>${esc(hub.startHere.why)}</p>
+              <p class="start-here__buy">
+                <span class="price">${money(fromPrice(startHere))}</span>
+                <a class="btn btn--primary" href="${productUrl(startHere)}">View this oil</a>
+              </p>
+            </div>
+          </section>` : ""}
+
+          ${families.map(([fam, list]) => `
+            <section class="coll-family" id="${slugify(fam)}">
+              <div class="section__head">
+                <div><p class="eyebrow">${c.label}</p><h2>${esc(fam)}</h2></div>
+                <p class="muted">${list.length} oil${list.length === 1 ? "" : "s"}</p>
+              </div>
+              ${productGrid(list)}
+            </section>`).join("")}
+
+          ${hub.choosing ? `
+          <section class="pdp__block">
+            <h2>How to choose between them</h2>
+            <div class="whofor">
+              ${hub.choosing.map((w) => `<article><h3>${esc(w.h)}</h3><p>${esc(w.p)}</p></article>`).join("")}
+            </div>
+          </section>` : ""}
+
+          <section class="pdp__block">
+            <h2>Compare every ${c.label.toLowerCase()} oil</h2>
+            <div class="post__table compare">
+              <table>
+                <thead><tr>
+                  <th>Oil</th><th>Botanical name</th><th>Character</th>
+                  <th>Sizes</th><th>From</th><th>Note</th>
+                </tr></thead>
+                <tbody>
+                  ${items.map((p) => `<tr>
+                    <td><a href="${productUrl(p)}">${esc(p.name)}</a></td>
+                    <td><em>${esc(p.botanical)}</em></td>
+                    <td>${esc(p.notes.join(", "))}</td>
+                    <td>${p.variants.map((v) => v.size).join(", ")}</td>
+                    <td>${money(fromPrice(p))}</td>
+                    <td>${p.warning ? `<span class="compare__flag">Safety note</span>` : "&mdash;"}</td>
+                  </tr>`).join("")}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          ${hub.uses ? `
+          <section class="pdp__block">
+            <h2>How people use these</h2>
+            <div class="uses">
+              ${hub.uses.map((u, i) => `
+                <article class="use">
+                  <div class="use__icon" aria-hidden="true">${["\u25CC", "\u270B", "\u2668"][i] || "\u25CC"}</div>
+                  <h3>${esc(u.h)}</h3><p>${esc(u.p)}</p>
+                </article>`).join("")}
+            </div>
+          </section>` : ""}
+
+          ${hub.faqs ? `
+          <section class="pdp__block" id="questions">
+            <h2>Questions about ${c.label.toLowerCase()} oils</h2>
+            <div class="faq__list faq__list--pdp">
+              ${hub.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}
+            </div>
+            <p class="muted small">More in the <a href="/faq/">full FAQ</a>.</p>
+          </section>` : ""}
+
           <div class="coll-next">
-            <h3>Other collections</h3>
+            <h2>Other collections</h2>
             <div class="coll-next__row">
               ${categories.filter((x) => x.id !== c.id).map((x) =>
                 `<a class="coll-next__item" href="${categoryUrl(x)}" style="background:${x.color}">
                    <span aria-hidden="true">${x.icon}</span>${x.label}
+                   <small>${inCategory(x.id).length}</small>
                  </a>`).join("")}
             </div>
           </div>
@@ -822,7 +927,6 @@ page("/about/", layout({
 /* ------------------------------------------------------------------ faq */
 
 const faqCats = [...new Set(faqs.map((f) => f.cat))];
-const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 page("/faq/", layout({
   path: "/faq/",

@@ -254,6 +254,72 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .faq__group { margin-bottom: 2.5rem; scroll-margin-top: 100px; }
 .faq__cat { font-size: 1.5rem; margin-bottom: .6rem; }
 
+/* ---- Collection hub pages ---- */
+
+/* At-a-glance facts in the collection header */
+.coll-facts {
+  display: flex; flex-wrap: wrap; gap: 1.8rem;
+  margin: 1.6rem 0 0; padding-top: 1.4rem; border-top: 1px solid rgba(35, 48, 31, .12);
+}
+.coll-facts div { display: flex; flex-direction: column; }
+.coll-facts dt {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .12em;
+  font-weight: 600; color: var(--muted); margin-bottom: .2rem;
+}
+.coll-facts dd { margin: 0; font-family: var(--serif); font-size: 1.5rem; color: var(--forest); }
+
+/* The recommended first oil */
+.start-here {
+  display: grid; grid-template-columns: 300px 1fr; gap: 0;
+  background: var(--paper); border: 1px solid #efe7d7; border-radius: var(--radius);
+  overflow: hidden; margin: 2.5rem 0 3.5rem;
+}
+.start-here__media { position: relative; overflow: hidden; }
+.start-here__media img { width: 100%; height: 100%; object-fit: cover; }
+.start-here__media.has-art { display: grid; place-items: center; }
+.start-here__media.has-art .bottle { width: 45%; }
+.start-here__copy { padding: 2.2rem; }
+.start-here__copy h2 { font-size: 2rem; margin: 0 0 .2rem; }
+.start-here__copy h2 a { text-decoration: none; }
+.start-here__copy h2 a:hover { color: var(--terracotta); }
+.start-here__copy .latin { font-style: italic; color: var(--muted); margin: 0 0 1rem; }
+.start-here__copy > p { color: var(--muted); }
+.start-here__buy { display: flex; align-items: center; gap: 1.2rem; margin: 1.4rem 0 0; }
+.start-here__buy .price { font-size: 1.4rem; }
+
+/* Scent-family groups within a collection */
+.coll-family { margin-bottom: 3rem; scroll-margin-top: 90px; }
+.coll-family .section__head { margin-bottom: 1.4rem; align-items: baseline; }
+.coll-family .section__head h2 { font-size: 1.9rem; }
+
+/* Comparison table */
+.compare table { font-size: .88rem; }
+.compare td a { font-weight: 600; text-decoration: none; }
+.compare td a:hover { color: var(--terracotta); }
+.compare em { color: var(--muted); font-size: .84rem; }
+.compare__flag {
+  display: inline-block; font-size: .72rem; font-weight: 600;
+  color: var(--terracotta-dark); background: #fbf0e6;
+  border: 1px solid #e3c3a4; border-radius: 999px; padding: .15rem .55rem;
+  white-space: nowrap;
+}
+
+.coll-next__item small {
+  background: rgba(35, 48, 31, .12); border-radius: 999px;
+  padding: .05rem .45rem; font-size: .76rem;
+}
+
+@media (max-width: 860px) {
+  .start-here { grid-template-columns: 1fr; }
+  .start-here__media { aspect-ratio: 16 / 10; }
+  .start-here__copy { padding: 1.6rem; }
+  .start-here__copy h2 { font-size: 1.7rem; }
+  .start-here__buy { flex-direction: column; align-items: stretch; gap: .8rem; }
+  .coll-facts { gap: 1.2rem; }
+  .coll-facts dd { font-size: 1.25rem; }
+  .compare table { font-size: .82rem; min-width: 620px; }
+}
+
 /* Standalone safety line between sections. It needs its own vertical space —
    as a bare paragraph it ended up flush against the next band. */
 .safety-band { padding: 3rem 0 3.5rem; border-top: 1px solid var(--line); }

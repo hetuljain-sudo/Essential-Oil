@@ -254,3 +254,23 @@ What the site emits:
 image, so those pages have no `og:image` and their `Product` schema has no
 `image` — which Google requires for product rich results. Adding a photo to a
 product fixes both at once.
+
+## Collection hub pages
+
+Collection pages are where commercial search lands — "essential oils for
+sleep" is a far bigger query than any product name — so they carry real
+content rather than just a grid.
+
+Editorial lives in [`src/collections.mjs`](src/collections.mjs), keyed by
+category id: a `lede`, a `startHere` recommendation with reasoning,
+`choosing` guidance, `uses`, and per-collection `faqs` that also emit
+FAQPage structured data.
+
+Everything else is derived from the product data — the at-a-glance facts,
+the scent-family sub-groups, and the comparison table listing every oil in
+the collection with its botanical name, character, sizes, price and whether
+it carries a safety note.
+
+Sub-grouping uses each product's `family` field. Keyword-derived grouping was
+tried first and misfired — ginger read as citrus because of a "lemon peel"
+note, clove as woody — so families are assigned explicitly.
