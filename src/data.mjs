@@ -313,6 +313,7 @@ export const products = [
     notes: ["Creamy floral", "Ripe banana", "Faint spice"],
     origin: "Tamil Nadu, India", method: "Steam distilled",
     swatch: ["#e8d58f", "#c0a23f"], bg: "#f4eed6",
+    image: { src: "https://images.unsplash.com/photo-1694735785416-c0dd9318edeb?auto=format&fit=crop&q=70&w=900", alt: "Cream and yellow tropical blossoms with glossy green leaves" },
     variants: [{ size: "15 ml", price: 449, stock: 20 }, { size: "30 ml", price: 799, stock: 9 }],
   },
   {
@@ -329,6 +330,7 @@ export const products = [
     notes: ["Wet earth", "Dry root", "Smoke"],
     origin: "Uttar Pradesh, India", method: "Steam distilled",
     swatch: ["#9a8766", "#6b5a3c"], bg: "#ece5d6",
+    image: { src: "https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=900", alt: "Tall green grass bending in the wind" },
     variants: [{ size: "10 ml", price: 899, stock: 11 }],
   },
   {
@@ -345,6 +347,7 @@ export const products = [
     notes: ["Creamy wood", "Warm milk", "Soft balsam"],
     origin: "Karnataka, India", method: "Steam distilled",
     swatch: ["#e0c9a0", "#b08f5c"], bg: "#f3e9d8",
+    image: { src: "https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=900", alt: "Close-up of fine-grained brown heartwood" },
     variants: [{ size: "5 ml", price: 2499, stock: 4 }],
   },
   {
@@ -363,6 +366,7 @@ export const products = [
     origin: "Kerala, India", method: "Steam distilled",
     swatch: ["#cfd46a", "#8f9a2e"], bg: "#eef1d8",
     warning: "More irritating to skin than its freshness suggests — keep to 1% or below.",
+    image: { src: "https://images.unsplash.com/photo-1777723915762-31069e8e737b?auto=format&fit=crop&q=70&w=900", alt: "Tall green and white lemongrass blades against a blue sky" },
     variants: [{ size: "15 ml", price: 449, stock: 34 }, { size: "30 ml", price: 799, stock: 15 }],
   },
   {
@@ -381,6 +385,7 @@ export const products = [
     origin: "Calabria, Italy", method: "Cold pressed",
     swatch: ["#bcd47e", "#7d9a3c"], bg: "#e9f0d8",
     warning: "Phototoxic. Bergapten in cold-pressed bergamot reacts with sunlight — keep below 0.4% on skin that will be exposed, or use after dark.",
+    image: { src: "https://images.unsplash.com/photo-1579169326371-ccb4e63f7889?auto=format&fit=crop&q=70&w=900", alt: "Citrus fruit ripening on the tree in sunlight" },
     variants: [{ size: "15 ml", price: 549, stock: 16 }, { size: "30 ml", price: 999, stock: 7 }],
   },
   {
@@ -399,6 +404,7 @@ export const products = [
     origin: "Maharashtra, India", method: "Cold pressed",
     swatch: ["#f0a894", "#cf6a58"], bg: "#f8e4de",
     warning: "Mildly phototoxic. Keep below 4% on skin that will see direct sun within 12 hours.",
+    image: { src: "https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?auto=format&fit=crop&q=70&w=900", alt: "Pink grapefruit halves cut open, showing the blush flesh" },
     variants: [{ size: "15 ml", price: 499, stock: 23 }, { size: "30 ml", price: 899, stock: 11 }],
   },
   {
@@ -417,6 +423,7 @@ export const products = [
     origin: "Tamil Nadu, India", method: "Steam distilled",
     swatch: ["#c89a63", "#8f6433"], bg: "#f0e5d5",
     warning: "A strong skin sensitiser. Keep to 0.5% or below on skin, avoid in pregnancy, and keep well away from children and pets.",
+    image: { src: "https://images.unsplash.com/photo-1701191310584-3f319e0e6c59?auto=format&fit=crop&q=70&w=900", alt: "A glass jar of dried clove buds on a white table" },
     variants: [{ size: "10 ml", price: 549, stock: 13 }],
   },
   {
@@ -435,6 +442,7 @@ export const products = [
     origin: "Kerala, India", method: "Steam distilled",
     swatch: ["#c58a5c", "#8b5630"], bg: "#f1e2d6",
     warning: "A skin sensitiser. Keep to 0.6% or below on skin and avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1758657996518-e67bd328854e?auto=format&fit=crop&q=70&w=900", alt: "A pile of rolled cinnamon quills on a dark surface" },
     variants: [{ size: "10 ml", price: 449, stock: 17 }],
   },
   {
@@ -453,6 +461,7 @@ export const products = [
     origin: "Himachal Pradesh, India", method: "Steam distilled",
     swatch: ["#8fb08a", "#4f7a4c"], bg: "#e4eee2",
     warning: "Avoid during pregnancy and if you have epilepsy or high blood pressure.",
+    image: { src: "https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=900", alt: "Close-up of fresh rosemary needles on the stem" },
     variants: [{ size: "15 ml", price: 499, stock: 29 }, { size: "30 ml", price: 899, stock: 14 }],
   },
   {
@@ -469,6 +478,7 @@ export const products = [
     notes: ["Almost odourless", "Light", "Non-greasy"],
     origin: "Rajasthan, India", method: "Cold pressed",
     swatch: ["#e8cf84", "#c2a542"], bg: "#f6efd9",
+    image: { src: "https://images.unsplash.com/photo-1621958180509-74e9a29b3758?auto=format&fit=crop&q=70&w=900", alt: "A clear glass bottle of pale golden oil" },
     variants: [{ size: "100 ml", price: 649, stock: 30 }, { size: "250 ml", price: 1399, stock: 12 }],
   },
   {
@@ -487,6 +497,7 @@ export const products = [
     origin: "Jammu & Kashmir, India", method: "Cold pressed",
     swatch: ["#f0dfb8", "#cbb279"], bg: "#f7f0e0",
     warning: "Derived from tree nuts. Avoid if you have a nut allergy.",
+    image: { src: "https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&q=70&w=900", alt: "Whole almonds in a white ceramic bowl" },
     variants: [{ size: "100 ml", price: 449, stock: 36 }, { size: "250 ml", price: 899, stock: 18 }],
   },
   {
@@ -505,6 +516,7 @@ export const products = [
     origin: "Uttar Pradesh, India", method: "Steam distilled",
     swatch: ["#a7bd7e", "#67803f"], bg: "#e9efdc",
     warning: "Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1615041443219-2a63ee45bb60?auto=format&fit=crop&q=70&w=900", alt: "Holy basil in flower, purple spikes above green leaves" },
     variants: [{ size: "10 ml", price: 549, stock: 21 }],
   },
 
@@ -526,6 +538,7 @@ export const products = [
     origin: "Uttarakhand, India", method: "Steam distilled",
     swatch: ["#b8c49a", "#7d8f5c"], bg: "#eaf0df",
     warning: "Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=900", alt: "Close-up of a purple and white clary sage flower" },
     variants: [{ size: "10 ml", price: 699, stock: 12 }, { size: "15 ml", price: 899, stock: 7 }],
   },
   {
@@ -542,6 +555,7 @@ export const products = [
     notes: ["Damp earth", "Dark sweetness", "Dry wood"],
     origin: "Indonesia", method: "Steam distilled",
     swatch: ["#a08a6a", "#6b5538"], bg: "#eee6da",
+    image: { src: "https://images.unsplash.com/photo-1651773485326-41b9ae7d3c05?auto=format&fit=crop&q=70&w=900", alt: "Broad soft green leaves of an aromatic shrub" },
     variants: [{ size: "15 ml", price: 849, stock: 15 }, { size: "30 ml", price: 1549, stock: 6 }],
   },
   {
@@ -560,6 +574,7 @@ export const products = [
     origin: "Egypt", method: "Steam distilled",
     swatch: ["#a9bd8e", "#6f8651"], bg: "#ebf0e0",
     warning: "Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=900", alt: "Marjoram in flower, small pale blooms above green leaves" },
     variants: [{ size: "15 ml", price: 549, stock: 19 }],
   },
   {
@@ -578,6 +593,7 @@ export const products = [
     origin: "Tamil Nadu, India", method: "Solvent extracted",
     swatch: ["#e6dfc0", "#b9ad72"], bg: "#f5f1e0",
     warning: "An absolute, not an essential oil — it is solvent extracted, so trace residue is inherent to the process. Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=900", alt: "White jasmine flowers with yellow centres against a blue sky" },
     variants: [{ size: "5 ml", price: 2999, stock: 5 }],
   },
 
@@ -595,6 +611,7 @@ export const products = [
     notes: ["Sweet peel", "Soft citrus", "Faint floral"],
     origin: "Nagpur, India", method: "Cold pressed",
     swatch: ["#f4b268", "#d4812e"], bg: "#f9e8d4",
+    image: { src: "https://images.unsplash.com/photo-1557800636-894a64c1696f?auto=format&fit=crop&q=70&w=900", alt: "Ripe mandarin oranges" },
     variants: [{ size: "15 ml", price: 449, stock: 28 }, { size: "30 ml", price: 799, stock: 13 }],
   },
   {
@@ -613,6 +630,7 @@ export const products = [
     origin: "Andhra Pradesh, India", method: "Cold pressed",
     swatch: ["#c3d672", "#86a033"], bg: "#eef2da",
     warning: "Strongly phototoxic. Cold-pressed lime is among the most reactive citrus oils — keep below 0.7% on skin that will see sun within twelve hours, or use after dark.",
+    image: { src: "https://images.unsplash.com/photo-1578855691621-8a08ea00d1fb?auto=format&fit=crop&q=70&w=900", alt: "Fresh green limes" },
     variants: [{ size: "15 ml", price: 499, stock: 24 }, { size: "30 ml", price: 899, stock: 10 }],
   },
   {
@@ -629,6 +647,7 @@ export const products = [
     notes: ["Sweet mint", "Green leaf", "Soft herb"],
     origin: "Uttar Pradesh, India", method: "Steam distilled",
     swatch: ["#9fd4a8", "#4f9460"], bg: "#e4f2e6",
+    image: { src: "https://images.unsplash.com/photo-1709132301602-b001c50aa459?auto=format&fit=crop&q=70&w=900", alt: "Spearmint leaves beaded with water" },
     variants: [{ size: "15 ml", price: 449, stock: 30 }, { size: "30 ml", price: 799, stock: 12 }],
   },
 
@@ -646,6 +665,7 @@ export const products = [
     notes: ["Dry spice", "Warm wood", "Green resin"],
     origin: "Kerala, India", method: "Steam distilled",
     swatch: ["#9c8f7a", "#605645"], bg: "#ece7dd",
+    image: { src: "https://images.unsplash.com/photo-1649951806971-ad0e00408773?auto=format&fit=crop&q=70&w=900", alt: "A bowl of black peppercorns" },
     variants: [{ size: "10 ml", price: 549, stock: 16 }],
   },
   {
@@ -664,6 +684,7 @@ export const products = [
     origin: "Himachal Pradesh, India", method: "Steam distilled",
     swatch: ["#8fae9c", "#4d7360"], bg: "#e3ede7",
     warning: "Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1782845988762-a1cd0a45033e?auto=format&fit=crop&q=70&w=900", alt: "A juniper branch carrying ripe blue and unripe green berries" },
     variants: [{ size: "15 ml", price: 649, stock: 14 }],
   },
   {
@@ -682,6 +703,7 @@ export const products = [
     origin: "Uttarakhand, India", method: "Steam distilled",
     swatch: ["#b0b47e", "#767a41"], bg: "#eef0dd",
     warning: "A strong skin irritant and sensitiser. Keep to 0.5% or below, avoid during pregnancy, and avoid entirely if you have high blood pressure. Not for children.",
+    image: { src: "https://images.unsplash.com/photo-1679061584104-534b7ec4afe6?auto=format&fit=crop&q=70&w=900", alt: "Close-up of fresh thyme sprigs" },
     variants: [{ size: "10 ml", price: 549, stock: 11 }],
   },
 
@@ -699,6 +721,7 @@ export const products = [
     notes: ["Soft rose", "Green grass", "Sweet floral"],
     origin: "Madhya Pradesh, India", method: "Steam distilled",
     swatch: ["#d7b89c", "#a8805c"], bg: "#f3e9df",
+    image: { src: "https://images.unsplash.com/photo-1761071181946-18f6cba215c2?auto=format&fit=crop&q=70&w=900", alt: "Lush green blades of aromatic grass, overlapping in the sun" },
     variants: [{ size: "15 ml", price: 499, stock: 26 }, { size: "30 ml", price: 899, stock: 11 }],
   },
   {
@@ -717,6 +740,7 @@ export const products = [
     origin: "Rajasthan, India", method: "Steam distilled",
     swatch: ["#d4b171", "#9c7736"], bg: "#f2e8d4",
     warning: "Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1596380134329-5a768bcd0475?auto=format&fit=crop&q=70&w=900", alt: "Wild carrot flowering in flat white umbels" },
     variants: [{ size: "10 ml", price: 649, stock: 13 }],
   },
   {
@@ -735,6 +759,7 @@ export const products = [
     origin: "Souss-Massa, Morocco", method: "Cold pressed",
     swatch: ["#e8cf90", "#bd9b45"], bg: "#f6efdc",
     warning: "Pressed from tree nut kernels. Avoid if you have a nut allergy.",
+    image: { src: "https://images.unsplash.com/photo-1600189020840-e9918c25269d?auto=format&fit=crop&q=70&w=900", alt: "Argan nuts and kernels, shelled and whole" },
     variants: [{ size: "50 ml", price: 699, stock: 22 }, { size: "100 ml", price: 1199, stock: 9 }],
   },
 
@@ -756,6 +781,7 @@ export const products = [
     origin: "Kannauj, India", method: "Solvent extracted",
     swatch: ["#d98fa0", "#a44f68"], bg: "#f6e2e7",
     warning: "An absolute, not an essential oil — solvent extracted, so trace residue is inherent to the process. Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=900", alt: "Pink damask roses in bloom, still wet with dew" },
     variants: [{ size: "5 ml", price: 9499, stock: 3 }],
   },
   {
@@ -774,6 +800,7 @@ export const products = [
     origin: "Tamil Nadu, India", method: "Solvent extracted",
     swatch: ["#e8e0cd", "#b9ab84"], bg: "#f6f2e6",
     warning: "An absolute, not an essential oil — solvent extracted, so trace residue is inherent. Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=900", alt: "White tuberose blooms laid out on white cloth" },
     variants: [{ size: "5 ml", price: 6499, stock: 4 }],
   },
   {
@@ -792,6 +819,7 @@ export const products = [
     origin: "Karnataka, India", method: "Steam distilled",
     swatch: ["#c08a6a", "#8a5438"], bg: "#f1e3d8",
     warning: "Avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=900", alt: "Delicate pale green foliage with tiny white buds" },
     variants: [{ size: "10 ml", price: 1499, stock: 6 }],
   },
 
@@ -809,6 +837,7 @@ export const products = [
     notes: ["Green conifer", "Dry smoke", "Clean resin"],
     origin: "Uttarakhand, India", method: "Steam distilled",
     swatch: ["#8aa894", "#4a6b58"], bg: "#e3ece6",
+    image: { src: "https://images.unsplash.com/photo-1542969587-5b90477b65f4?auto=format&fit=crop&q=70&w=900", alt: "Close-up of dense evergreen cypress foliage" },
     variants: [{ size: "15 ml", price: 599, stock: 20 }, { size: "30 ml", price: 1099, stock: 8 }],
   },
   {
@@ -827,6 +856,7 @@ export const products = [
     origin: "Uttar Pradesh, India", method: "Steam distilled",
     swatch: ["#9dbd7e", "#5e8040"], bg: "#e9f0de",
     warning: "Avoid during pregnancy, and keep to 1.5% or below on skin.",
+    image: { src: "https://images.unsplash.com/photo-1591495746097-8a92864d5c1f?auto=format&fit=crop&q=70&w=900", alt: "A single fresh basil leaf on a white surface" },
     variants: [{ size: "15 ml", price: 399, stock: 27 }, { size: "30 ml", price: 699, stock: 12 }],
   },
   {
@@ -845,6 +875,7 @@ export const products = [
     origin: "Assam, India", method: "Steam distilled",
     swatch: ["#c7cf6a", "#8c9433"], bg: "#eff1d9",
     warning: "A known skin sensitiser — keep to 1% or below, and avoid during pregnancy.",
+    image: { src: "https://images.unsplash.com/photo-1575032558058-683487d88fb1?auto=format&fit=crop&q=70&w=900", alt: "A clump of citronella grass growing in the ground" },
     variants: [{ size: "15 ml", price: 399, stock: 31 }, { size: "30 ml", price: 699, stock: 14 }],
   },
 
@@ -864,6 +895,7 @@ export const products = [
     origin: "Madagascar", method: "Steam distilled",
     swatch: ["#9ec6b0", "#53876c"], bg: "#e6f0ea",
     warning: "High in 1,8-cineole — not suitable for babies or young children.",
+    image: { src: "https://images.unsplash.com/photo-1686600662417-619469ba175c?auto=format&fit=crop&q=70&w=900", alt: "Fluffy white melaleuca blossom on the branch" },
     variants: [{ size: "15 ml", price: 549, stock: 18 }],
   },
   {
@@ -882,6 +914,7 @@ export const products = [
     origin: "Madagascar", method: "Steam distilled",
     swatch: ["#a9c49b", "#5f8650"], bg: "#e9f0e3",
     warning: "Not suitable for babies or young children.",
+    image: { src: "https://images.unsplash.com/photo-1584204559709-ca7d413229eb?auto=format&fit=crop&q=70&w=900", alt: "Glossy green camphor-scented leaves" },
     variants: [{ size: "15 ml", price: 599, stock: 15 }],
   },
   {
@@ -900,6 +933,7 @@ export const products = [
     origin: "Gujarat, India", method: "Steam distilled",
     swatch: ["#d9cf8c", "#a3974a"], bg: "#f3f0da",
     warning: "High in trans-anethole. Avoid during pregnancy and while breastfeeding, avoid with oestrogen-sensitive conditions, and keep away from children. Keep to 1% on skin.",
+    image: { src: "https://images.unsplash.com/photo-1701189975806-97b11541ec82?auto=format&fit=crop&q=70&w=900", alt: "A spoonful of dried fennel seeds" },
     variants: [{ size: "10 ml", price: 799, stock: 10 }],
   },
   {
@@ -916,6 +950,7 @@ export const products = [
     notes: ["Sweet spice", "Light wood", "Faint floral"],
     origin: "Rajasthan, India", method: "Steam distilled",
     swatch: ["#cbb98c", "#95824a"], bg: "#f1ecdb",
+    image: { src: "https://images.unsplash.com/photo-1508748169069-82590c9f26e6?auto=format&fit=crop&q=70&w=900", alt: "Dried coriander seeds" },
     variants: [{ size: "10 ml", price: 649, stock: 13 }],
   },
 
@@ -934,6 +969,7 @@ export const products = [
     origin: "Kerala, India", method: "Cold pressed",
     swatch: ["#f0ead9", "#c4b893"], bg: "#f8f4e8",
     warning: "Solidifies below roughly 24°C. It is also comedogenic for some people — patch-test before using it on your face.",
+    image: { src: "https://images.unsplash.com/photo-1560769680-ba2f3767c785?auto=format&fit=crop&q=70&w=900", alt: "Whole coconuts in their brown husks" },
     variants: [{ size: "100 ml", price: 449, stock: 34 }, { size: "250 ml", price: 899, stock: 16 }],
   },
   {
@@ -951,6 +987,7 @@ export const products = [
     origin: "Maharashtra, India", method: "Cold pressed",
     swatch: ["#d6dba8", "#9aa15f"], bg: "#f0f2de",
     warning: "High in polyunsaturated fats, so it oxidises faster than jojoba or coconut. Refrigerate after opening and use within six months.",
+    image: { src: "https://images.unsplash.com/photo-1659038025134-5f47bf7956c0?auto=format&fit=crop&q=70&w=900", alt: "A bunch of green grapes hanging on the vine" },
     variants: [{ size: "100 ml", price: 649, stock: 21 }, { size: "250 ml", price: 1299, stock: 8 }],
   },
   {
@@ -969,6 +1006,7 @@ export const products = [
     origin: "Tamil Nadu, India", method: "Cold pressed",
     swatch: ["#b4a657", "#7c7030"], bg: "#efeccf",
     warning: "Avoid during pregnancy and while trying to conceive. Not for use on babies or young children.",
+    image: { src: "https://images.unsplash.com/photo-1687945906634-25c66199d941?auto=format&fit=crop&q=70&w=900", alt: "Neem leaves after rain, beaded with water" },
     variants: [{ size: "100 ml", price: 499, stock: 24 }],
   },
 ];
