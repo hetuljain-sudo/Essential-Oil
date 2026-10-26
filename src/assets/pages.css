@@ -466,6 +466,9 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   /* relative, not static — the badge is absolutely positioned inside it */
   .pdp__media { position: relative; top: auto; aspect-ratio: 1; }
   .pdp__detail, .contact { grid-template-columns: 1fr; gap: 2rem; }
+  /* 4rem + 2.5rem of section spacing reads as dead air on a phone, where
+     everything is one column and the specs end on a rule already. */
+  .pdp__detail { margin-top: 2.25rem; padding-top: 1.75rem; }
   .coll { grid-template-columns: 1fr; }
   .coll__head, .coll__body { padding: 1.8rem; }
   .library { flex-direction: column; height: auto; gap: 10px; }
