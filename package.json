@@ -8,6 +8,11 @@
     "build": "node build.mjs",
     "dev": "node build.mjs && python -m http.server 4321 --directory dist",
     "serve": "python -m http.server 4321 --directory dist",
-    "seo": "node build.mjs && node seo-audit.mjs"
+    "seo": "node build.mjs && node seo-audit.mjs",
+    "test": "node --test test/*.test.mjs",
+    "seed": "node db/seed-stock.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
   }
 }

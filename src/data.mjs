@@ -24,6 +24,10 @@ export const site = {
   currency: "₹",
   locale: "en-IN",
   freeShippingAt: 999,
+  // Charged on orders below freeShippingAt. The site has always said shipping
+  // is free "over ₹999" without ever saying what it costs under that, which
+  // was answerable while nothing could be bought and is not any more.
+  shippingFlat: 79,
 };
 
 /** Header navigation. The FAQ lives in the footer only — it is a reference

@@ -16,6 +16,7 @@ import {
   site, categories, products, library, faqs, steps,
   inCategory, bySlug, fromPrice, inStock, firstAvailable, categoryOf, money,
 } from "./src/data.mjs";
+import { skuFor } from "./src/sku.mjs";
 
 import {
   layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
@@ -96,20 +97,37 @@ const returnPolicy = {
   returnFees: "https://schema.org/FreeReturn",
 };
 
-const shippingDetails = {
-  "@type": "OfferShippingDetails",
-  shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
-  shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "INR" },
-  deliveryTime: {
-    "@type": "ShippingDeliveryTime",
-    handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
-    transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 5, unitCode: "DAY" },
-  },
+const deliveryTime = {
+  "@type": "ShippingDeliveryTime",
+  handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+  transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 5, unitCode: "DAY" },
 };
 
-/** SRV-LAVENDE-15ML — stable, readable, and unique per size. */
-const skuFor = (p, v) =>
-  `SRV-${p.id.replace(/-/g, "").slice(0, 7).toUpperCase()}-${v.size.replace(/\s/g, "").toUpperCase()}`;
+/* Two rates, because that is what we actually charge: free at or above the
+   threshold, a flat fee below it. This used to declare free shipping
+   unconditionally, which was a claim we would not have honoured on a ₹449
+   order once checkout went live. */
+const shippingDetails = [
+  {
+    "@type": "OfferShippingDetails",
+    shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
+    shippingRate: {
+      "@type": "MonetaryAmount", value: 0, currency: "INR",
+      eligibleTransactionVolume: {
+        "@type": "PriceSpecification",
+        minPrice: site.freeShippingAt, priceCurrency: "INR",
+      },
+    },
+    deliveryTime,
+  },
+  {
+    "@type": "OfferShippingDetails",
+    shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
+    shippingRate: { "@type": "MonetaryAmount", value: site.shippingFlat, currency: "INR" },
+    deliveryTime,
+  },
+];
+
 
 const isCarrier = (p) => !!p.carrier;
 const oilWord = (p) => (isCarrier(p) ? "Carrier Oil" : "Essential Oil");
