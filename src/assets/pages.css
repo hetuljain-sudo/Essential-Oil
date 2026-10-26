@@ -325,6 +325,46 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .safety-band { padding: 3rem 0 3.5rem; border-top: 1px solid var(--line); }
 .safety-band .note { margin: 0 auto; line-height: 1.7; }
 
+/* ---- Footer as a secondary sitemap ---- */
+.footer__inner { grid-template-columns: 1.6fr repeat(5, 1fr); gap: 2rem 1.6rem; }
+.footer__col { min-width: 0; }
+.footer__col summary { list-style: none; cursor: default; }
+.footer__col summary::-webkit-details-marker { display: none; }
+.footer__col summary::after {
+  content: "+"; float: right; font-size: 1.1rem; line-height: 1;
+  color: #8c9a80; display: none;
+}
+.footer__col[open] summary::after { content: "−"; }
+.footer__col h4 { display: inline; }
+.footer__col nav { display: flex; flex-direction: column; margin-top: .9rem; }
+/* Scoped under .footer__inner to outrank `.footer__inner a:not(.logo)`,
+   which otherwise forces display:block and collapses the gap. */
+.footer__inner .footer__col nav a {
+  display: flex; align-items: baseline; gap: .45rem;
+  text-decoration: none; margin-bottom: .5rem; width: fit-content;
+}
+.footer__inner .footer__col nav a small {
+  font-size: .7rem; opacity: .45;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1100px) {
+  .footer__inner { grid-template-columns: 1.4fr repeat(3, 1fr); }
+}
+@media (max-width: 860px) {
+  /* Collapsible on phones — six stacked columns is an unusable wall. */
+  .footer__inner { grid-template-columns: 1fr; gap: 0; }
+  .footer__brand { margin-bottom: 1.6rem; }
+  .footer__col { border-top: 1px solid rgba(255, 255, 255, .12); }
+  .footer__col summary {
+    cursor: pointer; padding: .95rem 0;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer__col summary::after { display: block; float: none; }
+  .footer__col summary:focus-visible { outline: 2px solid var(--terracotta); outline-offset: -2px; }
+  .footer__col nav { margin: 0 0 1rem; }
+}
+
 /* Contact details in the footer's brand column */
 .footer__brand > p { margin-bottom: 1.4rem; }
 .footer__contact { font-style: normal; display: grid; gap: .45rem; font-size: .86rem; }

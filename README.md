@@ -274,3 +274,19 @@ it carries a safety note.
 Sub-grouping uses each product's `family` field. Keyword-derived grouping was
 tried first and misfired — ginger read as citrus because of a "lemon peel"
 note, clove as woody — so families are assigned explicitly.
+
+## The footer
+
+The footer doubles as a secondary sitemap. Six columns — contact, Shop,
+By scent, Popular oils, Learn, Company — give every page 38 outbound links
+instead of 15, which is how a flat catalogue gets internal links pointing at
+its depth.
+
+"By scent" links to scent-family anchors on the collection pages
+(`/collections/energy/#citrus`), so the families are reachable without
+needing pages of their own.
+
+Columns are `<details>` elements that ship open, so every link is in the
+markup for crawlers and for anyone without JavaScript. On screens under
+860px, `app.js` closes all but the first — six stacked columns is an
+unusable wall on a phone.

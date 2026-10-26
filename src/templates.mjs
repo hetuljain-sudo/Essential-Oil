@@ -126,7 +126,46 @@ function header(current) {
   </header>`;
 }
 
+const slug = (x) => x.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/**
+ * The footer doubles as a secondary sitemap: it links every collection, every
+ * scent family and a selection of products from all 62 pages, which is how a
+ * flat catalogue gets internal links pointing at its depth.
+ *
+ * Columns are <details> so they can collapse on narrow screens — app.js closes
+ * them below 860px. They ship open, so the links are in the markup either way.
+ */
 function footer() {
+  // Each scent family lives as an anchor on its collection page.
+  const familyLinks = [];
+  const seen = new Set();
+  for (const p of products) {
+    if (seen.has(p.family)) continue;
+    seen.add(p.family);
+    const cat = categories.find((c) => c.id === p.category);
+    familyLinks.push({
+      label: p.family,
+      href: `/collections/${cat.id}/#${slug(p.family)}`,
+      n: products.filter((x) => x.family === p.family).length,
+    });
+  }
+
+  // A spread of products rather than one collection's worth.
+  const popular = [
+    ...products.filter((p) => p.featured),
+    ...categories.map((c) => products.find((p) => p.category === c.id && !p.featured)),
+  ].filter(Boolean).slice(0, 9);
+
+  const column = (heading, links) => `
+    <details class="footer__col" open>
+      <summary><h4>${heading}</h4></summary>
+      <nav aria-label="${heading}">
+        ${links.map((l) => `<a href="${l.href}">${esc(l.label)}${
+          l.n ? `<small>${l.n}</small>` : ""}</a>`).join("")}
+      </nav>
+    </details>`;
+
   return `<footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
@@ -141,19 +180,36 @@ function footer() {
           ${site.address.country}</span>
         </address>
       </div>
-      <nav aria-label="Shop links">
-        <h4>Shop</h4>
-        <a href="/shop/">All oils</a>
-        ${categories.map((c) => `<a href="${categoryUrl(c)}">${c.label}</a>`).join("")}
-      </nav>
-      <nav aria-label="Company links">
-        <h4>Company</h4>
-        <a href="/about/">Our story</a><a href="/collections/">Collections</a><a href="/contact/">Contact</a>
-      </nav>
-      <nav aria-label="Help links">
-        <h4>Help</h4>
-        <a href="/faq/">FAQ</a><a href="/faq/#usage-safety">Safety &amp; dilution</a><a href="/faq/#shipping-delivery">Shipping</a>
-      </nav>
+
+      ${column("Shop", [
+        { href: "/shop/", label: "All oils", n: products.length },
+        ...categories.map((c) => ({
+          href: `/collections/${c.id}/`,
+          label: c.label,
+          n: products.filter((p) => p.category === c.id).length,
+        })),
+      ])}
+
+      ${column("By scent", familyLinks)}
+
+      ${column("Popular oils", popular.map((p) => ({
+        href: `/oils/${p.id}/`, label: p.name,
+      })))}
+
+      ${column("Learn", [
+        { href: "/blog/", label: "Journal" },
+        { href: "/faq/#product-quality-sourcing", label: "Purity & sourcing" },
+        { href: "/faq/#usage-safety", label: "Safe use & dilution" },
+        { href: "/faq/#shipping-delivery", label: "Shipping & delivery" },
+        { href: "/faq/#returns-support", label: "Returns & support" },
+        { href: "/faq/", label: "All questions" },
+      ])}
+
+      ${column("Company", [
+        { href: "/about/", label: "Our story" },
+        { href: "/collections/", label: "Collections" },
+        { href: "/contact/", label: "Contact us" },
+      ])}
     </div>
     <div class="container footer__base">© <span data-year></span> ${site.name}. All rights reserved.</div>
   </footer>`;

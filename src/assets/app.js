@@ -617,3 +617,19 @@ if (!prefersReducedMotion() && "IntersectionObserver" in window) {
 }
 
 renderCart();
+
+/* ------------------------------------------------------- footer columns */
+/**
+ * The footer's six columns ship open, so every link is in the markup for
+ * crawlers and for anyone without JS. On a phone that is an unusable wall,
+ * so collapse them there — leaving the first one open as an affordance.
+ */
+const footerCols = $$(".footer__col");
+if (footerCols.length) {
+  const narrow = window.matchMedia("(max-width: 860px)");
+  const sync = () => footerCols.forEach((d, i) => {
+    d.open = narrow.matches ? i === 0 : true;
+  });
+  sync();
+  narrow.addEventListener("change", sync);
+}
