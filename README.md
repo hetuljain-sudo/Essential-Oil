@@ -218,3 +218,39 @@ Each post emits `BlogPosting` structured data, and the index emits `Blog`.
 
 Same rule as the product pages: describe how oils smell and how people use
 them, never what they treat.
+
+## SEO
+
+```bash
+npm run seo
+```
+
+Builds, then audits every page for title and description length, heading
+structure, canonical and social tags, image alt text and dimensions,
+structured data completeness, and whether referenced assets exist.
+
+What the site emits:
+
+- **Titles** built for search intent — `Lavender Fields Essential Oil — 15 ml
+  & 30 ml | Sarvha` rather than just the product name — kept under 60
+  characters so they don't truncate
+- **Descriptions** clamped to 158 characters at a word boundary
+- **Structured data** per page in a single `@graph`: `Organization` and
+  `WebSite` (with a `SearchAction` for the sitelinks search box) on the home
+  page, `Product` + `FAQPage` on every oil, `CollectionPage` + `ItemList` on
+  shop and collection pages, `AboutPage`, `ContactPage`, and a
+  `BreadcrumbList` on all 60 inner pages
+- **Offers** carrying SKU, `priceValidUntil`, `itemCondition`, seller, a
+  30-day `MerchantReturnPolicy` and `OfferShippingDetails` — the fields
+  Google needs before it will show price and availability in results
+- **Social cards** using the product's own photography, with `og:locale`,
+  `og:image:alt` and Twitter equivalents
+- **`lang="en-IN"`**, explicit `robots` directives, `noindex` on the 404
+- **Sitemap** with `lastmod`, `changefreq` and per-section `priority`;
+  **robots.txt** disallowing the filtered `?collection=` views, which
+  duplicate the shop page
+
+**The one remaining gap** is photography. 38 of the 50 oils have no product
+image, so those pages have no `og:image` and their `Product` schema has no
+`image` — which Google requires for product rich results. Adding a photo to a
+product fixes both at once.

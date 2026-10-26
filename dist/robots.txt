@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+
+# Filtered views duplicate the shop page's content.
+Disallow: /shop/?collection=
+
 Sitemap: https://sarvha.com/sitemap.xml

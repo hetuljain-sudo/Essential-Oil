@@ -248,7 +248,8 @@ function productCard(p) {
   const sold = !inStock(p);
   const low = !sold && v.stock > 0 && v.stock <= 8;
   const media = p.image
-    ? `<img src="${p.image.src}" alt="${esc(p.image.alt)}" loading="lazy" decoding="async"
+    ? `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"
+         loading="lazy" decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
     : bottleSVG(p.swatch, shortLabel(p));
   return `<article class="card${sold ? " is-sold" : ""}">

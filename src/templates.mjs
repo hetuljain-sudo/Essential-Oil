@@ -36,7 +36,10 @@ export function bottleSVG([light, dark], label = "") {
 
 export function productMedia(p, sizes = "(max-width: 860px) 50vw, 25vw", eager = false) {
   if (!p.image) return bottleSVG(p.swatch, shortLabel(p));
-  return `<img src="${p.image.src}" alt="${esc(p.image.alt)}" ${eager ? '' : 'loading="lazy"'} decoding="async"
+  // width/height are the source dimensions — the browser reserves the right
+  // box before the image arrives, so nothing shifts as the grid loads.
+  return `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"
+    ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"
     sizes="${sizes}" data-pid="${p.id}" onerror="artFallback(this)" />`;
 }
 
@@ -175,26 +178,68 @@ const drawerAndModal = `
 
 /* ---------------------------------------------------------------- layout */
 
-export function layout({ title, description, path, body, jsonLd, bodyClass = "" }) {
-  const fullTitle = path === "/" ? title : `${title} — ${site.name}`;
+/**
+ * Clamps a description to what a search result actually shows, cutting at a
+ * word boundary rather than mid-word. Google truncates around 160 characters.
+ */
+export function clamp(text, max = 158) {
+  const t = String(text).replace(/\s+/g, " ").trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:—-]$/, "") + "…";
+}
+
+/** BreadcrumbList from the same trail the visible breadcrumbs use. */
+export const breadcrumbSchema = (trail) => ({
+  "@type": "BreadcrumbList",
+  itemListElement: trail.map((t, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: t.label,
+    ...(t.href ? { item: site.url + t.href } : {}),
+  })),
+});
+
+export function layout({
+  title, description, path, body, jsonLd, breadcrumb,
+  ogImage, ogType = "website", noindex = false, bodyClass = "",
+}) {
+  const fullTitle = path === "/" ? title : `${title} | ${site.name}`;
   const canonical = site.url + path;
+  const desc = clamp(description);
+
+  // One @graph per page, so breadcrumbs sit alongside whatever the page adds.
+  const nodes = [];
+  if (jsonLd) nodes.push(...(Array.isArray(jsonLd) ? jsonLd : [jsonLd]));
+  if (breadcrumb && breadcrumb.length > 1) nodes.push(breadcrumbSchema(breadcrumb));
+  const graph = nodes.length
+    ? { "@context": "https://schema.org", "@graph": nodes }
+    : null;
+
   return `<!doctype html>
-<html lang="en">
+<html lang="en-IN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${esc(fullTitle)}</title>
-  <meta name="description" content="${esc(description)}" />
+  <meta name="description" content="${esc(desc)}" />
   <link rel="canonical" href="${canonical}" />
+  <meta name="robots" content="${noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1"}" />
   <meta name="theme-color" content="#2f3e2c" />
   <meta name="color-scheme" content="light" />
 
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content="${ogType}" />
   <meta property="og:site_name" content="${site.name}" />
+  <meta property="og:locale" content="en_IN" />
   <meta property="og:title" content="${esc(fullTitle)}" />
-  <meta property="og:description" content="${esc(description)}" />
+  <meta property="og:description" content="${esc(desc)}" />
   <meta property="og:url" content="${canonical}" />
-  <meta name="twitter:card" content="summary_large_image" />
+  ${ogImage ? `<meta property="og:image" content="${ogImage.src}" />
+  <meta property="og:image:alt" content="${esc(ogImage.alt)}" />` : ""}
+  <meta name="twitter:card" content="${ogImage ? "summary_large_image" : "summary"}" />
+  <meta name="twitter:title" content="${esc(fullTitle)}" />
+  <meta name="twitter:description" content="${esc(desc)}" />
+  ${ogImage ? `<meta name="twitter:image" content="${ogImage.src}" />` : ""}
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f3e2c'/%3E%3Cpath d='M16 6c4.5 5.4 7 9.4 7 13.3a7 7 0 0 1-14 0C9 15.4 11.5 11.4 16 6z' fill='%23b5653b'/%3E%3C/svg%3E" />
 
@@ -203,7 +248,7 @@ export function layout({ title, description, path, body, jsonLd, bodyClass = "" 
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
-  ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ""}
+  ${graph ? `<script type="application/ld+json">${JSON.stringify(graph)}</script>` : ""}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ""}>
   <a href="#main" class="skip-link">Skip to content</a>

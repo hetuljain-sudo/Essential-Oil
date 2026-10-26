@@ -20,7 +20,7 @@ import {
 import {
   layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
   newsletter, trustBar, categoryTiles, oilLibrary, safetyNote,
-  productUrl, categoryUrl, postUrl, postDate, postCard, renderBlocks,
+  productUrl, categoryUrl, postUrl, postDate, postCard, renderBlocks, clamp,
 } from "./src/templates.mjs";
 
 import { guides } from "./src/content.mjs";
@@ -41,6 +41,107 @@ const addressLines = () => [
 
 // Counts in page copy come from the data, so they can't drift out of date.
 const count = products.length;
+
+/* ------------------------------------------------------------------- SEO */
+
+const BUILD_DATE = new Date().toISOString().slice(0, 10);
+/** Offers need a price validity date; a year out is the usual convention. */
+const PRICE_VALID_UNTIL = new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10);
+
+const brand = { "@type": "Brand", name: site.name };
+
+const organization = {
+  "@type": "Organization",
+  "@id": site.url + "/#organization",
+  name: site.name,
+  url: site.url,
+  email: site.email,
+  telephone: site.phones,
+  description: site.description,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: site.address.lines.join(", "),
+    addressLocality: site.address.city,
+    postalCode: site.address.postcode,
+    addressRegion: "Delhi",
+    addressCountry: "IN",
+  },
+};
+
+/** Lets Google show a search box for the site in results. */
+const website = {
+  "@type": "WebSite",
+  "@id": site.url + "/#website",
+  url: site.url,
+  name: site.name,
+  inLanguage: "en-IN",
+  publisher: { "@id": site.url + "/#organization" },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: `${site.url}/shop/?q={search_term_string}` },
+    "query-input": "required name=search_term_string",
+  },
+};
+
+/** What the store promises, expressed the way rich results expect. */
+const returnPolicy = {
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "IN",
+  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+  merchantReturnDays: 30,
+  returnMethod: "https://schema.org/ReturnByMail",
+  returnFees: "https://schema.org/FreeReturn",
+};
+
+const shippingDetails = {
+  "@type": "OfferShippingDetails",
+  shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
+  shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "INR" },
+  deliveryTime: {
+    "@type": "ShippingDeliveryTime",
+    handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+    transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 5, unitCode: "DAY" },
+  },
+};
+
+/** SRV-LAVENDE-15ML — stable, readable, and unique per size. */
+const skuFor = (p, v) =>
+  `SRV-${p.id.replace(/-/g, "").slice(0, 7).toUpperCase()}-${v.size.replace(/\s/g, "").toUpperCase()}`;
+
+const isCarrier = (p) => !!p.carrier;
+const oilWord = (p) => (isCarrier(p) ? "Carrier Oil" : "Essential Oil");
+
+/** A product title people actually search: name, what it is, sizes, brand. */
+function productTitle(p) {
+  const base = /oil$/i.test(p.name) ? p.name : `${p.name} ${oilWord(p)}`;
+  const sizes = p.variants.map((v) => v.size).join(" & ");
+  const withSizes = `${base} — ${sizes}`;
+  return withSizes.length <= 46 ? withSizes : base;
+}
+
+function productDescription(p) {
+  const sizes = p.variants.map((v) => v.size).join(" and ");
+  return `Buy ${p.name} ${isCarrier(p) ? "carrier oil" : "essential oil"} (${p.botanical}) online in India. ` +
+    `${p.tagline} 100% pure and undiluted, in ${sizes}. Free shipping over ${money(site.freeShippingAt)}.`;
+}
+
+const HOME = { href: "/", label: "Home" };
+const shopTrail        = [HOME, { label: "Shop" }];
+const collectionsTrail = [HOME, { label: "Collections" }];
+const journalTrail     = [HOME, { label: "Journal" }];
+const aboutTrail       = [HOME, { label: "Our story" }];
+const faqTrail         = [HOME, { label: "FAQ" }];
+const contactTrail     = [HOME, { label: "Contact" }];
+
+/** Site-wide social image — our own photography, standing in for the brand
+ *  until a dedicated 1200x630 card exists. */
+const defaultOg = (() => {
+  const p = products.find((x) => x.image);
+  return p ? { src: p.image.src, alt: `${site.name} essential oils` } : null;
+})();
+
+/** Product photography doubles as the social image where it exists. */
+const ogFor = (p) => (p.image ? { src: p.image.src, alt: p.image.alt } : null);
 
 /**
  * Questions every oil needs answered, written from its own data rather than
@@ -89,20 +190,35 @@ const faqsFor = (p) => [...(guides[p.id]?.faqs || []), ...sharedFaqs(p)];
 
 page("/", layout({
   path: "/",
-  title: `${site.name} — ${site.tagline}`,
-  description: site.description,
-  jsonLd: {
-    "@context": "https://schema.org", "@type": "Store",
-    name: site.name, description: site.description, url: site.url, email: site.email,
-    telephone: site.phones,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: site.address.lines.join(", "),
-      addressLocality: site.address.city,
-      postalCode: site.address.postcode,
-      addressCountry: "IN",
+  title: `${site.name} — Pure Essential Oils Online in India`,
+  ogImage: defaultOg,
+  description: `Buy 100% pure essential oils and cold-pressed carrier oils online in India. ${count} single-origin oils, bottled in small batches and shipped from Delhi. Free shipping over ${money(site.freeShippingAt)}.`,
+  jsonLd: [
+    organization,
+    website,
+    {
+      "@type": "Store",
+      "@id": site.url + "/#store",
+      name: site.name,
+      description: site.description,
+      url: site.url,
+      image: products.find((p) => p.image)?.image.src,
+      parentOrganization: { "@id": site.url + "/#organization" },
+      email: site.email,
+      telephone: site.phones,
+      priceRange: "₹₹",
+      currenciesAccepted: "INR",
+      areaServed: { "@type": "Country", name: "India" },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: site.address.lines.join(", "),
+        addressLocality: site.address.city,
+        postalCode: site.address.postcode,
+        addressRegion: "Delhi",
+        addressCountry: "IN",
+      },
     },
-  },
+  ],
   body: `
     <section class="hero">
       <div class="container hero__inner">
@@ -178,18 +294,31 @@ page("/", layout({
 
 page("/shop/", layout({
   path: "/shop/",
-  title: "Shop all essential oils",
-  description: "All twelve Sarvha oils — single-origin essential oils and cold-pressed carriers, with sizes, prices and usage notes.",
-  jsonLd: {
-    "@context": "https://schema.org", "@type": "ItemList",
-    itemListElement: products.map((p, i) => ({
-      "@type": "ListItem", position: i + 1, url: site.url + productUrl(p), name: p.name,
-    })),
-  },
+  title: "Buy Essential Oils Online in India",
+  description: `Shop all ${count} Sarvha oils — single-origin essential oils and cold-pressed carrier oils, 100% pure and undiluted. Sizes, prices and usage notes for every bottle.`,
+  breadcrumb: shopTrail,
+  ogImage: defaultOg,
+  jsonLd: [
+    {
+      "@type": "CollectionPage",
+      name: "Shop all essential oils",
+      description: `All ${count} essential and carrier oils sold by ${site.name}.`,
+      url: site.url + "/shop/",
+      isPartOf: { "@id": site.url + "/#website" },
+      about: { "@id": site.url + "/#organization" },
+    },
+    {
+      "@type": "ItemList",
+      numberOfItems: products.length,
+      itemListElement: products.map((p, i) => ({
+        "@type": "ListItem", position: i + 1, url: site.url + productUrl(p), name: p.name,
+      })),
+    },
+  ],
   body: `
     <section class="section section--first">
       <div class="container">
-        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "Shop" }])}
+        ${breadcrumbs(shopTrail)}
         <div class="page-head">
           <p class="eyebrow">The collection</p>
           <h1>Every oil we make</h1>
@@ -231,12 +360,23 @@ page("/shop/", layout({
 
 page("/collections/", layout({
   path: "/collections/",
-  title: "Collections",
-  description: "Four collections — relaxation, energy, immunity and skincare — to help you find the right oil for what you need.",
+  title: "Essential Oil Collections",
+  description: `Browse ${site.name} oils by what you need — relaxation, energy, immunity and skincare. ${count} single-origin essential and carrier oils, grouped to help you find the right bottle.`,
+  breadcrumb: collectionsTrail,
+  ogImage: defaultOg,
+  jsonLd: {
+    "@type": "CollectionPage",
+    name: "Collections",
+    url: site.url + "/collections/",
+    isPartOf: { "@id": site.url + "/#website" },
+    hasPart: categories.map((c) => ({
+      "@type": "CollectionPage", name: `${c.label} oils`, url: site.url + categoryUrl(c),
+    })),
+  },
   body: `
     <section class="section section--first">
       <div class="container">
-        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "Collections" }])}
+        ${breadcrumbs(collectionsTrail)}
         <div class="page-head">
           <p class="eyebrow">Browse</p>
           <h1>Four collections</h1>
@@ -268,20 +408,32 @@ page("/collections/", layout({
 
 for (const c of categories) {
   const items = inCategory(c.id);
+  const catTrail = [HOME, { href: "/collections/", label: "Collections" }, { label: c.label }];
   page(categoryUrl(c), layout({
     path: categoryUrl(c),
-    title: `${c.label} oils`,
-    description: `${c.blurb} ${c.intro}`,
-    jsonLd: {
-      "@context": "https://schema.org", "@type": "ItemList", name: `${c.label} oils`,
-      itemListElement: items.map((p, i) => ({
-        "@type": "ListItem", position: i + 1, url: site.url + productUrl(p), name: p.name,
-      })),
-    },
+    title: `${c.label} Essential Oils — Buy Online`,
+    description: `${c.blurb} ${items.length} oils for ${c.label.toLowerCase()} from ${site.name}, 100% pure and shipped across India. ${c.intro}`,
+    breadcrumb: catTrail,
+    ogImage: items.find((x) => x.image) ? { src: items.find((x) => x.image).image.src, alt: `${c.label} essential oils` } : defaultOg,
+    jsonLd: [
+      {
+        "@type": "CollectionPage",
+        name: `${c.label} essential oils`,
+        description: c.intro,
+        url: site.url + categoryUrl(c),
+        isPartOf: { "@id": site.url + "/#website" },
+      },
+      {
+        "@type": "ItemList", name: `${c.label} oils`, numberOfItems: items.length,
+        itemListElement: items.map((p, i) => ({
+          "@type": "ListItem", position: i + 1, url: site.url + productUrl(p), name: p.name,
+        })),
+      },
+    ],
     body: `
       <section class="section section--first">
         <div class="container">
-          ${breadcrumbs([{ href: "/", label: "Home" }, { href: "/collections/", label: "Collections" }, { label: c.label }])}
+          ${breadcrumbs(catTrail)}
           <div class="page-head page-head--coll" style="--tint:${c.color}">
             <span class="coll__icon coll__icon--lg" aria-hidden="true">${c.icon}</span>
             <p class="eyebrow">Collection</p>
@@ -317,48 +469,81 @@ for (const p of products) {
   const g = guides[p.id] || {};
   const faqs = faqsFor(p);
 
+  const trail = [
+    HOME,
+    { href: "/shop/", label: "Shop" },
+    { href: categoryUrl(cat), label: cat.label },
+    { label: p.name },
+  ];
+
   page(productUrl(p), layout({
     path: productUrl(p),
-    title: p.name,
-    description: `${p.tagline} ${p.desc}`.slice(0, 180),
+    title: productTitle(p),
+    description: productDescription(p),
+    ogType: "product",
+    ogImage: ogFor(p),
+    breadcrumb: trail,
     // Product and FAQPage together, so the questions are eligible to show
     // in search results alongside the price.
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Product",
-          name: p.name, description: p.desc, category: cat.label,
-          image: p.image ? [p.image.src] : undefined,
-          additionalProperty: [
-            { "@type": "PropertyValue", name: "Botanical name", value: p.botanical },
-            { "@type": "PropertyValue", name: "Origin", value: p.origin },
-            { "@type": "PropertyValue", name: "Extraction", value: p.method },
-          ],
+    jsonLd: [
+      {
+        "@type": "Product",
+        "@id": site.url + productUrl(p) + "#product",
+        name: `${p.name} ${isCarrier(p) ? "Carrier Oil" : "Essential Oil"}`,
+        alternateName: p.name,
+        description: p.desc,
+        category: `${cat.label} ${isCarrier(p) ? "carrier" : "essential"} oils`,
+        sku: skuFor(p, p.variants[0]),
+        brand,
+        manufacturer: { "@id": site.url + "/#organization" },
+        countryOfOrigin: { "@type": "Country", name: p.origin.split(", ").pop() },
+        image: p.image ? [p.image.src] : undefined,
+        additionalProperty: [
+          { "@type": "PropertyValue", name: "Botanical name", value: p.botanical },
+          { "@type": "PropertyValue", name: "Origin", value: p.origin },
+          { "@type": "PropertyValue", name: "Extraction method", value: p.method },
+          { "@type": "PropertyValue", name: "Aroma", value: p.notes.join(", ") },
+          { "@type": "PropertyValue", name: "Purity", value: "100% pure and undiluted" },
+        ],
+        offers: {
+          "@type": "AggregateOffer",
+          priceCurrency: "INR",
+          lowPrice: Math.min(...p.variants.map((x) => x.price)),
+          highPrice: Math.max(...p.variants.map((x) => x.price)),
+          offerCount: p.variants.length,
+          availability: inStock(p)
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
           offers: p.variants.map((x) => ({
-            "@type": "Offer", name: x.size, price: x.price, priceCurrency: "INR",
+            "@type": "Offer",
+            name: `${p.name} — ${x.size}`,
+            sku: skuFor(p, x),
+            price: x.price,
+            priceCurrency: "INR",
+            priceValidUntil: PRICE_VALID_UNTIL,
             url: site.url + productUrl(p),
-            availability: x.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            itemCondition: "https://schema.org/NewCondition",
+            availability: x.stock > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+            seller: { "@id": site.url + "/#organization" },
+            hasMerchantReturnPolicy: returnPolicy,
+            shippingDetails,
           })),
         },
-        {
-          "@type": "FAQPage",
-          mainEntity: faqs.map((f) => ({
-            "@type": "Question", name: f.q,
-            acceptedAnswer: { "@type": "Answer", text: f.a },
-          })),
-        },
-      ],
-    },
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+          "@type": "Question", name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+    ],
     body: `
       <section class="section section--first">
         <div class="container">
-          ${breadcrumbs([
-            { href: "/", label: "Home" },
-            { href: "/shop/", label: "Shop" },
-            { href: categoryUrl(cat), label: cat.label },
-            { label: p.name },
-          ])}
+${breadcrumbs(trail)}
 
           <div class="pdp" data-pdp="${p.id}">
             <div class="pdp__media${mediaClass(p)}" style="background:${p.bg}">
@@ -494,8 +679,10 @@ const blogPosts = postsNewestFirst();
 
 page("/blog/", layout({
   path: "/blog/",
-  title: "Journal",
-  description: `Notes on buying, using and storing essential oils, from the ${site.name} team.`,
+  title: "Journal — Notes on Using Essential Oils",
+  description: `Practical notes on buying, diluting, using and storing essential oils — written plainly by the ${site.name} team, with no claims we can't stand behind.`,
+  breadcrumb: journalTrail,
+  ogImage: defaultOg,
   jsonLd: blogPosts.length ? {
     "@context": "https://schema.org", "@type": "Blog",
     name: `${site.name} Journal`, url: site.url + "/blog/",
@@ -507,7 +694,7 @@ page("/blog/", layout({
   body: `
     <section class="section section--first">
       <div class="container">
-        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "Journal" }])}
+        ${breadcrumbs(journalTrail)}
         <div class="page-head">
           <p class="eyebrow">Journal</p>
           <h1>Notes from the bench</h1>
@@ -594,12 +781,21 @@ for (const post of blogPosts) {
 
 page("/about/", layout({
   path: "/about/",
-  title: "Our story",
-  description: "Why we started Sarvha, how we source our oils, and what we will and won't claim about them.",
+  title: "Our Story — How We Source Our Oils",
+  description: `Why we started ${site.name}, how we source our essential oils from a small number of named growers and distillers, and what we will and won't claim about them.`,
+  breadcrumb: aboutTrail,
+  ogImage: defaultOg,
+  jsonLd: {
+    "@type": "AboutPage",
+    name: `About ${site.name}`,
+    url: site.url + "/about/",
+    isPartOf: { "@id": site.url + "/#website" },
+    about: { "@id": site.url + "/#organization" },
+  },
   body: `
     <section class="section section--first">
       <div class="container narrow">
-        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "Our story" }])}
+        ${breadcrumbs(aboutTrail)}
         <div class="page-head">
           <p class="eyebrow">Our story</p>
           <h1>A small range, honestly described.</h1>
@@ -630,8 +826,10 @@ const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-
 
 page("/faq/", layout({
   path: "/faq/",
-  title: "Frequently asked questions",
-  description: "Purity and sourcing, safe use and dilution, shipping across India, and returns.",
+  title: "Essential Oil FAQs — Purity, Safety & Shipping",
+  description: `Answers on purity and sourcing, safe dilution and patch testing, shipping across India and returns. ${faqs.length} questions about buying and using essential oils.`,
+  breadcrumb: faqTrail,
+  ogImage: defaultOg,
   jsonLd: {
     "@context": "https://schema.org", "@type": "FAQPage",
     mainEntity: faqs.map((f) => ({
@@ -642,7 +840,7 @@ page("/faq/", layout({
   body: `
     <section class="section section--first">
       <div class="container">
-        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "FAQ" }])}
+        ${breadcrumbs(faqTrail)}
         <div class="page-head">
           <p class="eyebrow">Questions</p>
           <h1>Frequently asked</h1>
@@ -674,12 +872,21 @@ page("/faq/", layout({
 
 page("/contact/", layout({
   path: "/contact/",
-  title: "Contact",
-  description: `Get in touch with ${site.name} about an order, bulk pricing, or which oil suits what you need.`,
+  title: "Contact Us — Orders, Bulk Pricing & Advice",
+  description: `Get in touch with ${site.name} about an order, bulk or wholesale pricing, or which essential oil suits what you need. Based in New Delhi, shipping across India.`,
+  breadcrumb: contactTrail,
+  ogImage: defaultOg,
+  jsonLd: {
+    "@type": "ContactPage",
+    name: `Contact ${site.name}`,
+    url: site.url + "/contact/",
+    isPartOf: { "@id": site.url + "/#website" },
+    about: { "@id": site.url + "/#organization" },
+  },
   body: `
     <section class="section section--first">
       <div class="container">
-        ${breadcrumbs([{ href: "/", label: "Home" }, { label: "Contact" }])}
+        ${breadcrumbs(contactTrail)}
         <div class="contact">
           <div>
             <div class="page-head">
@@ -722,8 +929,9 @@ page("/contact/", layout({
 
 page("/404.html", layout({
   path: "/404.html",
-  title: "Page not found",
-  description: "That page doesn't exist.",
+  noindex: true,
+  title: "Page Not Found",
+  description: `That page doesn't exist. Browse all ${count} pure essential and carrier oils, or head back to the ${site.name} home page.`,
   body: `
     <section class="section section--first">
       <div class="container narrow center">
@@ -778,13 +986,41 @@ const css = await Promise.all(
 await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 await copyFile(join(root, "src/assets/app.js"), join(dist, "app.js"));
 
-// A sitemap, so the new pages are discoverable.
-const urls = pages.filter((p) => !p.path.endsWith("404.html")).map((p) => site.url + p.path);
+// A sitemap, so the pages are discoverable. The 404 is left out — it is
+// marked noindex and should not be submitted.
+const indexable = pages.filter((p) => !p.path.endsWith("404.html"));
+const sitemapEntry = ({ path }) => {
+  // The catalogue moves; the story and policy pages do not.
+  const priority = path === "/" ? "1.0"
+    : path === "/shop/" || path.startsWith("/oils/") ? "0.9"
+    : path.startsWith("/collections/") ? "0.8"
+    : "0.6";
+  const freq = path === "/shop/" || path.startsWith("/oils/") ? "weekly" : "monthly";
+  return [
+    "  <url>",
+    `    <loc>${site.url}${path}</loc>`,
+    `    <lastmod>${BUILD_DATE}</lastmod>`,
+    `    <changefreq>${freq}</changefreq>`,
+    `    <priority>${priority}</priority>`,
+    "  </url>",
+  ].join("\n");
+};
 await writeFile(join(dist, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  urls.map((u) => `  <url><loc>${u}</loc></url>`).join("\n") +
+  indexable.map(sitemapEntry).join("\n") +
   `\n</urlset>\n`, "utf8");
-await writeFile(join(dist, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${site.url}/sitemap.xml\n`, "utf8");
+
+await writeFile(join(dist, "robots.txt"),
+  [
+    "User-agent: *",
+    "Allow: /",
+    "",
+    "# Filtered views duplicate the shop page's content.",
+    "Disallow: /shop/?collection=",
+    "",
+    `Sitemap: ${site.url}/sitemap.xml`,
+    "",
+  ].join("\n"), "utf8");
 
 console.log(`Built ${pages.length} pages into dist/`);
 for (const p of pages) console.log("  " + p.path);
