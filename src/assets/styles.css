@@ -242,9 +242,25 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 .modal__close { position: absolute; top: 12px; right: 12px; background: var(--paper); }
 .tags { display: flex; gap: .4rem; flex-wrap: wrap; margin: 1rem 0; }
 .tag { font-size: .74rem; padding: .25rem .65rem; border-radius: 999px; background: var(--sand); }
-.specs { font-size: .86rem; color: var(--muted); margin: 0 0 1.4rem; display: grid; grid-template-columns: auto 1fr; gap: .3rem 1rem; }
-.specs dt { font-weight: 600; color: var(--ink); }
+/* Product specifications. A <dl> is the right semantics for label/value pairs,
+   but it reads as a table, so it is ruled like one: every row gets its own
+   line, with the label column fixed so the values start at the same x. */
+.specs {
+  font-size: .86rem; color: var(--muted); margin: 0 0 1.4rem;
+  display: grid; grid-template-columns: 7.5rem 1fr; gap: 0;
+  border-top: 1px solid var(--line);
+}
+.specs dt, .specs dd { padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.specs dt { font-weight: 600; color: var(--ink); padding-right: 1rem; }
 .specs dd { margin: 0; }
+
+@media (max-width: 560px) {
+  /* Narrow screens cannot afford a fixed label column beside a wrapping value,
+     so the pairs stack: label, then value, with the rule under the pair. */
+  .specs { grid-template-columns: 1fr; }
+  .specs dt { padding: .75rem 0 .2rem; border-bottom: 0; }
+  .specs dd { padding: 0 0 .75rem; }
+}
 
 /* Toast */
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: .8rem 1.3rem; border-radius: 999px; font-size: .88rem; opacity: 0; pointer-events: none; transition: .3s; z-index: 80; }

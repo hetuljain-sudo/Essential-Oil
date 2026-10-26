@@ -194,7 +194,7 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 }
 
 .related-block { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--line); }
-.specs { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.specs { margin-top: 1.5rem; }
 
 /* Safety note on oils that are phototoxic or strong sensitisers */
 .warn {
