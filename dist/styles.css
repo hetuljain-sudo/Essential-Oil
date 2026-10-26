@@ -1031,3 +1031,20 @@ body.menu-open .header { z-index: 56; }
 }
 .account__order ul { list-style: none; padding: 0; margin: .35rem 0 0; color: var(--muted); font-size: .86rem; }
 .account__flag { color: var(--terracotta); font-size: .82rem; }
+
+/* ------------------------------------------------------------- checkout */
+
+.checkout__summary {
+  background: var(--tint); border-radius: var(--radius);
+  padding: 1.5rem 1.8rem; margin-bottom: 1.8rem;
+}
+.checkout__summary h2 { font-size: 1.3rem; margin-bottom: .8rem; }
+.checkout__lines { list-style: none; padding: 0; margin: 0; font-size: .9rem; }
+.checkout__lines li {
+  display: flex; justify-content: space-between; gap: 1rem;
+  padding: .45rem 0; color: var(--muted);
+}
+.checkout__total {
+  margin-top: .4rem; padding-top: .7rem !important;
+  border-top: 1px solid var(--line); color: var(--ink); font-weight: 600; font-size: 1rem;
+}

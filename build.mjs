@@ -1234,6 +1234,80 @@ accountPage({
     </div>`,
 });
 
+/* ------------------------------------------------------------- checkout */
+
+/* Ordering requires an account. This page gates itself on load, but that is
+   only courtesy — api/checkout.js refuses a request without a session, which
+   is where the rule actually lives. */
+
+accountPage({
+  path: "/checkout/",
+  title: "Checkout",
+  description: "Complete your Sarvha order.",
+  label: "Checkout",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Checkout</p>
+      <h1>Complete your order</h1>
+    </div>
+
+    <div data-checkout-gate>
+      <p class="muted">Checking your account…</p>
+    </div>
+
+    <div data-checkout-body hidden>
+      <div class="checkout__summary" data-checkout-summary></div>
+
+      <form class="auth-form" data-checkout-form novalidate>
+        <div class="auth-form__error" data-checkout-error hidden role="alert"></div>
+
+        <h2>Where should it go?</h2>
+        <label>Full name
+          <input type="text" name="name" autocomplete="name" required />
+        </label>
+        <label>Mobile
+          <input type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" required />
+        </label>
+        <label>Address
+          <input type="text" name="line1" autocomplete="address-line1" placeholder="House and street" required />
+        </label>
+        <label>Area <span class="muted">(optional)</span>
+          <input type="text" name="line2" autocomplete="address-line2" />
+        </label>
+        <label>City
+          <input type="text" name="city" autocomplete="address-level2" required />
+        </label>
+        <label>State
+          <input type="text" name="state" autocomplete="address-level1" required />
+        </label>
+        <label>PIN code
+          <input type="text" name="postcode" autocomplete="postal-code" inputmode="numeric" required />
+        </label>
+        <label>Anything we should know? <span class="muted">(optional)</span>
+          <input type="text" name="notes" />
+        </label>
+
+        <button class="btn btn--primary btn--block" type="submit" data-pay>Pay securely</button>
+        <p class="muted small">Payment is handled by Razorpay. We never see your card details.</p>
+      </form>
+    </div>`,
+});
+
+accountPage({
+  path: "/checkout/thanks/",
+  title: "Order Received",
+  description: "Thank you — your Sarvha order has been received.",
+  label: "Order received",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Thank you</p>
+      <h1>Your order is in</h1>
+      <p class="lead">We've got it. You'll find it in <a href="/account/">your account</a>, and it leaves Delhi within two business days.</p>
+    </div>
+    <p data-order-ref class="muted"></p>
+    <p><a class="btn btn--ghost" href="/shop/">Keep shopping</a></p>`,
+});
+
 /* ------------------------------------------------------------- 404 page */
 
 page("/404.html", layout({
@@ -1261,7 +1335,8 @@ page("/404.html", layout({
 
 // Catalog data the browser needs for the cart drawer and shop filtering.
 const catalog = {
-  currency: site.currency, locale: site.locale, freeShippingAt: site.freeShippingAt,
+  currency: site.currency, locale: site.locale,
+  freeShippingAt: site.freeShippingAt, shippingFlat: site.shippingFlat,
   categories: categories.map(({ id, label }) => ({ id, label })),
   // The library rotates daily, so the browser needs all twelve entries.
   library: library.map((e) => {
@@ -1304,7 +1379,17 @@ const css = await Promise.all(
   ["src/assets/styles.css", "src/assets/pages.css"].map((f) => readFile(join(root, f), "utf8"))
 );
 await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
-await copyFile(join(root, "src/assets/app.js"), join(dist, "app.js"));
+// app.js is a plain script, not a module, so it cannot import. Rather than
+// keep a second copy of the redirect check in the browser — the kind of
+// duplicate that drifts and takes the security property with it — the tested
+// module is prepended with its export keywords stripped.
+const sharedForBrowser = (await readFile(join(root, "src/redirect.mjs"), "utf8"))
+  .replace(/^export /gm, "");
+await writeFile(
+  join(dist, "app.js"),
+  `${sharedForBrowser}\n${await readFile(join(root, "src/assets/app.js"), "utf8")}`,
+  "utf8",
+);
 
 // A sitemap, so the pages are discoverable.
 //

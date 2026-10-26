@@ -7,8 +7,12 @@
  * It does not take payment and it does not move stock. Both of those happen
  * when Razorpay tells us money was captured, in api/razorpay-webhook.js.
  *
+ * Requires a logged-in account. The email on the order is taken from that
+ * account rather than from the form: it is the address we have, and the one
+ * a confirmation has to reach.
+ *
  * Request:
- *   { items: [{ id, size, qty }], name, email, phone,
+ *   { items: [{ id, size, qty }], name, phone,
  *     address: { line1, line2?, city, state, postcode }, notes? }
  *
  * Response:
@@ -19,6 +23,7 @@ import { priceCart, CartError } from "./_lib/pricing.mjs";
 import { db, stockMap } from "./_lib/db.mjs";
 import { createOrder, keyId } from "./_lib/razorpay.mjs";
 import { json, methodGuard, validateCustomer } from "./_lib/http.mjs";
+import { currentCustomer } from "./_lib/auth.mjs";
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res, "POST")) return;
@@ -26,22 +31,35 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
 
-    const { customer, errors } = validateCustomer(body);
+    const sql = db();
+
+    // Ordering requires an account. The checkout page hides itself from
+    // logged-out visitors, but that is presentation; this is the rule. A
+    // POST straight to this endpoint without a session gets nowhere.
+    const account = await currentCustomer(sql, req);
+    if (!account) {
+      return json(res, 401, {
+        error: "Please log in to place an order.",
+        code: "login_required",
+      });
+    }
+
+    const { customer, errors } = validateCustomer({ ...body, email: account.email });
     if (errors) return json(res, 400, { error: errors[0], errors });
 
     // Stock comes from the database, prices from the catalogue. Nothing
     // about money is taken from the request.
     const priced = priceCart(body.items, await stockMap());
 
-    const sql = db();
-
     const [order] = await sql`
       insert into orders (
+        customer_id,
         razorpay_order_id, subtotal_paise, shipping_paise, total_paise,
         customer_name, customer_email, customer_phone,
         address_line1, address_line2, address_city, address_state,
         address_postcode, address_country, notes
       ) values (
+        ${account.id},
         ${"pending-" + crypto.randomUUID()},
         ${priced.subtotalPaise}, ${priced.shippingPaise}, ${priced.totalPaise},
         ${customer.name}, ${customer.email}, ${customer.phone},

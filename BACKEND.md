@@ -73,10 +73,17 @@ select sku, quantity from stock where quantity < 10;
 
 ## Accounts
 
-Optional, and they stay optional: checkout never asks for one. Forcing
-registration on a first-time buyer is the most reliable way to lose the sale,
-so `orders.customer_id` is nullable and a null is a perfectly ordinary guest
-order.
+**Ordering requires an account.** Browsing, searching and filling a cart do
+not — the gate is at checkout and nowhere earlier.
+
+`api/checkout.js` refuses a request without a session, and that refusal is the
+rule. The checkout page hiding its form from a logged-out visitor is only
+courtesy, so they are not left filling in an address they cannot submit.
+
+The known cost: some first-time buyers leave rather than register. It buys a
+customer record against every order, an order history, and one address on
+file. `orders.customer_id` stays nullable, because orders placed before this
+rule existed are not invalid.
 
 ```
 api/auth/register.js   create an account, sign in
@@ -157,3 +164,9 @@ do not own. That matters more once email is being sent to it.
 **Login lockout is per account, not per IP.** Ten failures locks that email for
 fifteen minutes, which also means someone can deliberately lock out an address
 they know. The real fix is rate limiting at the edge, by IP.
+
+**The checkout flow is unproven end to end.** The gate, the order summary and
+the prefill were checked in a browser against a stubbed `/api/auth/me`. What
+has never run is the real sequence: a session cookie from Postgres, a
+Razorpay order, their payment screen, and the webhook settling it. That needs
+credentials and a database.

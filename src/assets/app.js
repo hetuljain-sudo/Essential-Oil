@@ -581,8 +581,9 @@ document.addEventListener("keydown", (e) => {
 });
 
 $("[data-checkout]").addEventListener("click", () => {
-  // Backend hook: create an order here and hand off to your payment gateway.
-  toast("Checkout coming soon — no payment gateway connected yet");
+  // The checkout page handles the rest, including sending a logged-out
+  // shopper to log in and bringing them back.
+  location.href = "/checkout/";
 });
 
 const news = $("[data-newsletter]");
@@ -734,10 +735,8 @@ if (authForm) {
       }
 
       // `next` lets checkout send someone here and get them back afterwards.
-      // Only a path is honoured: an absolute URL here would be an open
-      // redirect, handing anyone a sarvha.com link that lands elsewhere.
-      const next = new URLSearchParams(location.search).get("next");
-      location.href = next && next.startsWith("/") && !next.startsWith("//") ? next : "/account/";
+      // safeNext comes from src/redirect.mjs, prepended by the build.
+      location.href = safeNext(new URLSearchParams(location.search).get("next"));
     } catch {
       showError("We couldn't reach the server. Check your connection and try again.");
     } finally {
@@ -795,4 +794,189 @@ if (accountPanel) {
     await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
     location.href = "/";
   });
+}
+
+/* ------------------------------------------------------------- checkout */
+/* The gate here is courtesy, not security: it saves a logged-out shopper
+   from filling in an address only to be refused. api/checkout.js is what
+   actually requires a session. */
+
+const checkoutGate = $("[data-checkout-gate]");
+
+if (checkoutGate) {
+  const panel = $("[data-checkout-body]");
+  const form = $("[data-checkout-form]");
+  const errorBox = $("[data-checkout-error]");
+  const payBtn = $("[data-pay]");
+
+  const cartItems = () =>
+    Object.entries(cart)
+      .filter(([k]) => lineProduct(k) && lineVariant(k))
+      .map(([key, qty]) => {
+        const [id, size] = key.split("::");
+        return { id, size, qty };
+      });
+
+  const showError = (message) => {
+    errorBox.textContent = message;
+    errorBox.hidden = false;
+    errorBox.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  };
+
+  const renderSummary = () => {
+    const lines = Object.entries(cart).filter(([k]) => lineProduct(k) && lineVariant(k));
+    const subtotal = lines.reduce((s, [k, q]) => s + lineVariant(k).price * q, 0);
+    const ship = subtotal >= C.freeShippingAt ? 0 : C.shippingFlat;
+
+    // Shown for reassurance only. The server prices the order again and its
+    // answer is the one that gets charged.
+    $("[data-checkout-summary]").innerHTML = `
+      <h2>Your order</h2>
+      <ul class="checkout__lines">
+        ${lines.map(([k, q]) => {
+          const p = lineProduct(k), v = lineVariant(k);
+          return `<li><span>${esc(p.name)} ${esc(v.size)} × ${q}</span>
+                      <span>${money(v.price * q)}</span></li>`;
+        }).join("")}
+        <li><span>Shipping</span><span>${ship === 0 ? "Free" : money(ship)}</span></li>
+        <li class="checkout__total"><span>Total</span><span>${money(subtotal + ship)}</span></li>
+      </ul>`;
+  };
+
+  const loadRazorpay = () =>
+    new Promise((resolve, reject) => {
+      if (window.Razorpay) return resolve();
+      const s = document.createElement("script");
+      s.src = "https://checkout.razorpay.com/v1/checkout.js";
+      s.onload = resolve;
+      s.onerror = () => reject(new Error("razorpay script blocked"));
+      document.head.appendChild(s);
+    });
+
+  (async () => {
+    if (!cartItems().length) {
+      checkoutGate.innerHTML = `
+        <p>Your cart is empty.</p>
+        <p><a class="btn btn--primary" href="/shop/">Start shopping</a></p>`;
+      return;
+    }
+
+    let me = null;
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+      me = (await res.json()).customer;
+    } catch {
+      checkoutGate.innerHTML = `<p class="muted">We couldn't reach the server. Please refresh.</p>`;
+      return;
+    }
+
+    if (!me) {
+      checkoutGate.innerHTML = `
+        <p>Please log in to place your order. It keeps your delivery details and
+           gives you somewhere to see the order afterwards.</p>
+        <p>
+          <a class="btn btn--primary" href="/account/login/?next=%2Fcheckout%2F">Log in</a>
+          <a class="btn btn--ghost" href="/account/register/?next=%2Fcheckout%2F">Create an account</a>
+        </p>`;
+      return;
+    }
+
+    // Prefill what the account already knows, so an existing customer is
+    // only typing an address.
+    form.name.value = me.name ?? "";
+    form.phone.value = me.phone ?? "";
+
+    checkoutGate.hidden = true;
+    panel.hidden = false;
+    renderSummary();
+  })();
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.hidden = true;
+
+    const f = Object.fromEntries(new FormData(form));
+    const payload = {
+      items: cartItems(),
+      name: f.name, phone: f.phone, notes: f.notes,
+      address: {
+        line1: f.line1, line2: f.line2, city: f.city,
+        state: f.state, postcode: f.postcode,
+      },
+    };
+
+    payBtn.disabled = true;
+    payBtn.textContent = "Preparing…";
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 401) {
+        location.href = "/account/login/?next=%2Fcheckout%2F";
+        return;
+      }
+      if (!res.ok) {
+        showError(data.error || "We couldn't start that order.");
+        return;
+      }
+
+      await loadRazorpay();
+
+      const rz = new window.Razorpay({
+        key: data.keyId,
+        order_id: data.razorpayOrderId,
+        amount: data.amountPaise,
+        currency: "INR",
+        name: "Sarvha",
+        description: "Essential oils",
+        prefill: { name: f.name, contact: f.phone },
+        theme: { color: "#2f3d2b" },
+        handler() {
+          // Deliberately not "payment confirmed". This fires in the browser;
+          // the order is settled by the webhook, which may land a moment
+          // later. Claiming success here would sometimes be a lie.
+          cart = {};
+          saveCart();
+          renderCart();
+          sessionStorage.setItem("sarvha-last-order", data.orderId);
+          location.href = "/checkout/thanks/";
+        },
+        modal: {
+          ondismiss() {
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay securely";
+          },
+        },
+      });
+
+      rz.on("payment.failed", (r) => {
+        showError(r?.error?.description || "That payment didn't go through. Please try again.");
+        payBtn.disabled = false;
+        payBtn.textContent = "Pay securely";
+      });
+
+      rz.open();
+      payBtn.textContent = "Pay securely";
+    } catch (err) {
+      showError(
+        err?.message === "razorpay script blocked"
+          ? "The payment window couldn't load. A browser extension may be blocking it."
+          : "We couldn't reach the server. Please try again.",
+      );
+      payBtn.disabled = false;
+      payBtn.textContent = "Pay securely";
+    }
+  });
+}
+
+const orderRef = $("[data-order-ref]");
+if (orderRef) {
+  const id = sessionStorage.getItem("sarvha-last-order");
+  if (id) orderRef.textContent = `Order reference: ${id}`;
 }
