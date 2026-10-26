@@ -31,11 +31,11 @@ illustrative images for most categories, so these will not serve for Shopping li
 | Rosehip Renewal | Amber dropper bottle and jar on hessian with green leaves resting behind | https://images.unsplash.com/photo-1624454002302-36b824d7bd0a |
 | Frankincense Quiet | Open amber oil bottle in warm light with foliage softly blurred behind | https://images.unsplash.com/photo-1512867957657-38dbae50a35b |
 | Geranium Balance | Amber oil bottles on linen beside a bowl of dried florals and a pink rose | https://images.unsplash.com/photo-1676852148076-7a92002419f3 |
-| Ylang Ylang Extra | Cream and yellow tropical blossoms with glossy green leaves | https://images.unsplash.com/photo-1694735785416-c0dd9318edeb |
+| Ylang Ylang Extra | The drooping yellow petals of a ylang ylang flower on the branch | https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa |
 | Vetiver (Khus) | Tall green grass bending in the wind | https://images.unsplash.com/photo-1685491455970-fcf003cba14d |
 | Sandalwood | Close-up of fine-grained brown heartwood | https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad |
 | Lemongrass | Tall green and white lemongrass blades against a blue sky | https://images.unsplash.com/photo-1777723915762-31069e8e737b |
-| Bergamot | Citrus fruit ripening on the tree in sunlight | https://images.unsplash.com/photo-1579169326371-ccb4e63f7889 |
+| Bergamot | A green bergamot-type citrus fruit ripening on a leafy branch | https://images.unsplash.com/photo-1760293049500-f68afa079549 |
 | Pink Grapefruit | Pink grapefruit halves cut open, showing the blush flesh | https://images.unsplash.com/photo-1577234286642-fc512a5f8f11 |
 | Clove Bud | A glass jar of dried clove buds on a white table | https://images.unsplash.com/photo-1701191310584-3f319e0e6c59 |
 | Cinnamon Leaf | A pile of rolled cinnamon quills on a dark surface | https://images.unsplash.com/photo-1758657996518-e67bd328854e |
@@ -44,7 +44,7 @@ illustrative images for most categories, so these will not serve for Shopping li
 | Sweet Almond Carrier Oil | Whole almonds in a white ceramic bowl | https://images.unsplash.com/photo-1608797178974-15b35a64ede9 |
 | Holy Basil (Tulsi) | Holy basil in flower, purple spikes above green leaves | https://images.unsplash.com/photo-1615041443219-2a63ee45bb60 |
 | Clary Sage | Close-up of a purple and white clary sage flower | https://images.unsplash.com/photo-1764098979813-4c2f8eba5057 |
-| Patchouli | Broad soft green leaves of an aromatic shrub | https://images.unsplash.com/photo-1651773485326-41b9ae7d3c05 |
+| Patchouli | Broad soft green leaves filling the frame | https://images.unsplash.com/photo-1519053772743-2548b859cef2 |
 | Sweet Marjoram | Marjoram in flower, small pale blooms above green leaves | https://images.unsplash.com/photo-1726923153013-20e5d7076130 |
 | Jasmine Sambac (Mogra) Absolute | White jasmine flowers with yellow centres against a blue sky | https://images.unsplash.com/photo-1781707533179-9c296c975a04 |
 | Mandarin | Ripe mandarin oranges | https://images.unsplash.com/photo-1557800636-894a64c1696f |
@@ -53,7 +53,7 @@ illustrative images for most categories, so these will not serve for Shopping li
 | Black Pepper | A bowl of black peppercorns | https://images.unsplash.com/photo-1649951806971-ad0e00408773 |
 | Juniper Berry | A juniper branch carrying ripe blue and unripe green berries | https://images.unsplash.com/photo-1782845988762-a1cd0a45033e |
 | Thyme | Close-up of fresh thyme sprigs | https://images.unsplash.com/photo-1679061584104-534b7ec4afe6 |
-| Palmarosa | Lush green blades of aromatic grass, overlapping in the sun | https://images.unsplash.com/photo-1761071181946-18f6cba215c2 |
+| Palmarosa | A clump of fine aromatic grass seen from above | https://images.unsplash.com/photo-1560705889-dc78ff46bbd6 |
 | Carrot Seed | Wild carrot flowering in flat white umbels | https://images.unsplash.com/photo-1596380134329-5a768bcd0475 |
 | Argan Carrier Oil | Argan nuts and kernels, shelled and whole | https://images.unsplash.com/photo-1600189020840-e9918c25269d |
 | Rose Absolute | Pink damask roses in bloom, still wet with dew | https://images.unsplash.com/photo-1531874824027-2a0d33bd6338 |
@@ -63,7 +63,7 @@ illustrative images for most categories, so these will not serve for Shopping li
 | Sweet Basil | A single fresh basil leaf on a white surface | https://images.unsplash.com/photo-1591495746097-8a92864d5c1f |
 | Citronella | A clump of citronella grass growing in the ground | https://images.unsplash.com/photo-1575032558058-683487d88fb1 |
 | Niaouli | Fluffy white melaleuca blossom on the branch | https://images.unsplash.com/photo-1686600662417-619469ba175c |
-| Ravensara | Glossy green camphor-scented leaves | https://images.unsplash.com/photo-1584204559709-ca7d413229eb |
+| Ravensara | Glossy green leaves and buds of a camphor-family tree | https://images.unsplash.com/photo-1715258645043-40cc995a863c |
 | Sweet Fennel | A spoonful of dried fennel seeds | https://images.unsplash.com/photo-1701189975806-97b11541ec82 |
 | Coriander Seed | Dried coriander seeds | https://images.unsplash.com/photo-1508748169069-82590c9f26e6 |
 | Coconut Carrier Oil | Whole coconuts in their brown husks | https://images.unsplash.com/photo-1560769680-ba2f3767c785 |

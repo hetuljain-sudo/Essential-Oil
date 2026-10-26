@@ -313,7 +313,7 @@ export const products = [
     notes: ["Creamy floral", "Ripe banana", "Faint spice"],
     origin: "Tamil Nadu, India", method: "Steam distilled",
     swatch: ["#e8d58f", "#c0a23f"], bg: "#f4eed6",
-    image: { src: "https://images.unsplash.com/photo-1694735785416-c0dd9318edeb?auto=format&fit=crop&q=70&w=900", alt: "Cream and yellow tropical blossoms with glossy green leaves" },
+    image: { src: "https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=900", alt: "The drooping yellow petals of a ylang ylang flower on the branch" },
     variants: [{ size: "15 ml", price: 449, stock: 20 }, { size: "30 ml", price: 799, stock: 9 }],
   },
   {
@@ -385,7 +385,7 @@ export const products = [
     origin: "Calabria, Italy", method: "Cold pressed",
     swatch: ["#bcd47e", "#7d9a3c"], bg: "#e9f0d8",
     warning: "Phototoxic. Bergapten in cold-pressed bergamot reacts with sunlight — keep below 0.4% on skin that will be exposed, or use after dark.",
-    image: { src: "https://images.unsplash.com/photo-1579169326371-ccb4e63f7889?auto=format&fit=crop&q=70&w=900", alt: "Citrus fruit ripening on the tree in sunlight" },
+    image: { src: "https://images.unsplash.com/photo-1760293049500-f68afa079549?auto=format&fit=crop&q=70&w=900", alt: "A green bergamot-type citrus fruit ripening on a leafy branch" },
     variants: [{ size: "15 ml", price: 549, stock: 16 }, { size: "30 ml", price: 999, stock: 7 }],
   },
   {
@@ -555,7 +555,7 @@ export const products = [
     notes: ["Damp earth", "Dark sweetness", "Dry wood"],
     origin: "Indonesia", method: "Steam distilled",
     swatch: ["#a08a6a", "#6b5538"], bg: "#eee6da",
-    image: { src: "https://images.unsplash.com/photo-1651773485326-41b9ae7d3c05?auto=format&fit=crop&q=70&w=900", alt: "Broad soft green leaves of an aromatic shrub" },
+    image: { src: "https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=900", alt: "Broad soft green leaves filling the frame" },
     variants: [{ size: "15 ml", price: 849, stock: 15 }, { size: "30 ml", price: 1549, stock: 6 }],
   },
   {
@@ -721,7 +721,7 @@ export const products = [
     notes: ["Soft rose", "Green grass", "Sweet floral"],
     origin: "Madhya Pradesh, India", method: "Steam distilled",
     swatch: ["#d7b89c", "#a8805c"], bg: "#f3e9df",
-    image: { src: "https://images.unsplash.com/photo-1761071181946-18f6cba215c2?auto=format&fit=crop&q=70&w=900", alt: "Lush green blades of aromatic grass, overlapping in the sun" },
+    image: { src: "https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900", alt: "A clump of fine aromatic grass seen from above" },
     variants: [{ size: "15 ml", price: 499, stock: 26 }, { size: "30 ml", price: 899, stock: 11 }],
   },
   {
@@ -914,7 +914,7 @@ export const products = [
     origin: "Madagascar", method: "Steam distilled",
     swatch: ["#a9c49b", "#5f8650"], bg: "#e9f0e3",
     warning: "Not suitable for babies or young children.",
-    image: { src: "https://images.unsplash.com/photo-1584204559709-ca7d413229eb?auto=format&fit=crop&q=70&w=900", alt: "Glossy green camphor-scented leaves" },
+    image: { src: "https://images.unsplash.com/photo-1715258645043-40cc995a863c?auto=format&fit=crop&q=70&w=900", alt: "Glossy green leaves and buds of a camphor-family tree" },
     variants: [{ size: "15 ml", price: 599, stock: 15 }],
   },
   {
