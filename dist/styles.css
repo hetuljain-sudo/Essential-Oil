@@ -957,3 +957,13 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   .moods { grid-template-columns: repeat(2, 1fr); }
 }
 .lib__note { font-size: .84rem; color: #a8b79c; margin: .6rem 0 0; }
+
+/* The mobile menu lives inside .header, which is position:sticky with a
+   z-index and therefore its own stacking context. The nav's z-index can only
+   compete inside that context, so the overlay at 50 painted over the whole
+   header — menu visible, greyed out, and unclickable.
+
+   While the menu is open, lift the header above the overlay. The cart drawer
+   at 60 still wins, and the header drops back when the menu closes so the
+   cart's overlay can dim it as before. */
+body.menu-open .header { z-index: 56; }

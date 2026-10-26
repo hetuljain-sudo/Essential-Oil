@@ -214,7 +214,8 @@ function openMenu() {
   $("[data-nav]").classList.add("is-open");
   $("[data-overlay]").classList.add("is-open");
   $("[data-menu-toggle]").setAttribute("aria-expanded", "true");
-  document.body.classList.add("no-scroll");
+  // menu-open lifts the header above the overlay — see pages.css
+  document.body.classList.add("no-scroll", "menu-open");
   setTimeout(() => $("[data-menu-close]").focus(), 60);
 }
 
@@ -222,6 +223,7 @@ function closeMenu() {
   const nav = $("[data-nav]");
   if (!nav.classList.contains("is-open")) return;
   nav.classList.remove("is-open");
+  document.body.classList.remove("menu-open");
   if (!$("[data-drawer]").classList.contains("is-open")) {
     $("[data-overlay]").classList.remove("is-open");
     document.body.classList.remove("no-scroll");
