@@ -284,8 +284,6 @@ page("/", layout({
         <div class="steps steps--light">
           ${steps.map((s) => `<div><span>${s.n}</span><h4>${s.h}</h4><p>${esc(s.p)}</p></div>`).join("")}
         </div>
-        <p class="note">We're a young business with a deliberately small range, so we can speak honestly about
-        everything we carry. <a href="/faq/#product-quality-sourcing">Read how we source and check our oils</a>.</p>
       </div>
     </section>
 
