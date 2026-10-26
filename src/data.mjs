@@ -32,6 +32,7 @@ export const nav = [
   { href: "/shop/", label: "Shop" },
   { href: "/collections/", label: "Collections" },
   { href: "/about/", label: "Our story" },
+  { href: "/guides/", label: "Guides" },
   { href: "/blog/", label: "Journal" },
   { href: "/contact/", label: "Contact" },
 ];
@@ -149,7 +150,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 449, stock: 40 }, { size: "30 ml", price: 799, stock: 17 }],
   },
   {
-    id: "peppermint-spark", family: "Mints", name: "Peppermint Spark", botanical: "Mentha piperita",
+    id: "peppermint-spark",
+    safety: { children: true, pets: true }, family: "Mints", name: "Peppermint Spark", botanical: "Mentha piperita",
     category: "energy", featured: true,
     tagline: "Pacific Northwest mint with a genuine cooling bite.",
     desc: "Cold, clean and immediate — you feel this one on the back of your neck before you have finished inhaling. Our go-to for the mid-afternoon wall.",
@@ -163,10 +165,12 @@ export const products = [
     origin: "Willamette Valley, Oregon", method: "Steam distilled",
     swatch: ["#8fd0bf", "#3d9b86"], bg: "#e1f1ea",
     image: { src: "https://images.unsplash.com/photo-1605039982749-c2fe1dd2a588?auto=format&fit=crop&q=70&w=900", alt: "Glass dropper of golden oil on dark wood with fresh green leaves behind" },
+    warning: "Not suitable for babies or young children, and best kept away from cats. Keep it below the brow line and wash your hands after use.",
     variants: [{ size: "15 ml", price: 499, stock: 31 }, { size: "30 ml", price: 899, stock: 8 }],
   },
   {
-    id: "lemon-clarity", family: "Citrus", name: "Lemon Clarity", botanical: "Citrus limon",
+    id: "lemon-clarity",
+    safety: { phototoxic: 2 }, family: "Citrus", name: "Lemon Clarity", botanical: "Citrus limon",
     category: "energy",
     tagline: "Sicilian peel, pressed at peak acidity.",
     desc: "Cleaner and greener than most lemon oils, with none of the candied quality that comes from over-ripe fruit. Brilliant for cutting through a stuffy room.",
@@ -180,10 +184,12 @@ export const products = [
     origin: "Sicily, Italy", method: "Cold pressed",
     swatch: ["#f2d97a", "#d4ac2e"], bg: "#f2f0d8",
     image: { src: "https://images.unsplash.com/photo-1633423411797-9a7317784d2b?auto=format&fit=crop&q=70&w=900", alt: "Dropper releasing bright yellow citrus oil onto a cream surface patterned with leaf shadows" },
+    warning: "Phototoxic. Cold-pressed lemon reacts with sunlight — keep below 2% on skin that will see sun within twelve hours, or use after dark.",
     variants: [{ size: "15 ml", price: 449, stock: 22 }, { size: "30 ml", price: 799, stock: 0 }],
   },
   {
-    id: "eucalyptus-clearing", family: "Camphorous", name: "Eucalyptus Clearing", botanical: "Eucalyptus globulus",
+    id: "eucalyptus-clearing",
+    safety: { children: true }, family: "Camphorous", name: "Eucalyptus Clearing", botanical: "Eucalyptus globulus",
     category: "immunity", featured: true,
     tagline: "A deep, cooling breath of Tasmanian blue gum.",
     desc: "High in 1,8-cineole, this is the oil we reach for the moment the seasons turn. Sharp and camphorous on first inhale, then surprisingly soft as it settles.",
@@ -197,10 +203,12 @@ export const products = [
     origin: "Blue Mountains, Australia", method: "Steam distilled",
     swatch: ["#7fb8a4", "#3f8570"], bg: "#e0eef1",
     image: { src: "https://images.unsplash.com/photo-1674906027853-4bd48f476244?auto=format&fit=crop&q=70&w=900", alt: "Essential oil bottle surrounded by eucalyptus sprigs and blooms on a pale background" },
+    warning: "High in 1,8-cineole — not suitable for babies or young children.",
     variants: [{ size: "15 ml", price: 499, stock: 27 }, { size: "30 ml", price: 899, stock: 9 }],
   },
   {
-    id: "tea-tree-shield", family: "Camphorous", name: "Tea Tree Shield", botanical: "Melaleuca alternifolia",
+    id: "tea-tree-shield",
+    safety: { maxDilution: 1, pets: true }, family: "Camphorous", name: "Tea Tree Shield", botanical: "Melaleuca alternifolia",
     category: "immunity",
     tagline: "Australian-grown, terpinen-rich, endlessly useful.",
     desc: "The workhorse of any collection. Sharp, green and medicinal in the way tea tree should be — the smell most people associate with getting on top of something.",
@@ -214,6 +222,7 @@ export const products = [
     origin: "New South Wales, Australia", method: "Steam distilled",
     swatch: ["#a3c48b", "#5f8a4c"], bg: "#e8eedd",
     image: { src: "https://images.unsplash.com/photo-1671493234842-6e600f721982?auto=format&fit=crop&q=70&w=900", alt: "Amber essential oil bottle resting on natural woven linen" },
+    warning: "Genuinely toxic to cats and dogs, including as vapour in a closed room. Dilute to 1% or below on skin; never apply it neat.",
     variants: [{ size: "15 ml", price: 549, stock: 18 }, { size: "30 ml", price: 999, stock: 6 }],
   },
   {
@@ -340,7 +349,8 @@ export const products = [
     variants: [{ size: "5 ml", price: 2499, stock: 4 }],
   },
   {
-    id: "lemongrass", family: "Green & grassy", name: "Lemongrass", botanical: "Cymbopogon citratus",
+    id: "lemongrass",
+    safety: { maxDilution: 1 }, family: "Green & grassy", name: "Lemongrass", botanical: "Cymbopogon citratus",
     category: "energy",
     tagline: "Sharp, green citrus from freshly cut grass.",
     desc: "Brighter and greener than any citrus peel, with a grassy edge underneath that keeps it from turning sweet. One of the few oils that smells exactly like the plant it came from.",
@@ -353,10 +363,12 @@ export const products = [
     notes: ["Green citrus", "Cut grass", "Faint ginger"],
     origin: "Kerala, India", method: "Steam distilled",
     swatch: ["#cfd46a", "#8f9a2e"], bg: "#eef1d8",
+    warning: "More irritating to skin than its freshness suggests — keep to 1% or below.",
     variants: [{ size: "15 ml", price: 449, stock: 34 }, { size: "30 ml", price: 799, stock: 15 }],
   },
   {
-    id: "bergamot", family: "Citrus", name: "Bergamot", botanical: "Citrus bergamia",
+    id: "bergamot",
+    safety: { phototoxic: 0.4 }, family: "Citrus", name: "Bergamot", botanical: "Citrus bergamia",
     category: "energy",
     tagline: "The citrus that gives Earl Grey its character.",
     desc: "Floral where most citrus is simply sweet — green, slightly bitter, and more complex than orange or lemon. Cold-pressed from the peel of a fruit grown almost entirely for its rind.",
@@ -373,7 +385,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 549, stock: 16 }, { size: "30 ml", price: 999, stock: 7 }],
   },
   {
-    id: "grapefruit", family: "Citrus", name: "Pink Grapefruit", short: "Grapefruit", botanical: "Citrus paradisi",
+    id: "grapefruit",
+    safety: { phototoxic: 4 }, family: "Citrus", name: "Pink Grapefruit", short: "Grapefruit", botanical: "Citrus paradisi",
     category: "energy",
     tagline: "Cold-pressed pink peel, tart rather than sweet.",
     desc: "Sharper and drier than orange, with a bitter edge that stops it becoming cloying in a diffuser. Among the shortest-lived oils we carry — citrus peel oils oxidise quickly once opened.",
@@ -390,7 +403,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 499, stock: 23 }, { size: "30 ml", price: 899, stock: 11 }],
   },
   {
-    id: "clove-bud", family: "Warm spices", name: "Clove Bud", botanical: "Syzygium aromaticum",
+    id: "clove-bud",
+    safety: { maxDilution: 0.5, pregnancy: true, children: true, pets: true }, family: "Warm spices", name: "Clove Bud", botanical: "Syzygium aromaticum",
     category: "immunity",
     tagline: "Distilled from the bud, not the leaf or stem.",
     desc: "Warm, sweet and unmistakably clove, with far less harshness than the leaf or stem oils sold at a fraction of the price. Very high in eugenol, which is what makes it useful and what makes it demand respect.",
@@ -407,7 +421,8 @@ export const products = [
     variants: [{ size: "10 ml", price: 549, stock: 13 }],
   },
   {
-    id: "cinnamon-leaf", family: "Warm spices", name: "Cinnamon Leaf", botanical: "Cinnamomum verum",
+    id: "cinnamon-leaf",
+    safety: { maxDilution: 0.6, pregnancy: true }, family: "Warm spices", name: "Cinnamon Leaf", botanical: "Cinnamomum verum",
     category: "immunity",
     tagline: "The leaf oil, which is far gentler than the bark.",
     desc: "Warm and spicy with a clove-like edge, distilled from the leaf rather than the bark. We stock leaf rather than bark deliberately: bark oil is a severe skin sensitiser and has no business in a consumer dropper bottle.",
@@ -424,7 +439,8 @@ export const products = [
     variants: [{ size: "10 ml", price: 449, stock: 17 }],
   },
   {
-    id: "rosemary", family: "For skin & hair", name: "Rosemary", botanical: "Rosmarinus officinalis",
+    id: "rosemary",
+    safety: { pregnancy: true, conditions: ["epilepsy", "high blood pressure"] }, family: "For skin & hair", name: "Rosemary", botanical: "Rosmarinus officinalis",
     category: "skincare",
     tagline: "The cineole type, the one used for scalp and hair.",
     desc: "Sharp, green and camphorous. The most asked-for oil we carry, almost entirely for hair and scalp routines. We stock the 1,8-cineole chemotype, which is the one the hair research actually used.",
@@ -457,7 +473,8 @@ export const products = [
     variants: [{ size: "100 ml", price: 649, stock: 30 }, { size: "250 ml", price: 1399, stock: 12 }],
   },
   {
-    id: "sweet-almond", family: "Carrier oils", carrier: true, name: "Sweet Almond Carrier Oil", short: "Almond", botanical: "Prunus amygdalus dulcis",
+    id: "sweet-almond",
+    safety: { nutAllergy: true }, family: "Carrier oils", carrier: true, name: "Sweet Almond Carrier Oil", short: "Almond", botanical: "Prunus amygdalus dulcis",
     category: "skincare",
     tagline: "Cold-pressed from sweet almonds — the everyday carrier.",
     desc: "Mild, slightly nutty and inexpensive enough to use generously, which makes it the right choice for full-body massage where jojoba would be extravagant. Heavier than jojoba and slower to absorb.",
@@ -474,7 +491,8 @@ export const products = [
     variants: [{ size: "100 ml", price: 449, stock: 36 }, { size: "250 ml", price: 899, stock: 18 }],
   },
   {
-    id: "basil-holy", family: "Herbal", name: "Holy Basil (Tulsi)", short: "Tulsi", botanical: "Ocimum sanctum",
+    id: "basil-holy",
+    safety: { pregnancy: true }, family: "Herbal", name: "Holy Basil (Tulsi)", short: "Tulsi", botanical: "Ocimum sanctum",
     category: "immunity",
     tagline: "Tulsi, distilled from leaf picked before flowering.",
     desc: "Sweeter and more peppery than culinary basil, with the clove-like warmth that tulsi is known for. Distilled from leaf harvested before the plant flowers, when the oil is at its most aromatic.",
@@ -494,7 +512,8 @@ export const products = [
   /* Second batch from the same suppliers. */
 
   {
-    id: "clary-sage", family: "Herbaceous", name: "Clary Sage", botanical: "Salvia sclarea",
+    id: "clary-sage",
+    safety: { pregnancy: true }, family: "Herbaceous", name: "Clary Sage", botanical: "Salvia sclarea",
     category: "relaxation",
     tagline: "Nutty, herbaceous and faintly sweet — nothing like garden sage.",
     desc: "Warm and slightly winey, with a tea-like quality underneath. People expecting culinary sage are always surprised: this is softer, rounder and much less sharp than the herb in the kitchen.",
@@ -527,7 +546,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 849, stock: 15 }, { size: "30 ml", price: 1549, stock: 6 }],
   },
   {
-    id: "marjoram", family: "Herbaceous", name: "Sweet Marjoram", botanical: "Origanum majorana",
+    id: "marjoram",
+    safety: { pregnancy: true }, family: "Herbaceous", name: "Sweet Marjoram", botanical: "Origanum majorana",
     category: "relaxation",
     tagline: "Warm, soft and herbal — oregano's gentler relative.",
     desc: "Closely related to oregano but far milder, with a rounded warmth where oregano is sharp and medicinal. Long used in massage blends for exactly that softness.",
@@ -544,7 +564,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 549, stock: 19 }],
   },
   {
-    id: "jasmine-sambac", family: "Florals", name: "Jasmine Sambac (Mogra) Absolute", botanical: "Jasminum sambac",
+    id: "jasmine-sambac",
+    safety: { pregnancy: true }, family: "Florals", name: "Jasmine Sambac (Mogra) Absolute", botanical: "Jasminum sambac",
     short: "Mogra", category: "relaxation", badge: "Premium",
     tagline: "Mogra, extracted from flowers picked before dawn.",
     desc: "Intensely floral, green at the top and almost fruity underneath — the smell of mogra garlands, concentrated to the point where a single drop fills a room. The flowers are picked at night, when the scent is strongest, and must be processed within hours.",
@@ -578,7 +599,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 449, stock: 28 }, { size: "30 ml", price: 799, stock: 13 }],
   },
   {
-    id: "lime", family: "Citrus", name: "Lime", botanical: "Citrus aurantifolia",
+    id: "lime",
+    safety: { phototoxic: 0.7 }, family: "Citrus", name: "Lime", botanical: "Citrus aurantifolia",
     category: "energy",
     tagline: "Sharper and greener than lemon, with a bitter edge.",
     desc: "The most bracing citrus we carry — tart, green and slightly resinous, closer to the smell of the peel than the juice. Excellent for cutting through a heavy room.",
@@ -628,7 +650,8 @@ export const products = [
     variants: [{ size: "10 ml", price: 549, stock: 16 }],
   },
   {
-    id: "juniper-berry", family: "Herbal", name: "Juniper Berry", botanical: "Juniperus communis",
+    id: "juniper-berry",
+    safety: { pregnancy: true }, family: "Herbal", name: "Juniper Berry", botanical: "Juniperus communis",
     category: "immunity",
     tagline: "Crisp, resinous and green — the smell behind gin.",
     desc: "Sharp and piney with a clean, almost cold quality. Familiar to anyone who drinks gin, though the oil is drier and more resinous than the spirit suggests.",
@@ -645,7 +668,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 649, stock: 14 }],
   },
   {
-    id: "thyme", family: "Herbal", name: "Thyme", botanical: "Thymus vulgaris",
+    id: "thyme",
+    safety: { maxDilution: 0.5, pregnancy: true, children: true, conditions: ["high blood pressure"] }, family: "Herbal", name: "Thyme", botanical: "Thymus vulgaris",
     category: "immunity",
     tagline: "Sharply herbal and genuinely strong — handle with care.",
     desc: "Hot, medicinal and unmistakably herbal. Among the most potent oils in the range, high in thymol, and one of the few where the dilution guidance is not a formality.",
@@ -679,7 +703,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 499, stock: 26 }, { size: "30 ml", price: 899, stock: 11 }],
   },
   {
-    id: "carrot-seed", family: "For skin & hair", name: "Carrot Seed", botanical: "Daucus carota",
+    id: "carrot-seed",
+    safety: { pregnancy: true }, family: "For skin & hair", name: "Carrot Seed", botanical: "Daucus carota",
     category: "skincare",
     tagline: "Earthy, dry and nothing like the vegetable.",
     desc: "Distilled from the seeds of wild carrot, not the root, which is why it smells of dry earth and hay rather than anything sweet. Long used in facial oils for mature skin.",
@@ -696,7 +721,8 @@ export const products = [
     variants: [{ size: "10 ml", price: 649, stock: 13 }],
   },
   {
-    id: "argan", family: "Carrier oils", carrier: true, name: "Argan Carrier Oil", botanical: "Argania spinosa",
+    id: "argan",
+    safety: { nutAllergy: true }, family: "Carrier oils", carrier: true, name: "Argan Carrier Oil", botanical: "Argania spinosa",
     short: "Argan", category: "skincare",
     tagline: "Cold-pressed Moroccan argan, unroasted and cosmetic grade.",
     desc: "Light, quickly absorbed and high in vitamin E. The cosmetic grade is pressed from unroasted kernels, which is why it has almost no smell — the nutty culinary version is roasted first and is a different product.",
@@ -716,7 +742,8 @@ export const products = [
   /* Third batch. */
 
   {
-    id: "rose-absolute", family: "Florals", name: "Rose Absolute", botanical: "Rosa damascena",
+    id: "rose-absolute",
+    safety: { pregnancy: true }, family: "Florals", name: "Rose Absolute", botanical: "Rosa damascena",
     short: "Rose", category: "relaxation", badge: "Premium",
     tagline: "Damask rose, extracted from petals picked at first light.",
     desc: "Deep, honeyed and unmistakably rose — richer and more complex than anything a candle or a soap has prepared you for. The petals are picked before the sun gets to them and processed the same morning, because the scent falls away within hours of cutting.",
@@ -733,7 +760,8 @@ export const products = [
     variants: [{ size: "5 ml", price: 9499, stock: 3 }],
   },
   {
-    id: "tuberose-absolute", family: "Florals", name: "Tuberose (Rajnigandha) Absolute", botanical: "Polianthes tuberosa",
+    id: "tuberose-absolute",
+    safety: { pregnancy: true }, family: "Florals", name: "Tuberose (Rajnigandha) Absolute", botanical: "Polianthes tuberosa",
     short: "Tuberose", category: "relaxation", badge: "Premium",
     tagline: "Rajnigandha — white, creamy and almost narcotic.",
     desc: "The heaviest floral there is. Creamy and green at once, with a quality that perfumers describe as narcotic and most people describe as unforgettable. The flowers keep producing scent after picking, which is why they are processed alive.",
@@ -750,7 +778,8 @@ export const products = [
     variants: [{ size: "5 ml", price: 6499, stock: 4 }],
   },
   {
-    id: "davana", family: "Herbaceous", name: "Davana", botanical: "Artemisia pallens",
+    id: "davana",
+    safety: { pregnancy: true }, family: "Herbaceous", name: "Davana", botanical: "Artemisia pallens",
     category: "relaxation",
     tagline: "Fruity, boozy and unlike anything else we carry.",
     desc: "Sweet and jammy with a distinctly winey edge — closer to dried fruit and rum than to any flower or herb. Famously it smells slightly different on every person who wears it, which is why perfumers are so attached to it.",
@@ -784,7 +813,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 599, stock: 20 }, { size: "30 ml", price: 1099, stock: 8 }],
   },
   {
-    id: "sweet-basil", family: "Green & grassy", name: "Sweet Basil", botanical: "Ocimum basilicum",
+    id: "sweet-basil",
+    safety: { maxDilution: 1.5, pregnancy: true }, family: "Green & grassy", name: "Sweet Basil", botanical: "Ocimum basilicum",
     category: "energy",
     tagline: "Green, peppery and sharply clarifying.",
     desc: "The culinary basil, distilled. Fresh and anise-like at the top with a peppery green body — brighter and more cutting than holy basil, and a natural partner for rosemary in a working blend.",
@@ -801,7 +831,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 399, stock: 27 }, { size: "30 ml", price: 699, stock: 12 }],
   },
   {
-    id: "citronella", family: "Green & grassy", name: "Citronella", botanical: "Cymbopogon winterianus",
+    id: "citronella",
+    safety: { maxDilution: 1, pregnancy: true }, family: "Green & grassy", name: "Citronella", botanical: "Cymbopogon winterianus",
     category: "energy",
     tagline: "Lemony grass with a sharper, greener edge.",
     desc: "Close to lemongrass but rougher and more rasping, with a woody note underneath. Best known as the smell of summer evenings outdoors, and genuinely useful for clearing stale air.",
@@ -819,7 +850,8 @@ export const products = [
   },
 
   {
-    id: "niaouli", family: "Camphorous", name: "Niaouli", botanical: "Melaleuca quinquenervia",
+    id: "niaouli",
+    safety: { children: true }, family: "Camphorous", name: "Niaouli", botanical: "Melaleuca quinquenervia",
     category: "immunity",
     tagline: "Tea tree's gentler cousin, sweeter and less medicinal.",
     desc: "From the same family as tea tree and cajuput, but softer and noticeably sweeter — camphorous without the sharp medicinal edge that puts people off tea tree. Easier to live with in a diffuser.",
@@ -836,7 +868,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 549, stock: 18 }],
   },
   {
-    id: "ravensara", family: "Camphorous", name: "Ravensara", botanical: "Ravensara aromatica",
+    id: "ravensara",
+    safety: { children: true }, family: "Camphorous", name: "Ravensara", botanical: "Ravensara aromatica",
     category: "immunity",
     tagline: "Soft, sweet and faintly aniseed — a mild seasonal oil.",
     desc: "Gentler than eucalyptus and sweeter than tea tree, with a faint liquorice note that neither has. Often confused with ravintsara, which is a different species entirely.",
@@ -853,7 +886,8 @@ export const products = [
     variants: [{ size: "15 ml", price: 599, stock: 15 }],
   },
   {
-    id: "fennel", family: "Warm spices", name: "Sweet Fennel", botanical: "Foeniculum vulgare",
+    id: "fennel",
+    safety: { maxDilution: 1, pregnancy: true, children: true, conditions: ["breastfeeding", "oestrogen-sensitive conditions"] }, family: "Warm spices", name: "Sweet Fennel", botanical: "Foeniculum vulgare",
     category: "immunity",
     tagline: "Warm, sweet and strongly aniseed.",
     desc: "Unmistakably liquorice, warm and faintly peppery underneath. A polarising scent — people who like anise like it a great deal, and people who do not will not be persuaded.",
@@ -921,7 +955,8 @@ export const products = [
     variants: [{ size: "100 ml", price: 649, stock: 21 }, { size: "250 ml", price: 1299, stock: 8 }],
   },
   {
-    id: "neem", family: "Carrier oils", carrier: true, name: "Neem Carrier Oil", botanical: "Azadirachta indica",
+    id: "neem",
+    safety: { pregnancy: true, children: true }, family: "Carrier oils", carrier: true, name: "Neem Carrier Oil", botanical: "Azadirachta indica",
     short: "Neem", category: "skincare",
     tagline: "Cold-pressed neem — and yes, it smells exactly as you remember.",
     desc: "Bitter, garlicky and sulphurous. There is no pretending otherwise, and anyone who grew up in India knows the smell. Used for generations in skin and hair preparations, almost always blended into something else rather than alone.",

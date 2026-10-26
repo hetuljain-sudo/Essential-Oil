@@ -197,6 +197,11 @@ function footer() {
       })))}
 
       ${column("Learn", [
+        { href: "/guides/", label: "All guides" },
+        { href: "/guides/dilution-chart/", label: "Dilution chart" },
+        { href: "/guides/phototoxic-oils/", label: "Phototoxic oils" },
+        { href: "/guides/essential-oils-and-pregnancy/", label: "Pregnancy & children" },
+        { href: "/guides/how-to-use-a-diffuser/", label: "Using a diffuser" },
         { href: "/blog/", label: "Journal" },
         { href: "/faq/#product-quality-sourcing", label: "Purity & sourcing" },
         { href: "/faq/#usage-safety", label: "Safe use & dilution" },

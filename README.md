@@ -290,3 +290,31 @@ Columns are `<details>` elements that ship open, so every link is in the
 markup for crawlers and for anyone without JavaScript. On screens under
 860px, `app.js` closes all but the first — six stacked columns is an
 unusable wall on a phone.
+
+## Guides
+
+Four reference pages at `/guides/` that answer a question rather than sell a
+product — dilution, phototoxicity, pregnancy and pet safety, and diffuser use.
+Prose lives in [`src/guides.mjs`](src/guides.mjs).
+
+**The tables are generated, not written.** Each product carries a structured
+`safety` object:
+
+```js
+safety: { maxDilution: 0.5, pregnancy: true, children: true, pets: true }
+```
+
+A block of `["table:pregnancy"]` in a guide body inserts every oil flagged
+`safety.pregnancy`, linked to its own page. Add an oil with that flag and it
+appears on the guide automatically — a guide cannot fall out of step with the
+catalogue.
+
+Supported blocks: `table:dilution`, `table:maxDilution`, `table:phototoxic`,
+`table:pregnancy`, `table:children`, `table:pets`, `table:nutAllergy`,
+`table:diffuserCaution`.
+
+Structuring this exposed four products whose prose and data disagreed —
+cold-pressed lemon was phototoxic with no warning, peppermint and eucalyptus
+said "not for young children" only in their guide text, and tea tree's FAQ
+called it toxic to cats and dogs while its page said nothing. All now carry
+warnings matching their data.

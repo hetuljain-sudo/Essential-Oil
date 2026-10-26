@@ -26,6 +26,7 @@ import {
 import { guides } from "./src/content.mjs";
 import { postsNewestFirst, readingTime } from "./src/posts.mjs";
 import { hubs } from "./src/collections.mjs";
+import { guidePages } from "./src/guides.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -876,6 +877,197 @@ for (const post of blogPosts) {
               ${more.map((x) => postCard(x, readingTime(x))).join("")}
             </div>
           </div>` : ""}
+        </div>
+      </section>
+      ${newsletter()}`,
+  }));
+}
+
+
+/* --------------------------------------------------------------- guides */
+
+const guideUrl = (g) => `/guides/${g.slug}/`;
+
+/** Oils carrying a given safety flag, alphabetically. */
+const flagged = (key) =>
+  products.filter((p) => p.safety && p.safety[key])
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+const oilLink = (p) => `<a href="${productUrl(p)}">${esc(p.name)}</a>`;
+
+/**
+ * The tables on guide pages are generated from each product's `safety` data,
+ * so a guide cannot fall out of step with the catalogue.
+ */
+function derivedTable(kind) {
+  const wrap = (head, rows) => rows.length
+    ? `<div class="post__table"><table>
+        <thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
+        <tbody>${rows.join("")}</tbody>
+      </table></div>`
+    : `<p class="muted">Nothing in the range currently carries this flag.</p>`;
+
+  if (kind === "dilution") {
+    const rows = [
+      ["0.5%", "half a drop", "3 drops", "Clove, cinnamon, thyme — anything flagged as a sensitiser"],
+      ["1%", "1 drop", "6 drops", "The face, sensitive skin, and most blends for older children"],
+      ["2%", "2 drops", "12 drops", "General body use — the everyday default"],
+      ["3%", "3 drops", "18 drops", "Short-term, on a small area"],
+    ].map((r) => `<tr>${r.map((c, i) =>
+      i === 0 ? `<td><strong>${c}</strong></td>` : `<td>${c}</td>`).join("")}</tr>`);
+    return wrap(["Dilution", "Per teaspoon (5 ml)", "Per 30 ml", "Typical use"], rows);
+  }
+
+  if (kind === "phototoxic") {
+    const rows = flagged("phototoxic")
+      .sort((a, b) => a.safety.phototoxic - b.safety.phototoxic)
+      .map((p) => `<tr>
+        <td>${oilLink(p)}</td>
+        <td><em>${esc(p.botanical)}</em></td>
+        <td>${esc(p.method)}</td>
+        <td><strong>${p.safety.phototoxic}%</strong></td>
+      </tr>`);
+    return wrap(["Oil", "Botanical name", "Extraction", "Limit on sun-exposed skin"], rows);
+  }
+
+  if (kind === "maxDilution") {
+    const rows = flagged("maxDilution")
+      .sort((a, b) => a.safety.maxDilution - b.safety.maxDilution)
+      .map((p) => `<tr>
+        <td>${oilLink(p)}</td>
+        <td><strong>${p.safety.maxDilution}%</strong></td>
+        <td>${esc(p.warning || "")}</td>
+      </tr>`);
+    return wrap(["Oil", "Maximum on skin", "Why"], rows);
+  }
+
+  if (kind === "diffuserCaution") {
+    const rows = products
+      .filter((p) => p.safety && (p.safety.children || p.safety.pets))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((p) => `<tr>
+        <td>${oilLink(p)}</td>
+        <td>${p.safety.children ? "Babies &amp; young children" : "&mdash;"}</td>
+        <td>${p.safety.pets ? "Cats &amp; dogs" : "&mdash;"}</td>
+      </tr>`);
+    return wrap(["Oil", "Avoid around", "Also avoid around"], rows);
+  }
+
+  // pregnancy | children | pets | nutAllergy
+  const rows = flagged(kind).map((p) => `<tr>
+    <td>${oilLink(p)}</td>
+    <td><em>${esc(p.botanical)}</em></td>
+    <td>${esc(categoryOf(p.category).label)}</td>
+    ${kind === "pregnancy" && p.safety.conditions
+      ? `<td>Also avoid with ${esc(p.safety.conditions.join(", "))}</td>`
+      : kind === "pregnancy" ? "<td>&mdash;</td>" : ""}
+  </tr>`);
+  const head = ["Oil", "Botanical name", "Collection"];
+  if (kind === "pregnancy") head.push("Other cautions");
+  return wrap(head, rows);
+}
+
+/** Guide bodies use the same block list as posts, plus `table:<kind>`. */
+const renderGuide = (body) => body.map(([kind, value]) => {
+  if (kind.startsWith("table:")) return derivedTable(kind.slice(6));
+  if (kind === "h2") return `<h2 id="${slugify(value)}">${esc(value)}</h2>`;
+  if (kind === "ul") return `<ul>${value.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+  if (kind === "ol") return `<ol>${value.map((i) => `<li>${i}</li>`).join("")}</ol>`;
+  if (kind === "note") return `<aside class="post__note"><p>${value}</p></aside>`;
+  return `<p>${value}</p>`;
+}).join("");
+
+const guidesTrail = [HOME, { label: "Guides" }];
+
+page("/guides/", layout({
+  path: "/guides/",
+  title: "Essential Oil Guides",
+  description: `Plain reference guides from ${site.name} — dilution, phototoxicity, pregnancy and pet safety, and how to use a diffuser. Written from our own catalogue data.`,
+  breadcrumb: guidesTrail,
+  ogImage: defaultOg,
+  jsonLd: {
+    "@type": "CollectionPage",
+    name: "Essential oil guides",
+    url: site.url + "/guides/",
+    isPartOf: { "@id": site.url + "/#website" },
+    hasPart: guidePages.map((g) => ({
+      "@type": "Article", headline: g.title, url: site.url + guideUrl(g),
+    })),
+  },
+  body: `
+    <section class="section section--first">
+      <div class="container">
+        ${breadcrumbs(guidesTrail)}
+        <div class="page-head">
+          <p class="eyebrow">Guides</p>
+          <h1>Reference, not marketing</h1>
+          <p class="lead">Four pages answering the questions people actually ask before buying.
+          The tables on them are generated from our own catalogue, so they cannot fall out of
+          step with what we sell.</p>
+        </div>
+        <div class="post-list">
+          ${guidePages.map((g) => `
+            <article class="post-card">
+              <a href="${guideUrl(g)}">
+                <p class="post-card__meta">Guide</p>
+                <h2>${esc(g.title)}</h2>
+                <p class="post-card__excerpt">${esc(g.excerpt)}</p>
+                <span class="post-card__more">Read it</span>
+              </a>
+            </article>`).join("")}
+        </div>
+      </div>
+    </section>
+    ${newsletter()}`,
+}));
+
+for (const g of guidePages) {
+  const trail = [HOME, { href: "/guides/", label: "Guides" }, { label: g.nav }];
+  const others = guidePages.filter((x) => x.slug !== g.slug);
+  page(guideUrl(g), layout({
+    path: guideUrl(g),
+    title: g.title,
+    description: g.description,
+    breadcrumb: trail,
+    ogImage: defaultOg,
+    jsonLd: {
+      "@type": "Article",
+      headline: g.title,
+      description: g.description,
+      datePublished: g.updated,
+      dateModified: g.updated,
+      author: { "@id": site.url + "/#organization" },
+      publisher: { "@id": site.url + "/#organization" },
+      mainEntityOfPage: site.url + guideUrl(g),
+    },
+    body: `
+      <section class="section section--first">
+        <div class="container">
+          ${breadcrumbs(trail)}
+          <article class="post guide">
+            <header class="post__head">
+              <p class="eyebrow">Guide</p>
+              <h1>${esc(g.title)}</h1>
+              <p class="post__meta">Last updated ${postDate(g.updated)}</p>
+              <p class="post__excerpt">${esc(g.excerpt)}</p>
+            </header>
+            <div class="post__body">${renderGuide(g.body)}</div>
+          </article>
+
+          <div class="related-block">
+            <div class="section__head"><div><p class="eyebrow">More guides</p><h2>Keep reading</h2></div></div>
+            <div class="post-list post-list--row">
+              ${others.map((x) => `
+                <article class="post-card">
+                  <a href="${guideUrl(x)}">
+                    <p class="post-card__meta">Guide</p>
+                    <h3>${esc(x.title)}</h3>
+                    <p class="post-card__excerpt">${esc(x.excerpt)}</p>
+                    <span class="post-card__more">Read it</span>
+                  </a>
+                </article>`).join("")}
+            </div>
+          </div>
         </div>
       </section>
       ${newsletter()}`,
