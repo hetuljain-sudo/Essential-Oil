@@ -591,21 +591,76 @@ $("[data-checkout]").addEventListener("click", () => {
   location.href = "/checkout/";
 });
 
+/* Both of these used to say "sent" and then throw the message away. They now
+   post to the API, and say nothing that has not actually happened. */
+
+async function postJson(path, body) {
+  let res;
+  try {
+    res = await fetch(path, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error(API_UNREACHABLE);
+  }
+  if (res.status === 404) throw new Error(API_MISSING);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || API_DOWN);
+  return data;
+}
+
+/** A failed submit must not look like a successful one. */
+function formFeedback(form, err) {
+  const known = [API_MISSING, API_UNREACHABLE, API_DOWN].includes(err?.message);
+  toast(known ? apiMessage(err) : err.message);
+  form.querySelector("button[type=submit]").disabled = false;
+}
+
 const news = $("[data-newsletter]");
-if (news) news.addEventListener("submit", (e) => {
+if (news) news.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const input = e.target.querySelector("input");
+  const input = e.target.querySelector("input[type=email]");
   if (!input.checkValidity()) return toast("Please enter a valid email address");
-  e.target.reset();
-  toast("Thanks! Check your inbox for your 10% code.");
+
+  const btn = e.target.querySelector("button[type=submit]");
+  btn.disabled = true;
+  try {
+    await postJson("/api/newsletter", {
+      email: input.value,
+      source: location.pathname,
+      website: e.target.querySelector("[name=website]")?.value,
+    });
+    e.target.reset();
+    // Deliberately not "check your inbox": nothing is sent yet, and a
+    // discount code that never arrives is worse than no promise at all.
+    toast("You're on the list — thank you.");
+  } catch (err) {
+    formFeedback(e.target, err);
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 const contact = $("[data-contact]");
-if (contact) contact.addEventListener("submit", (e) => {
+if (contact) contact.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!e.target.checkValidity()) return toast("Please fill in every required field");
-  e.target.reset();
-  toast("Thanks — we'll be in touch shortly.");
+
+  const f = Object.fromEntries(new FormData(e.target));
+  const btn = e.target.querySelector("button[type=submit]");
+  btn.disabled = true;
+  try {
+    await postJson("/api/contact", f);
+    e.target.reset();
+    toast("Thanks — we've got it and we'll reply by email.");
+  } catch (err) {
+    formFeedback(e.target, err);
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 /* ------------------------------------------------------------ motion */
@@ -964,10 +1019,17 @@ if (checkoutGate) {
       return;
     }
 
-    // Prefill what the account already knows, so an existing customer is
-    // only typing an address.
+    // Prefill what the account already knows. For a returning customer that
+    // is the whole form, and checkout becomes one button.
     form.name.value = me.name ?? "";
     form.phone.value = me.phone ?? "";
+    if (me.address) {
+      form.line1.value = me.address.line1 ?? "";
+      form.line2.value = me.address.line2 ?? "";
+      form.city.value = me.address.city ?? "";
+      form.state.value = me.address.state ?? "";
+      form.postcode.value = me.address.postcode ?? "";
+    }
 
     checkoutGate.hidden = true;
     panel.hidden = false;

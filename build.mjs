@@ -1125,8 +1125,9 @@ page("/contact/", layout({
               </select>
             </label>
             <label>Message<textarea name="message" rows="5" required></textarea></label>
+            <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <button class="btn btn--primary btn--block" type="submit">Send message</button>
-            <p class="muted small">This form isn't connected to a backend yet — nothing is sent.</p>
+            <p class="muted small">We read everything and reply by email, usually within a day or two.</p>
           </form>
         </div>
       </div>

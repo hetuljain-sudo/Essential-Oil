@@ -38,8 +38,28 @@ export default async function handler(req, res) {
        order by o.created_at desc
        limit 50`;
 
+    // The saved delivery address, for prefilling checkout. Not held in
+    // currentCustomer, which runs on every authenticated request and has no
+    // use for it.
+    const [saved] = await sql`
+      select address_line1, address_line2, address_city, address_state, address_postcode
+        from customers where id = ${customer.id}`;
+
     return json(res, 200, {
-      customer: { name: customer.name, email: customer.email, phone: customer.phone },
+      customer: {
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        address: saved?.address_line1
+          ? {
+              line1: saved.address_line1,
+              line2: saved.address_line2,
+              city: saved.address_city,
+              state: saved.address_state,
+              postcode: saved.address_postcode,
+            }
+          : null,
+      },
       orders,
     });
   } catch (err) {

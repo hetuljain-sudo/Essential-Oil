@@ -126,3 +126,45 @@ create index if not exists sessions_expiry_idx on sessions (expires_at);
 -- is a perfectly normal row, not a missing value to be backfilled.
 alter table orders add column if not exists customer_id uuid references customers (id) on delete set null;
 create index if not exists orders_customer_idx on orders (customer_id);
+
+-- ------------------------------------------------- messages & subscribers
+--
+-- Both of these were forms that told the visitor their message had been sent
+-- while doing nothing at all.
+
+create table if not exists messages (
+  id          uuid primary key default gen_random_uuid(),
+  name        text not null,
+  email       text not null,
+  subject     text,
+  body        text not null,
+  -- Set when the sender was logged in. Null is an ordinary anonymous message.
+  customer_id uuid references customers (id) on delete set null,
+  handled_at  timestamptz,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists messages_created_idx on messages (created_at desc);
+create index if not exists messages_unhandled_idx on messages (created_at desc) where handled_at is null;
+
+create table if not exists subscribers (
+  email          text primary key,
+  -- Random, and in the unsubscribe link. One-click out without logging in,
+  -- and not guessable from the address itself.
+  unsubscribe_token text not null unique,
+  confirmed_at   timestamptz,
+  unsubscribed_at timestamptz,
+  source         text,
+  created_at     timestamptz not null default now()
+);
+
+create index if not exists subscribers_active_idx on subscribers (created_at desc)
+  where unsubscribed_at is null;
+
+-- One delivery address remembered per account, so a returning customer is not
+-- retyping it. Checkout still takes whatever is typed; this only prefills.
+alter table customers add column if not exists address_line1 text;
+alter table customers add column if not exists address_line2 text;
+alter table customers add column if not exists address_city text;
+alter table customers add column if not exists address_state text;
+alter table customers add column if not exists address_postcode text;

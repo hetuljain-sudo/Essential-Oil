@@ -122,6 +122,45 @@ Nothing about an account is stored in the browser beyond that cookie. The cart
 remains in `localStorage` and is not tied to an account — logging in on another
 device does not bring your cart with you.
 
+## Messages and subscribers
+
+```
+api/contact.js      store a contact message
+api/newsletter.js   record a subscriber
+```
+
+Both forms previously told the visitor their message had been sent and then
+discarded it. The newsletter one went further and promised a 10% code that
+nothing could send.
+
+Read what has come in:
+
+```sql
+select name, email, subject, created_at from messages
+ where handled_at is null order by created_at;
+
+select count(*) from subscribers where unsubscribed_at is null;
+```
+
+Both endpoints carry a honeypot field named `website`: hidden off-screen,
+untabbable and hidden from screen readers, so a person never meets it. A
+submission with it filled in gets a cheerful 200 and is dropped, because
+telling a bot it failed only invites a better-dressed attempt.
+
+Neither sends email, so nobody is notified that a message arrived. Until
+that exists, check the table.
+
+**There is still no discount-code system.** The homepage offers 10% off a
+first order and nothing in the backend can issue, store or redeem a code.
+The confirmation now says only "You're on the list", which is true, but the
+offer above it is not yet something the site can honour.
+
+## Saved addresses
+
+Checkout writes the delivery address back to the account, and `/api/auth/me`
+returns it so the next checkout is prefilled. One address per customer,
+overwritten each time: a chooser is worth building when someone asks for one.
+
 ## Known trade-offs
 
 **Stock is not reserved between checkout and payment.** Two shoppers can both

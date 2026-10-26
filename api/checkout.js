@@ -85,6 +85,20 @@ export default async function handler(req, res) {
 
     await sql`update orders set razorpay_order_id = ${rp.id} where id = ${order.id}`;
 
+    // Remember where this went, so the next order is prefilled. Overwrites
+    // rather than keeping a list: one address covers almost everyone, and a
+    // chooser is only worth building once someone asks for it.
+    await sql`
+      update customers
+         set name = coalesce(nullif(${customer.name}, ''), name),
+             phone = coalesce(nullif(${customer.phone}, ''), phone),
+             address_line1 = ${customer.address.line1},
+             address_line2 = ${customer.address.line2},
+             address_city = ${customer.address.city},
+             address_state = ${customer.address.state},
+             address_postcode = ${customer.address.postcode}
+       where id = ${account.id}`;
+
     for (const l of priced.lines) {
       await sql`
         insert into order_items (order_id, sku, product_id, name, size, qty, unit_price_paise, line_paise)
