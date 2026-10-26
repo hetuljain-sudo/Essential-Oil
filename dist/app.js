@@ -391,6 +391,10 @@ if (lib) {
 
 /* ------------------------------------------------------------ product page */
 
+// Exposed so the live-stock pass below can redraw the picker. Declared
+// here rather than reached into, since it lives inside the block.
+let pdpRefresh = null;
+
 const pdp = $("[data-pdp]");
 if (pdp) {
   const product = byId(pdp.dataset.pdp);
@@ -426,6 +430,7 @@ if (pdp) {
     if (e.target.closest("[data-pdp-add]")) addToCart(product.id, size, qty);
   });
 
+  pdpRefresh = refresh;
   refresh();
 }
 
@@ -1086,3 +1091,45 @@ if (orderRef) {
   const id = sessionStorage.getItem("sarvha-last-order");
   if (id) orderRef.textContent = `Order reference: ${id}`;
 }
+
+/* ---------------------------------------------------------- live stock */
+/* Stock is baked into the page at build time, so between deploys a sold-out
+   oil still looks available. /api/stock has the real numbers; this folds them
+   in after load and re-renders what is on screen.
+
+   Entirely optional. If the call fails — no backend, offline, blocked — the
+   page keeps the built-in numbers and nobody sees an error. The server checks
+   stock again at checkout regardless, so the worst case here is a shopper
+   adding something they cannot buy, not an order we cannot fulfil. */
+
+const skuFor = (p, v) =>
+  `SRV-${p.id.replace(/-/g, "").slice(0, 7).toUpperCase()}-${v.size.replace(/\s/g, "").toUpperCase()}`;
+
+(async () => {
+  if (!C?.products?.length) return;
+
+  let stock;
+  try {
+    stock = (await apiGet("/api/stock")).stock;
+  } catch {
+    return; // the built-in numbers stand
+  }
+  if (!stock) return;
+
+  let changed = false;
+  for (const p of C.products) {
+    for (const v of p.variants) {
+      const live = stock[skuFor(p, v)];
+      if (Number.isInteger(live) && live !== v.stock) {
+        v.stock = live;
+        changed = true;
+      }
+    }
+  }
+  if (!changed) return;
+
+  // Re-render whatever is showing. Each of these is a no-op off its own page.
+  if (typeof renderGrid === "function" && $("[data-grid]")) renderGrid();
+  if (pdpRefresh) pdpRefresh();
+  if ($("[data-cart-items]")) renderCart();
+})();

@@ -16,21 +16,6 @@ export function methodGuard(req, res, allowed) {
   return false;
 }
 
-/**
- * The exact bytes of the request body.
- *
- * Needed for webhook signatures, which are computed over what was sent rather
- * than over anything we reconstruct from it.
- */
-export function rawBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on("data", (c) => chunks.push(c));
-    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-    req.on("error", reject);
-  });
-}
-
 const str = (v) => (typeof v === "string" ? v.trim() : "");
 
 /**
