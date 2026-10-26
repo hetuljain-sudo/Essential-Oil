@@ -573,3 +573,57 @@ body.menu-open .header { z-index: 56; }
   position: absolute; left: -9999px; width: 1px; height: 1px;
   opacity: 0; pointer-events: none;
 }
+
+/* ---------------------------------------------------------------- admin */
+/* A working screen, not a showpiece: dense, legible, no decoration that
+   costs a glance. */
+
+.admin__stats { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+.admin__stats > div {
+  flex: 1 1 10rem; padding: 1rem 1.2rem;
+  background: var(--tint); border-radius: var(--radius);
+}
+.admin__stats strong { display: block; font-size: 1.6rem; font-family: var(--serif); }
+.admin__stats span { font-size: .8rem; color: var(--muted); }
+.admin__stats .is-warn { background: #fbf0e6; color: #6b4428; }
+
+.admin__tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+.admin__tab {
+  padding: .6rem 1rem; font: inherit; font-size: .9rem; font-weight: 500;
+  background: none; border: 0; border-bottom: 2px solid transparent;
+  color: var(--muted); cursor: pointer;
+}
+.admin__tab.is-on { color: var(--ink); border-bottom-color: var(--terracotta); }
+
+.admin__row { padding: 1.2rem 0; border-bottom: 1px solid var(--line); }
+.admin__row.is-warn { background: #fbf0e6; padding-inline: 1rem; border-radius: 8px; }
+.admin__row.is-done { opacity: .55; }
+.admin__rowhead { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.admin__items { list-style: none; padding: 0; margin: .6rem 0; font-size: .9rem; }
+
+.admin__badge {
+  display: inline-block; margin-left: .5rem; padding: .1rem .5rem;
+  border-radius: 999px; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+  background: var(--tint); color: var(--muted);
+}
+.admin__badge--paid { background: #e6efe3; color: #2f4a28; }
+.admin__badge--shipped { background: #e4eaf4; color: #2c3f5e; }
+.admin__badge--oversold { background: #f6ddc9; color: #7a3f16; }
+
+.admin__ship, .admin__qty { display: flex; gap: .5rem; margin-top: .8rem; }
+.admin__ship input, .admin__qty input {
+  flex: 1; padding: .5rem .7rem; font: inherit; font-size: .88rem;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--cream);
+}
+.admin__qty { margin: 0; }
+.admin__qty input { width: 5.5rem; flex: none; }
+
+.admin__stock { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.admin__stock th, .admin__stock td { padding: .6rem .5rem; text-align: left; border-bottom: 1px solid var(--line); }
+.admin__stock th { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.admin__stock tr.is-warn td { background: #fbf0e6; }
+
+@media (max-width: 600px) {
+  .admin__rowhead { flex-direction: column; }
+  .admin__stock th:last-child, .admin__stock td:last-child { display: none; }
+}

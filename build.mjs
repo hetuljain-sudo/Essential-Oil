@@ -1309,6 +1309,45 @@ accountPage({
     <p><a class="btn btn--ghost" href="/shop/">Keep shopping</a></p>`,
 });
 
+/* ---------------------------------------------------------------- admin */
+
+/* Everything here is drawn client-side from /api/admin/*, each of which
+   checks the admin flag itself. This page being hidden is not the control;
+   those endpoints are. It is noindex and absent from the sitemap. */
+
+page("/admin/", layout({
+  path: "/admin/",
+  title: "Admin",
+  description: "Sarvha admin.",
+  noindex: true,
+  bodyClass: "admin-page",
+  body: `
+    <section class="section section--first">
+      <div class="container">
+        <div data-admin-gate><p class="muted">Checking…</p></div>
+
+        <div data-admin hidden>
+          <div class="page-head">
+            <p class="eyebrow">Admin</p>
+            <h1>Shop</h1>
+          </div>
+
+          <div class="admin__stats" data-admin-stats></div>
+
+          <div class="admin__tabs" role="tablist">
+            <button class="admin__tab is-on" role="tab" data-tab="orders">Orders</button>
+            <button class="admin__tab" role="tab" data-tab="messages">Messages</button>
+            <button class="admin__tab" role="tab" data-tab="stock">Stock</button>
+          </div>
+
+          <div data-panel="orders"></div>
+          <div data-panel="messages" hidden></div>
+          <div data-panel="stock" hidden></div>
+        </div>
+      </div>
+    </section>`,
+}));
+
 /* ------------------------------------------------------------- 404 page */
 
 page("/404.html", layout({

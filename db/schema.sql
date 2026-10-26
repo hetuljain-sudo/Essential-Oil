@@ -168,3 +168,24 @@ alter table customers add column if not exists address_line2 text;
 alter table customers add column if not exists address_city text;
 alter table customers add column if not exists address_state text;
 alter table customers add column if not exists address_postcode text;
+
+-- ------------------------------------------------------------------ admin
+--
+-- No separate admin accounts: a flag on an ordinary customer. One identity,
+-- one login, one session mechanism to get right. Grant it with
+-- `node db/make-admin.mjs you@example.com` — never through the web.
+
+alter table customers add column if not exists is_admin boolean not null default false;
+
+-- Shipping, so an order has somewhere to go after 'paid'.
+alter table orders add column if not exists shipped_at timestamptz;
+alter table orders add column if not exists tracking text;
+
+-- 'shipped' is new. A check constraint cannot be extended in place, so it is
+-- replaced; dropping by name first keeps this re-runnable.
+alter table orders drop constraint if exists orders_status_check;
+alter table orders add constraint orders_status_check
+  check (status in ('created', 'paid', 'shipped', 'failed', 'oversold'));
+
+create index if not exists orders_to_ship_idx on orders (paid_at)
+  where status = 'paid';

@@ -1195,3 +1195,179 @@ const skuFor = (p, v) =>
   if (pdpRefresh) pdpRefresh();
   if ($("[data-cart-items]")) renderCart();
 })();
+
+/* ---------------------------------------------------------------- admin */
+/* Read-and-write views over /api/admin/*. Every one of those checks the
+   admin flag server-side and answers 404 otherwise, so this page failing to
+   hide itself would leak nothing. */
+
+const adminGate = $("[data-admin-gate]");
+
+if (adminGate) {
+  const root = $("[data-admin]");
+  const panel = (name) => $(`[data-panel="${name}"]`);
+  const date = (s) => new Date(s).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  const rupees = (paise) => money(paise / 100);
+
+  const say = (message) => toast(message);
+
+  async function post(path, body) {
+    try {
+      const res = await fetch(path, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { say(data.error || "That didn't work."); return false; }
+      return true;
+    } catch {
+      say("Couldn't reach the server.");
+      return false;
+    }
+  }
+
+  /* ---------------------------------------------------------- orders */
+
+  const addressOf = (o) =>
+    [o.address_line1, o.address_line2, o.address_city, o.address_state, o.address_postcode]
+      .filter(Boolean).map(esc).join(", ");
+
+  async function loadOrders() {
+    const data = await apiGet("/api/admin/orders");
+    $("[data-admin-stats]").innerHTML = `
+      <div><strong>${data.counts.to_ship}</strong><span>to dispatch</span></div>
+      <div><strong>${rupees(data.counts.taken_paise)}</strong><span>taken</span></div>
+      ${data.counts.oversold
+        ? `<div class="is-warn"><strong>${data.counts.oversold}</strong><span>oversold</span></div>` : ""}`;
+
+    panel("orders").innerHTML = data.orders.length
+      ? data.orders.map((o) => `
+        <article class="admin__row${o.status === "oversold" ? " is-warn" : ""}">
+          <div class="admin__rowhead">
+            <div>
+              <strong>${esc(o.customer_name)}</strong>
+              <span class="admin__badge admin__badge--${esc(o.status)}">${esc(o.status)}</span>
+              <div class="muted small">${date(o.created_at)} · ${esc(o.customer_email)} · ${esc(o.customer_phone)}</div>
+            </div>
+            <strong>${rupees(o.total_paise)}</strong>
+          </div>
+          <ul class="admin__items">${o.items.map((i) =>
+            `<li>${esc(i.name)} ${esc(i.size)} × ${i.qty}</li>`).join("")}</ul>
+          <p class="muted small">${addressOf(o)}</p>
+          ${o.notes ? `<p class="muted small">Note: ${esc(o.notes)}</p>` : ""}
+          ${o.status === "paid" ? `
+            <form class="admin__ship" data-ship="${esc(o.id)}">
+              <input type="text" name="tracking" placeholder="Tracking reference (optional)" />
+              <button class="btn btn--primary" type="submit">Mark dispatched</button>
+            </form>` : ""}
+          ${o.status === "shipped" ? `<p class="muted small">Dispatched ${date(o.shipped_at)}${
+            o.tracking ? ` · ${esc(o.tracking)}` : ""}</p>` : ""}
+        </article>`).join("")
+      : `<p class="muted">No orders yet.</p>`;
+  }
+
+  /* -------------------------------------------------------- messages */
+
+  async function loadMessages() {
+    const data = await apiGet("/api/admin/messages");
+    panel("messages").innerHTML = `
+      <p class="muted small">${data.counts.unhandled} unanswered ·
+         ${data.counts.subscribers} newsletter subscribers</p>
+      ${data.messages.length
+        ? data.messages.map((m) => `
+          <article class="admin__row${m.handled_at ? " is-done" : ""}">
+            <div class="admin__rowhead">
+              <div>
+                <strong>${esc(m.name)}</strong>
+                <div class="muted small">${date(m.created_at)} · ${esc(m.email)}${
+                  m.subject ? ` · ${esc(m.subject)}` : ""}</div>
+              </div>
+              <button class="btn btn--ghost" data-handled="${esc(m.id)}" data-to="${m.handled_at ? "false" : "true"}">
+                ${m.handled_at ? "Reopen" : "Mark done"}
+              </button>
+            </div>
+            <p>${esc(m.body)}</p>
+          </article>`).join("")
+        : `<p class="muted">Nothing yet.</p>`}`;
+  }
+
+  /* ----------------------------------------------------------- stock */
+
+  async function loadStock() {
+    const data = await apiGet("/api/admin/stock");
+    panel("stock").innerHTML = `
+      <p class="muted small">${data.counts.out_of_stock} sold out ·
+         ${data.counts.low} low (5 or fewer)</p>
+      <table class="admin__stock">
+        <thead><tr><th>Oil</th><th>Size</th><th>In stock</th><th></th></tr></thead>
+        <tbody>${data.stock.map((s) => `
+          <tr${s.quantity === 0 ? ' class="is-warn"' : ""}>
+            <td>${esc(s.name)}${s.orphan ? ' <span class="muted small">(not in catalogue)</span>' : ""}</td>
+            <td>${esc(s.size)}</td>
+            <td><form class="admin__qty" data-stock="${esc(s.sku)}">
+              <input type="number" name="quantity" value="${s.quantity}" min="0" max="10000" />
+              <button class="btn btn--ghost" type="submit">Save</button>
+            </form></td>
+            <td class="muted small">${s.updated_at ? date(s.updated_at) : ""}</td>
+          </tr>`).join("")}</tbody>
+      </table>`;
+  }
+
+  const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock };
+
+  /* ------------------------------------------------------ behaviour */
+
+  root.addEventListener("click", async (e) => {
+    const tab = e.target.closest("[data-tab]");
+    if (tab) {
+      $$("[data-tab]", root).forEach((t) => t.classList.toggle("is-on", t === tab));
+      for (const name of Object.keys(loaders)) panel(name).hidden = name !== tab.dataset.tab;
+      await loaders[tab.dataset.tab]().catch(() => say("Couldn't load that."));
+      return;
+    }
+
+    const done = e.target.closest("[data-handled]");
+    if (done) {
+      if (await post("/api/admin/messages", { id: done.dataset.handled, handled: done.dataset.to === "true" })) {
+        await loadMessages();
+      }
+    }
+  });
+
+  root.addEventListener("submit", async (e) => {
+    const ship = e.target.closest("[data-ship]");
+    if (ship) {
+      e.preventDefault();
+      if (await post("/api/admin/orders", {
+        id: ship.dataset.ship, action: "ship", tracking: ship.tracking.value,
+      })) { say("Marked dispatched — the customer is not told."); await loadOrders(); }
+      return;
+    }
+
+    const stock = e.target.closest("[data-stock]");
+    if (stock) {
+      e.preventDefault();
+      if (await post("/api/admin/stock", {
+        sku: stock.dataset.stock, quantity: Number(stock.quantity.value),
+      })) say("Stock updated.");
+    }
+  });
+
+  (async () => {
+    try {
+      await apiGet("/api/admin/orders");
+    } catch (err) {
+      // 404 is both "no backend" and "not an admin" — deliberately the same
+      // answer, so this page cannot be used to discover that admin exists.
+      adminGate.innerHTML = `
+        <p class="muted">${esc(err?.message === "offline" ? apiMessage(err) : "Nothing to see here.")}</p>
+        <p><a class="btn btn--ghost" href="/">Back to the shop</a></p>`;
+      return;
+    }
+    adminGate.hidden = true;
+    root.hidden = false;
+    await loadOrders();
+  })();
+}

@@ -161,6 +161,42 @@ Checkout writes the delivery address back to the account, and `/api/auth/me`
 returns it so the next checkout is prefilled. One address per customer,
 overwritten each time: a chooser is worth building when someone asks for one.
 
+## Admin
+
+`/admin/` — orders, messages and stock. Noindex and out of the sitemap.
+
+```
+api/admin/orders.js     list; mark an order dispatched
+api/admin/messages.js   list; mark a message handled
+api/admin/stock.js      list; set a quantity
+```
+
+There are no separate admin accounts. `customers.is_admin` is a flag on an
+ordinary account, so there is one identity, one login and one session
+mechanism to get right rather than two.
+
+```bash
+node db/make-admin.mjs you@example.com     # after registering on the site
+node db/make-admin.mjs them@example.com --revoke
+```
+
+Granting admin is a command against the database, never a button. A "make
+this person an admin" control is the one whose compromise hands over
+everything, and it is not needed often enough to be worth having.
+
+Every endpoint calls `requireAdmin` and checks the flag **in the database on
+each request**, so revoking takes effect on the next request rather than
+whenever the session expires. A signed-in non-admin gets the same **404** as
+a stranger: a 403 would confirm that `/api/admin/*` exists and is worth
+attacking.
+
+Stock is set outright rather than adjusted by a delta — counting the shelf
+and typing that number is what actually happens, and working out the
+difference first is a step at which people make mistakes.
+
+**Marking an order dispatched tells the customer nothing.** It is logged
+server-side as a reminder. That stays true until email exists.
+
 ## Known trade-offs
 
 **Stock is not reserved between checkout and payment.** Two shoppers can both
