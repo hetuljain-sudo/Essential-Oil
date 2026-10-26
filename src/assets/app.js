@@ -724,6 +724,40 @@ function paintAccountLink() {
 
 paintAccountLink();
 
+/* --------------------------------------------------- talking to the API */
+/* Three different things can go wrong fetching from /api/, and they want
+   three different messages. Collapsing them into "please refresh" tells
+   someone to retry when the endpoint does not exist, which it does not on a
+   static preview, and never will until the backend is deployed. */
+
+const API_MISSING = "api_missing";   // no backend here — refreshing cannot help
+const API_DOWN = "api_down";         // it exists but is unwell — retrying might
+const API_UNREACHABLE = "offline";   // the request never arrived
+
+async function apiGet(path) {
+  let res;
+  try {
+    res = await fetch(path, { credentials: "same-origin" });
+  } catch {
+    throw new Error(API_UNREACHABLE);
+  }
+
+  // A 404 from a static host means the function was never deployed. So does
+  // an HTML body where JSON was expected: that is the host's own 404 page.
+  if (res.status === 404) throw new Error(API_MISSING);
+
+  try {
+    return await res.json();
+  } catch {
+    throw new Error(res.ok ? API_MISSING : API_DOWN);
+  }
+}
+
+const apiMessage = (err) => ({
+  [API_MISSING]: "Accounts aren't switched on yet — this is a preview of the site without its server.",
+  [API_UNREACHABLE]: "We couldn't reach the server. Check your connection and try again.",
+})[err?.message] ?? "Something went wrong at our end. Please try again in a moment.";
+
 /* ------------------------------------------------------------- accounts */
 /* Progressive enhancement: these pages are plain forms. Without JavaScript
    they do nothing useful, which is why nothing else on the site depends on
@@ -792,8 +826,7 @@ if (accountPanel) {
 
   (async () => {
     try {
-      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
-      const data = await res.json();
+      const data = await apiGet("/api/auth/me");
 
       setSignedIn(data.customer?.name ?? null);
 
@@ -822,8 +855,10 @@ if (accountPanel) {
               </li>`).join("")}</ul>`
           : `<p class="muted">Nothing yet. <a href="/shop/">Have a look around</a>.</p>`}
         <p class="muted"><button class="btn btn--ghost" data-logout>Log out</button></p>`;
-    } catch {
-      accountPanel.innerHTML = `<p class="muted">We couldn't load your account just now. Please refresh.</p>`;
+    } catch (err) {
+      accountPanel.innerHTML = `
+        <p class="muted">${esc(apiMessage(err))}</p>
+        <p><a class="btn btn--ghost" href="/shop/">Browse the oils</a></p>`;
     }
   })();
 
@@ -902,10 +937,12 @@ if (checkoutGate) {
 
     let me = null;
     try {
-      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
-      me = (await res.json()).customer;
-    } catch {
-      checkoutGate.innerHTML = `<p class="muted">We couldn't reach the server. Please refresh.</p>`;
+      me = (await apiGet("/api/auth/me")).customer;
+    } catch (err) {
+      // Fail closed: no form, because an order could not be placed anyway.
+      checkoutGate.innerHTML = `
+        <p class="muted">${esc(apiMessage(err))}</p>
+        <p><a class="btn btn--ghost" href="/shop/">Back to the shop</a></p>`;
       return;
     }
 
