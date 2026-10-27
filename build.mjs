@@ -22,6 +22,7 @@ import {
   layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
   newsletter, trustBar, categoryTiles, oilLibrary, safetyNote,
   productUrl, categoryUrl, postDate, clamp,
+  setAssetStamp,
 } from "./src/templates.mjs";
 
 import { guides } from "./src/content.mjs";
@@ -30,6 +31,22 @@ import { guidePages, liveGuides } from "./src/guides.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
+
+/* Stamp the shared assets before a single page is rendered.
+ *
+ * Hashed from the sources that produce styles.css, app.js and catalog.js,
+ * so the stamp changes exactly when one of them does — and not on every
+ * build, which would throw away a perfectly good cache every deploy. */
+{
+  const { createHash } = await import("node:crypto");
+  const sources = [
+    "src/assets/styles.css", "src/assets/pages.css",
+    "src/assets/app.js", "src/redirect.mjs", "src/data.mjs",
+  ];
+  const h = createHash("sha256");
+  for (const f of sources) h.update(await readFile(join(root, f)));
+  setAssetStamp(h.digest("hex").slice(0, 8));
+}
 
 const pages = [];
 const page = (path, html) => pages.push({ path, html });

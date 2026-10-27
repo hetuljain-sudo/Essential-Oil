@@ -1025,7 +1025,9 @@ export const products = [
  * and the generated bottle art does not carry a full-bleed panel.
  * `story` completes the phrase "<name> is a … story".
  */
-export const library = [
+/* Editorial notes for the oils that have them. Everything else in the
+   library is derived below from the catalogue itself. */
+const libraryNotes = [
   { id: "lavender-fields", name: "Lavender", story: "sleep",
     blurb: "Cut at first bloom and distilled the same day. Softly floral, with a green herbaceous edge." },
   { id: "eucalyptus-clearing", name: "Eucalyptus", story: "breath",
@@ -1051,6 +1053,52 @@ export const library = [
   { id: "geranium-balance", name: "Geranium", story: "rose",
     blurb: "The most rose-adjacent oil we carry, grown for scent rather than flower, at a tenth of the cost." },
 ];
+
+/**
+ * The oil library: every photographed oil, not a chosen few.
+ *
+ * All 50 now carry an image, so there is no reason to show twelve. The
+ * twelve above keep their written blurbs; the rest take their one-line
+ * tagline and their first scent note, which were already written per oil.
+ *
+ * Ordered round-robin across the collections rather than in catalogue
+ * order. The rotation shows a contiguous run of five, and in catalogue
+ * order that run would be five oils from the same collection — five quiet
+ * woods one day, five citruses the next.
+ */
+const noteFor = (id) => libraryNotes.find((e) => e.id === id);
+
+/** A name short enough for a vertical label on a narrow column. */
+function libraryName(p) {
+  if (p.short) return p.short;
+  const trimmed = p.name
+    .replace(/\s*\([^)]*\)/g, "")
+    .replace(/\s+(Carrier Oil|Absolute|Extra)$/i, "")
+    .trim();
+  return trimmed.length > 14 ? trimmed.split(" ")[0] : trimmed;
+}
+
+export const library = (() => {
+  const photographed = products.filter((p) => p.image);
+
+  // One queue per collection, drained a column at a time.
+  const queues = categories.map((c) => photographed.filter((p) => p.category === c.id));
+  const woven = [];
+  for (let i = 0; woven.length < photographed.length; i++) {
+    for (const q of queues) if (q[i]) woven.push(q[i]);
+  }
+
+  return woven.map((p) => {
+    const note = noteFor(p.id);
+    return {
+      id: p.id,
+      name: note?.name ?? libraryName(p),
+      story: note?.story ?? (p.notes[0] ?? "").toLowerCase(),
+      blurb: note?.blurb ?? p.tagline,
+    };
+  });
+})();
+
 
 
 /**

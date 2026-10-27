@@ -322,7 +322,7 @@ export function layout({
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=${assetStamp}" />
   ${graph ? `<script type="application/ld+json">${JSON.stringify(graph)}</script>` : ""}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ""}>
@@ -332,8 +332,8 @@ export function layout({
   <main id="main">${body}</main>
   ${footer()}
   ${drawerAndModal}
-  <script src="/catalog.js"></script>
-  <script src="/app.js"></script>
+  <script src="/catalog.js?v=${assetStamp}"></script>
+  <script src="/app.js?v=${assetStamp}"></script>
 </body>
 </html>`;
 }
@@ -387,6 +387,19 @@ export const categoryTiles = () => `
  * The day number is counted in IST, so everyone sees the same five regardless
  * of where they are.
  */
+/**
+ * Cache-busting stamp for the three shared assets.
+ *
+ * styles.css, catalog.js and app.js keep the same filenames across deploys,
+ * so a browser holding yesterday's copy will happily run it against today's
+ * HTML. That is not theoretical: the oil library re-renders itself from
+ * catalog.js, so a stale copy pins it to an old set of oils indefinitely.
+ *
+ * build.mjs sets this to a hash of the three files once they are written.
+ */
+let assetStamp = "dev";
+export const setAssetStamp = (v) => { assetStamp = v; };
+
 export const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 export const libraryDay = (now = Date.now()) =>
   Math.floor((now + IST_OFFSET_MS) / 86400000);
@@ -416,7 +429,7 @@ export const oilLibrary = () => `
       <div class="section__head section__head--center">
         <p class="eyebrow eyebrow--light">The oil library</p>
         <h2>Five distillations, five stories</h2>
-        <p class="lib__note">Five of our twelve photographed oils, changing every day.</p>
+        <p class="lib__note">Five of the ${library.length} oils we make, changing every day. No two days repeat.</p>
       </div>
       <div class="library" data-library>
         ${libraryFor(libraryDay())
