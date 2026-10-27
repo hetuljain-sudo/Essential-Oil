@@ -159,6 +159,11 @@ const slug = (x) => x.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g
  * Columns are <details> so they can collapse on narrow screens — app.js closes
  * them below 860px. They ship open, so the links are in the markup either way.
  */
+/* The number of link columns beside the brand block. The grid reads it, so a
+   new column lands in the same row rather than wrapping underneath — which is
+   exactly what adding Legal did. Keep in step with the column() calls below. */
+const footerColumnCount = 6;
+
 function footer() {
   // Each scent family lives as an anchor on its collection page.
   const familyLinks = [];
@@ -190,7 +195,7 @@ function footer() {
     </details>`;
 
   return `<footer class="footer">
-    <div class="container footer__inner">
+    <div class="container footer__inner" style="--footer-cols: ${footerColumnCount}">
       <div class="footer__brand">
         <a href="/" class="logo logo--light"><span>${site.name}</span></a>
         <p>${esc(site.tagline)}. Shipped across India.</p>

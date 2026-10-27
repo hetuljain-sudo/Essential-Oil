@@ -330,7 +330,7 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .safety-band .note { margin: 0 auto; line-height: 1.7; }
 
 /* ---- Footer as a secondary sitemap ---- */
-.footer__inner { grid-template-columns: 1.6fr repeat(5, 1fr); gap: 2rem 1.6rem; }
+.footer__inner { grid-template-columns: 1.5fr repeat(var(--footer-cols, 5), 1fr); gap: 2rem 1.4rem; }
 .footer__col { min-width: 0; }
 .footer__col summary { list-style: none; cursor: default; }
 .footer__col summary::-webkit-details-marker { display: none; }
