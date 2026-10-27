@@ -637,3 +637,24 @@ body.menu-open .header { z-index: 56; }
 .guides-empty ul { list-style: none; padding: 0; margin: 0 0 1.2rem; }
 .guides-empty li { padding: .5rem 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
 .guides-empty li:last-child { border-bottom: 0; }
+
+/* Policy pages. Narrow measure — these are read, not scanned. */
+.container--readable { width: min(46rem, 100% - 32px); }
+.policy .post__body h2 { margin-top: 2.5rem; }
+.policy .post__body h3 { margin-top: 1.6rem; font-size: 1.05rem; }
+
+/* An unanswered policy question, rendered rather than hidden in a comment:
+   it should be impossible to publish these pages without noticing. */
+.policy-todo {
+  margin: 1.2rem 0; padding: .9rem 1.1rem;
+  background: #fdf3d8; border: 1px dashed #c9a227; border-radius: 10px;
+  color: #6b5411; font-size: .88rem;
+}
+.policy-todo p { margin: 0; }
+
+.policy-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.policy-nav h2 { font-size: 1.2rem; margin-bottom: .6rem; }
+.policy-nav ul { list-style: none; padding: 0; margin: 0; }
+.policy-nav li { padding: .4rem 0; }
+
+.checkout__terms { margin-top: .6rem; }

@@ -5,6 +5,7 @@ import {
   fromPrice, inStock, firstAvailable, categoryOf, money,
 } from "./data.mjs";
 import { liveGuides } from "./guides.mjs";
+import { policies } from "./policies.mjs";
 
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -236,11 +237,13 @@ function footer() {
         { href: "/about/", label: "Our story" },
         { href: "/collections/", label: "Collections" },
         { href: "/contact/", label: "Contact us" },
-        // The footer is the whole way in to an account. Deliberately not in
-        // the header: an account is optional here, and putting "Log in"
-        // beside the cart implies you need one to buy.
+        // Also in the header now. Ordering has required an account since the
+        // auth work landed, so hiding the way in only meant people met the
+        // requirement at checkout, which is the worst moment to meet it.
         { href: "/account/", label: "Your account" },
       ])}
+
+      ${column("Legal", policies.map((p) => ({ href: `/${p.slug}/`, label: p.nav })))}
     </div>
     <div class="container footer__base">© <span data-year></span> ${site.name}. All rights reserved.</div>
   </footer>`;

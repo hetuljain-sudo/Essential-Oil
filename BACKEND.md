@@ -212,6 +212,11 @@ abandoned carts hold inventory hostage, which at this volume is the more
 common and more costly failure. If orders start colliding, add a reservation
 with an expiry.
 
+**The FAQ and the code disagree about shipping.** The FAQ says charges below
+₹999 are "calculated at checkout based on your location"; `priceCart` charges
+a flat ₹79 anywhere in India. The new shipping policy states the flat fee,
+because that is what the checkout does. One of the two has to change.
+
 **No "sign out everywhere".** Logging out ends one session; a lost device
 has to be dealt with by deleting rows from `sessions` by hand.
 
@@ -222,9 +227,15 @@ This is the first gap worth closing.
 
 These are not optional, and two of them are legal requirements in India:
 
-- **Policy pages.** Privacy Policy, Terms, Refund/Cancellation and Shipping
-  Policy. Required by the Consumer Protection (E-Commerce) Rules 2020, and
-  Razorpay will not activate a live account without them. The site has none.
+- **Policy pages — written, but not finished.** `/privacy/`, `/terms/`,
+  `/refunds/` and `/shipping/` exist, are linked from the footer and from
+  checkout, and are in the sitemap. They carry **18 visible `TODO` blocks**
+  for facts nobody has stated yet: legal entity, GST status, returns window,
+  whether opened bottles come back, refund timeline, courier, grievance
+  officer. Each renders on the page in a yellow box, so publishing them
+  unfinished is hard to do by accident. Search `src/policies.mjs` for
+  `"todo"`. Until those are answered the pages will not satisfy Razorpay and
+  should not be treated as a legal position.
 - **Business verification.** Razorpay needs PAN, bank account and, above a
   threshold, GST registration.
 - **Switch the keys.** `rzp_test_…` to `rzp_live_…`, and a fresh webhook

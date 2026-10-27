@@ -28,6 +28,7 @@ import {
 import { guides } from "./src/content.mjs";
 import { hubs } from "./src/collections.mjs";
 import { guidePages, liveGuides } from "./src/guides.mjs";
+import { policies } from "./src/policies.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -1331,6 +1332,12 @@ accountPage({
 
         <button class="btn btn--primary btn--block" type="submit" data-pay>Pay securely</button>
         <p class="muted small">Payment is handled by Razorpay. We never see your card details.</p>
+        <!-- The Rules expect the terms to be reachable at the point of
+             purchase. Stated quietly: this is a legal requirement, not
+             something to push anyone through. -->
+        <p class="muted small checkout__terms">By paying you agree to our
+          <a href="/terms/">Terms &amp; Conditions</a> and
+          <a href="/refunds/">Refund &amp; Cancellation Policy</a>.</p>
       </form>
     </div>`,
 });
@@ -1388,6 +1395,75 @@ page("/admin/", layout({
       </div>
     </section>`,
 }));
+
+/* -------------------------------------------------------------- policies */
+
+/* The four pages the Consumer Protection (E-Commerce) Rules 2020 require,
+   and that Razorpay asks for before activating a live account. Content is in
+   src/policies.mjs; this only renders it.
+
+   Indexable on purpose — customers and Razorpay are both meant to find them. */
+
+const renderPolicy = (body) => body.map(([kind, value]) => {
+  if (kind === "h3") return `<h3>${esc(value)}</h3>`;
+  if (kind === "ul") return `<ul>${value.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+  if (kind === "note") return `<aside class="post__note"><p>${value}</p></aside>`;
+  // Deliberately loud, and deliberately rendered rather than hidden in a
+  // comment: an unanswered policy question should be impossible to miss on
+  // the page itself, not something only a developer finds.
+  if (kind === "todo") {
+    return `<aside class="policy-todo"><p><strong>TODO — not yet decided.</strong> ${value}</p></aside>`;
+  }
+  return `<p>${value}</p>`;
+}).join("");
+
+for (const pol of policies) {
+  const url = `/${pol.slug}/`;
+  const trail = [HOME, { label: pol.nav }];
+  const others = policies.filter((x) => x.slug !== pol.slug);
+
+  page(url, layout({
+    path: url,
+    title: pol.title,
+    description: pol.description,
+    breadcrumb: trail,
+    ogImage: defaultOg,
+    jsonLd: {
+      "@type": "WebPage",
+      name: pol.title,
+      description: pol.description,
+      url: site.url + url,
+      isPartOf: { "@id": site.url + "/#website" },
+      publisher: { "@id": site.url + "/#organization" },
+      dateModified: pol.updated,
+    },
+    body: `
+      <section class="section section--first">
+        <div class="container container--readable">
+          ${breadcrumbs(trail)}
+          <article class="post policy">
+            <header class="post__head">
+              <p class="eyebrow">Legal</p>
+              <h1>${esc(pol.title)}</h1>
+              <p class="post__meta">Last updated ${postDate(pol.updated)}</p>
+              <p class="post__excerpt">${esc(pol.lede)}</p>
+            </header>
+            <div class="post__body">
+              ${pol.sections.map((s) => `
+                <h2 id="${slugify(s.h)}">${esc(s.h)}</h2>
+                ${renderPolicy(s.body)}`).join("")}
+            </div>
+          </article>
+
+          <nav class="policy-nav" aria-label="Other policies">
+            <h2>The other policies</h2>
+            <ul>${others.map((x) =>
+              `<li><a href="/${x.slug}/">${esc(x.title)}</a></li>`).join("")}</ul>
+          </nav>
+        </div>
+      </section>`,
+  }));
+}
 
 /* ------------------------------------------------------------- 404 page */
 
