@@ -183,6 +183,65 @@ own.
 `npm run db:check` reports which provider is configured and warns when
 `PUBLIC_URL` is missing.
 
+## 3c. The Google Sheet *(optional)*
+
+Mirrors every order into one spreadsheet you keep open, instead of
+downloading a file. The button in `/admin/` stays hidden until this is set
+up.
+
+**How it works, so the failure modes make sense.** The database is the
+source of truth and the sheet is a copy of it. Each sync clears the tab and
+writes it again from scratch, so running it twice cannot duplicate a row, a
+failed sync cannot leave a gap, and editing the sheet by hand is simply
+overwritten next time. Do not keep notes in it — keep them in the order's
+Notes field, which is a column.
+
+### Create the service account
+
+A service account is a robot identity with its own email address. You share
+the sheet with it exactly as you would with a colleague, and it can touch
+that one sheet and nothing else in your Drive.
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → create a
+   project (any name).
+2. **APIs & Services → Library** → search **Google Sheets API** → **Enable**.
+3. **APIs & Services → Credentials → Create Credentials → Service account.**
+   Any name. No roles are needed — the permission comes from sharing the
+   sheet, not from the project.
+4. Open the service account → **Keys → Add Key → Create new key → JSON**.
+   A file downloads. It holds a private key; treat it like a password.
+
+### Create and share the sheet
+
+5. Make a blank Google Sheet. From its URL
+   `docs.google.com/spreadsheets/d/THIS_PART/edit`, the middle part is
+   `GOOGLE_SHEET_ID`.
+6. **Share it with the service account's email address, as an Editor.**
+   It looks like `something@your-project.iam.gserviceaccount.com` and is in
+   the JSON file as `client_email`.
+
+   **This is the step everyone forgets.** Without it every sync fails with a
+   403, and `api/_lib/sheets.mjs` adds a hint saying exactly this when it
+   sees one.
+
+### The keys
+
+From the downloaded JSON:
+
+```
+GOOGLE_SERVICE_ACCOUNT_EMAIL="...@....iam.gserviceaccount.com"   # client_email
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEv...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEET_ID="the id from the sheet's URL"
+```
+
+`GOOGLE_PRIVATE_KEY` is the `private_key` field **exactly as it appears in
+the JSON**, including the `\n` sequences. Do not convert them to real
+newlines: hosting dashboards do not keep them, and the error Google returns
+says nothing about the cause.
+
+Then `npm run db:check` reports the sheet, and the **Sync to Google Sheet**
+button appears in `/admin/`.
+
 ## 4. Deploy — Vercel
 
 1. [vercel.com](https://vercel.com) → Add New → Project → import the GitHub
@@ -194,8 +253,9 @@ own.
    `DATABASE_URL` is the only one the site needs in order to work at all; the
    three `RAZORPAY_*` ones are read by `/api/checkout` and the webhook and
    nothing else, so leave them out if you are deferring payments. The
-   `EMAIL_*` ones and `PUBLIC_URL` from step 3b go here too — without them
-   the admin page says email is not set up rather than failing quietly.
+   `EMAIL_*` ones and `PUBLIC_URL` from step 3b go here too, along with the
+   `GOOGLE_*` ones from 3c — without them the admin page says the feature is
+   not set up rather than failing quietly.
 4. Deploy.
 
 If you add the variables afterwards, redeploy — they are read at build and
@@ -394,3 +454,8 @@ The honest list, after `npm run smoke` passes:
   but no message has been delivered by a real provider from this project. The
   first thank-you you send is the test. An order confirmation at checkout, a
   password reset and a contact notification are still missing.
+- **The Google Sheet sync.** The signing is proven — a throwaway key gets as
+  far as Google rejecting it for not existing, so the JWT and the request are
+  well formed — but no row has reached a real spreadsheet. The first sync is
+  the test, and it is also the only way to find out whether the sheet was
+  shared correctly.

@@ -1267,10 +1267,24 @@ if (adminGate) {
 
   const exportBtn = $("[data-export-orders]");
   if (exportBtn) {
-    exportBtn.addEventListener("click", () => {
-      if (!lastOrders.length) return say("No orders to export yet.");
+    exportBtn.addEventListener("click", async () => {
+      // Asks for every order rather than reusing what the page is showing.
+      // The page draws at most 100 cards; a spreadsheet that stopped at the
+      // hundredth order would be wrong in a way nobody notices until the
+      // accounts do not add up.
+      const previous = exportBtn.textContent;
+      exportBtn.disabled = true;
+      exportBtn.textContent = "Preparing…";
 
-      const blob = new Blob([ordersToCsv(lastOrders)], { type: "text/csv;charset=utf-8" });
+      const data = await apiGet("/api/admin/orders?all=1").catch(() => null);
+
+      exportBtn.disabled = false;
+      exportBtn.textContent = previous;
+
+      const all = data?.orders ?? [];
+      if (!all.length) return say("No orders to export yet.");
+
+      const blob = new Blob([ordersToCsv(all)], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -1281,7 +1295,7 @@ if (adminGate) {
       // Revoking immediately can cancel the download in some browsers.
       setTimeout(() => URL.revokeObjectURL(url), 10000);
 
-      say(`${lastOrders.length} order${lastOrders.length === 1 ? "" : "s"} downloaded.`);
+      say(`${all.length} order${all.length === 1 ? "" : "s"} downloaded.`);
     });
   }
 
@@ -1301,6 +1315,25 @@ if (adminGate) {
     // click never fails with an error the page could have predicted.
     emailReady = data.email?.configured === true;
     emailWhy = data.email?.reason ?? "";
+
+    // Say what is not on screen, rather than drawing a truncated list that
+    // looks complete.
+    const showing = $("[data-orders-showing]");
+    if (showing) {
+      showing.textContent = data.total > data.showing
+        ? `Showing ${data.showing} of ${data.total} orders — the export and the sheet include all of them.`
+        : "";
+    }
+
+    const syncBtn = $("[data-sync-sheet]");
+    if (syncBtn) {
+      // Hidden rather than disabled when there is no sheet at all: a button
+      // for a feature you have not set up is clutter, not information.
+      syncBtn.hidden = !data.sheet;
+      if (data.sheet && !data.sheet.configured) {
+        syncBtn.hidden = true;
+      }
+    }
     $("[data-admin-stats]").innerHTML = `
       <div><strong>${data.counts.to_ship}</strong><span>to dispatch</span></div>
       <div><strong>${rupees(data.counts.taken_paise)}</strong><span>taken</span></div>
@@ -1363,6 +1396,27 @@ if (adminGate) {
             <p>${esc(m.body)}</p>
           </article>`).join("")
         : `<p class="muted">Nothing yet.</p>`}`;
+  }
+
+  /* Sync to the sheet. Reports the row count on success and Google's own
+     complaint on failure — "sync failed" with no reason means opening a log
+     nobody has. */
+  const syncBtn = $("[data-sync-sheet]");
+  if (syncBtn) {
+    syncBtn.addEventListener("click", async () => {
+      const previous = syncBtn.textContent;
+      syncBtn.disabled = true;
+      syncBtn.textContent = "Syncing…";
+
+      const result = await post("/api/admin/sheet", {});
+
+      syncBtn.disabled = false;
+      syncBtn.textContent = previous;
+
+      if (result?.synced) {
+        say(`${result.rows} order${result.rows === 1 ? "" : "s"} written to the sheet.`);
+      }
+    });
   }
 
   /* The thank-you button. Reports what actually happened — the endpoint

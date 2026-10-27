@@ -662,8 +662,10 @@ body.menu-open .header { z-index: 56; }
 /* The admin toolbar: actions that apply to the whole list rather than to one
    row. One button today; it exists so the next one has somewhere to go. */
 .admin__bar {
-  display: flex; justify-content: flex-end; gap: .6rem;
-  margin: 0 0 1rem;
+  display: flex; justify-content: flex-end; align-items: center; gap: .6rem;
+  margin: 0 0 1rem; flex-wrap: wrap;
 }
+/* Pushes the buttons right while staying on the same line. */
+.admin__showing { margin-right: auto; font-size: .82rem; color: var(--muted); }
 .admin__thank { margin-right: .6rem; }
 .admin__thank[disabled] { opacity: .45; cursor: not-allowed; }

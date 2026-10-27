@@ -63,6 +63,14 @@ console.log("\nEmail");
   }
 }
 
+console.log("\nGoogle Sheet");
+{
+  const { sheetStatus } = await import("../api/_lib/sheets.mjs");
+  const status = sheetStatus();
+  if (status.configured) ok(`sheet ${status.sheetId.slice(0, 8)}… as ${status.serviceAccount}`);
+  else warn(`not configured (${status.reason}) — orders are not mirrored to a sheet`);
+}
+
 if (!process.env.DATABASE_URL) {
   console.log("\nSkipping database checks — DATABASE_URL is not set.\n");
   process.exit(1);

@@ -15,6 +15,8 @@
 import { json } from "../_lib/http.mjs";
 import { requireAdmin, parseTracking } from "../_lib/admin.mjs";
 import { sendEmail, emailStatus } from "../_lib/email.mjs";
+import { listOrders, countOrders } from "../_lib/order-list.mjs";
+import { sheetStatus } from "../_lib/sheets.mjs";
 import { thankYouEmail, dispatchEmail } from "../../src/emails.mjs";
 
 /** The order with its items, in the shape the email templates expect. */
@@ -45,27 +47,12 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
-      const orders = await sql`
-        select o.id, o.status, o.subtotal_paise, o.total_paise, o.shipping_paise,
-               o.created_at, o.paid_at, o.shipped_at, o.tracking, o.thanked_at,
-               o.customer_name, o.customer_email, o.customer_phone,
-               o.address_line1, o.address_line2, o.address_city,
-               o.address_state, o.address_postcode, o.notes,
-               coalesce(
-                 json_agg(json_build_object(
-                   'name', i.name, 'size', i.size, 'qty', i.qty,
-                   'linePaise', i.line_paise
-                 ) order by i.id) filter (where i.id is not null),
-                 '[]'
-               ) as items
-          from orders o
-          left join order_items i on i.order_id = o.id
-         group by o.id
-         order by
-           -- Paid and unshipped first: that is the actual to-do list.
-           case o.status when 'oversold' then 0 when 'paid' then 1 else 2 end,
-           o.created_at desc
-         limit 100`;
+      // ?all=1 lifts the page limit. The export and the sheet sync need
+      // every order: a spreadsheet that stops at the hundredth is wrong in
+      // a way nobody notices until the accounts do not add up.
+      const wantsAll = /(^|[?&])all=1(&|$)/.test(req.url ?? "");
+      const orders = await listOrders(sql, { limit: wantsAll ? null : 100 });
+      const total = await countOrders(sql);
 
       const [counts] = await sql`
         select count(*) filter (where status = 'paid')::int as to_ship,
@@ -76,7 +63,16 @@ export default async function handler(req, res) {
       // The page needs to know whether a thank-you button can do anything
       // at all, so it can say why it is disabled rather than failing on
       // click.
-      return json(res, 200, { orders, counts, email: emailStatus() });
+      return json(res, 200, {
+        orders,
+        counts,
+        // So the page can say "showing 100 of 240" rather than quietly
+        // drawing a truncated list.
+        total,
+        showing: orders.length,
+        email: emailStatus(),
+        sheet: sheetStatus(),
+      });
     }
 
     if (req.method === "POST") {
