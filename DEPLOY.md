@@ -144,6 +144,45 @@ Expect `ok` on every line, and `Every database path ran and cleaned up after
 itself.` at the end. Anything marked `FAIL` names the statement that broke —
 fix it before deploying, because the same statement is in an endpoint.
 
+## 3b. Email *(optional, but the admin page says so until it is set)*
+
+Without this, the thank-you button in `/admin/` is disabled and explains why,
+and marking an order shipped tells you the customer was **not** emailed.
+Nothing pretends a message went out.
+
+**Which provider.** `EMAIL_PROVIDER` takes `brevo` or `resend`.
+
+- **Brevo** lets you verify a single sender address — a Gmail address counts
+  — and send from it. This is the one that works before you own a domain,
+  which today you do not.
+- **Resend** expects a domain you control and will otherwise only deliver to
+  your own address. Switch to it after the domain is bought; it is one
+  environment variable.
+
+Sign up, verify the sender address they ask you to verify, create an API key,
+then add to `.env.local` (and later to Vercel):
+
+```
+EMAIL_PROVIDER="brevo"
+EMAIL_API_KEY="..."
+EMAIL_FROM="the address you verified"
+EMAIL_FROM_NAME="Sarvha"
+EMAIL_REPLY_TO="an address you actually read"
+PUBLIC_URL="https://<your-app>.vercel.app"
+```
+
+`EMAIL_REPLY_TO` matters: the emails invite a reply, and `hello@sarvha.com`
+does not exist yet, so without it a reply goes nowhere.
+
+`PUBLIC_URL` matters for the same reason. `site.url` in `src/data.mjs` is
+`https://sarvha.com`, the address the shop will have one day — correct as a
+canonical URL, wrong in an email, which is an instruction to a person.
+Delete `PUBLIC_URL` once the real domain resolves and it falls back on its
+own.
+
+`npm run db:check` reports which provider is configured and warns when
+`PUBLIC_URL` is missing.
+
 ## 4. Deploy — Vercel
 
 1. [vercel.com](https://vercel.com) → Add New → Project → import the GitHub
@@ -154,7 +193,9 @@ fix it before deploying, because the same statement is in an endpoint.
    under **Settings → Environment Variables**, for all environments.
    `DATABASE_URL` is the only one the site needs in order to work at all; the
    three `RAZORPAY_*` ones are read by `/api/checkout` and the webhook and
-   nothing else, so leave them out if you are deferring payments.
+   nothing else, so leave them out if you are deferring payments. The
+   `EMAIL_*` ones and `PUBLIC_URL` from step 3b go here too — without them
+   the admin page says email is not set up rather than failing quietly.
 4. Deploy.
 
 If you add the variables afterwards, redeploy — they are read at build and
@@ -349,6 +390,7 @@ The honest list, after `npm run smoke` passes:
 - **Concurrency.** Two shoppers buying the last bottle at the same moment is
   the case the `oversold` flag exists for. The smoke test forces that state
   deliberately; it does not race two real requests.
-- **Email.** Nothing sends any. An order confirmation, a dispatch notice, a
-  password reset and a contact notification are all still missing, and the
-  site is careful not to promise them.
+- **Email delivery.** The sender is written and reports failures honestly,
+  but no message has been delivered by a real provider from this project. The
+  first thank-you you send is the test. An order confirmation at checkout, a
+  password reset and a contact notification are still missing.

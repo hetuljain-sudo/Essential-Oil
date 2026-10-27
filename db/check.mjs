@@ -47,6 +47,22 @@ if (process.env.RAZORPAY_KEY_ID) {
   else bad("RAZORPAY_KEY_ID does not look like a Razorpay key");
 }
 
+/*
+ * Email. Not a failure when absent — the site is honest about having none,
+ * and says so on the admin button rather than silently doing nothing.
+ */
+console.log("\nEmail");
+{
+  const { emailStatus } = await import("../api/_lib/email.mjs");
+  const status = emailStatus();
+  if (status.configured) ok(`${status.provider}, sending from @${status.fromDomain}`);
+  else warn(`not configured (${status.reason}) — no order confirmations, no thank-yous`);
+
+  if (!process.env.PUBLIC_URL) {
+    warn("PUBLIC_URL is not set — emails will link to site.url, which may not resolve yet");
+  }
+}
+
 if (!process.env.DATABASE_URL) {
   console.log("\nSkipping database checks — DATABASE_URL is not set.\n");
   process.exit(1);

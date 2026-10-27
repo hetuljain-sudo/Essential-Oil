@@ -193,6 +193,12 @@ alter table customers add column if not exists is_admin boolean not null default
 alter table orders add column if not exists shipped_at timestamptz;
 alter table orders add column if not exists tracking text;
 
+-- When a thank-you was sent to the customer, so the admin page can say
+-- whether one has gone and a second click does not send a second copy. Null
+-- means none sent, which is the honest default for every order placed before
+-- email existed.
+alter table orders add column if not exists thanked_at timestamptz;
+
 -- 'shipped' is new. A check constraint cannot be extended in place, so it is
 -- replaced; dropping by name first keeps this re-runnable.
 alter table orders drop constraint if exists orders_status_check;

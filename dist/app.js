@@ -27,6 +27,123 @@ function safeNext(next, fallback = "/account/") {
 }
 
 /**
+ * Orders as a spreadsheet.
+ *
+ * CSV rather than a real .xlsx: Excel opens it natively, Google Sheets opens
+ * it, and it needs no library on either side. An .xlsx would mean a
+ * dependency and a binary format, to produce a file that opens the same way.
+ *
+ * Two things here are not decoration.
+ *
+ * **The BOM.** Excel on Windows reads a CSV as the system codepage unless the
+ * file starts with a UTF-8 byte order mark. Without it, ₹ becomes â‚¹ and an
+ * Indian name with any accent is mangled. One invisible character is the
+ * difference between a usable file and a support question.
+ *
+ * **Formula injection.** A cell whose text begins `=`, `+`, `-` or `@` is run
+ * as a formula when the file is opened. Customer names and addresses are
+ * typed by strangers, so `=HYPERLINK(...)` in a delivery address would
+ * execute on your machine when you open your own orders. Those values are
+ * prefixed with an apostrophe, which Excel strips on display and which stops
+ * it being a formula.
+ *
+ * Money is written as plain numbers in rupees, not "₹778", so a column can be
+ * summed without cleaning it first.
+ */
+
+/** Characters Excel and Sheets treat as the start of a formula. */
+const FORMULA_START = /^[=+\-@\t\r]/;
+
+/**
+ * One field, safe to place in a CSV.
+ *
+ * Always quoted. Unquoted fields are legal but a name containing a comma, a
+ * quote or a newline then breaks the row, and quoting everything costs two
+ * bytes per field and removes the whole class of problem.
+ */
+function csvField(value) {
+  if (value === null || value === undefined) return '""';
+
+  let text = String(value);
+  if (FORMULA_START.test(text)) text = "'" + text;
+
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
+/** Rows of values to CSV text. CRLF, because that is what Excel expects. */
+function toCsv(rows) {
+  return rows.map((row) => row.map(csvField).join(",")).join("\r\n");
+}
+
+const CSV_BOM = "﻿";
+
+/** paise -> a number in rupees, for a cell that will be summed. */
+const rupees = (paise) => Number(paise ?? 0) / 100;
+
+/**
+ * An ISO date, which sorts correctly in a spreadsheet.
+ *
+ * "27 Oct 2026" reads better and sorts as text, putting April before
+ * January. A column of dates that cannot be sorted is worse than an ugly one.
+ */
+const isoDate = (value) => {
+  if (!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
+};
+
+const ORDER_COLUMNS = [
+  "Order ID", "Date", "Status", "Customer", "Phone", "Email",
+  "Address", "City", "State", "PIN",
+  "Items", "Subtotal", "Shipping", "Total", "Tracking", "Dispatched", "Notes",
+];
+
+/**
+ * One row per order, with the items collapsed into a single cell.
+ *
+ * Deliberately not one row per item. This file is for packing parcels and
+ * for the accounts — both of which think in orders — and an order split over
+ * three rows is counted three times by anyone summing the Total column.
+ */
+function ordersToRows(orders) {
+  return orders.map((o) => {
+    const items = (Array.isArray(o.items) ? o.items : [])
+      .map((i) => `${i.qty}x ${i.name} ${i.size}`)
+      .join("; ");
+
+    return [
+      o.id,
+      isoDate(o.created_at),
+      o.status,
+      o.customer_name,
+      o.customer_phone,
+      o.customer_email,
+      [o.address_line1, o.address_line2].filter(Boolean).join(", "),
+      o.address_city,
+      o.address_state,
+      o.address_postcode,
+      items,
+      rupees(o.subtotal_paise),
+      rupees(o.shipping_paise),
+      rupees(o.total_paise),
+      o.tracking ?? "",
+      isoDate(o.shipped_at),
+      o.notes ?? "",
+    ];
+  });
+}
+
+/** The whole file, BOM included, ready to download. */
+function ordersToCsv(orders) {
+  return CSV_BOM + toCsv([ORDER_COLUMNS, ...ordersToRows(orders)]);
+}
+
+/** sarvha-orders-2026-10-27.csv */
+function ordersFilename(now = new Date()) {
+  return `sarvha-orders-${now.toISOString().slice(0, 10)}.csv`;
+}
+
+/**
  * Shared behaviour for every page: cart drawer, mobile menu, shop filtering,
  * and the product page's size/quantity picker.
  *
@@ -1284,7 +1401,39 @@ if (adminGate) {
     }
   }
 
+  /* ---------------------------------------------------- excel export */
+  /* Built here from the orders already on the page rather than from a new
+     endpoint: the data is in hand, and another admin route is another thing
+     to guard. ordersToCsv is prepended from src/csv.mjs, which the tests
+     cover — the quoting and the formula guard are not worth a second,
+     untested copy. */
+
+  let lastOrders = [];
+
+  const exportBtn = $("[data-export-orders]");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      if (!lastOrders.length) return say("No orders to export yet.");
+
+      const blob = new Blob([ordersToCsv(lastOrders)], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = ordersFilename();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Revoking immediately can cancel the download in some browsers.
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+      say(`${lastOrders.length} order${lastOrders.length === 1 ? "" : "s"} downloaded.`);
+    });
+  }
+
   /* ---------------------------------------------------------- orders */
+
+  let emailReady = false;
+  let emailWhy = "";
 
   const addressOf = (o) =>
     [o.address_line1, o.address_line2, o.address_city, o.address_state, o.address_postcode]
@@ -1292,6 +1441,11 @@ if (adminGate) {
 
   async function loadOrders() {
     const data = await apiGet("/api/admin/orders");
+    lastOrders = data.orders ?? [];
+    // Whether a thank-you can be sent at all. Said once, on the button, so a
+    // click never fails with an error the page could have predicted.
+    emailReady = data.email?.configured === true;
+    emailWhy = data.email?.reason ?? "";
     $("[data-admin-stats]").innerHTML = `
       <div><strong>${data.counts.to_ship}</strong><span>to dispatch</span></div>
       <div><strong>${rupees(data.counts.taken_paise)}</strong><span>taken</span></div>
@@ -1314,6 +1468,13 @@ if (adminGate) {
           <p class="muted small">${addressOf(o)}</p>
           ${o.notes ? `<p class="muted small">Note: ${esc(o.notes)}</p>` : ""}
           ${o.status === "paid" ? `
+            ${o.status === "paid" || o.status === "shipped" ? `
+              <button class="btn btn--quiet admin__thank" data-thank="${esc(o.id)}"
+                ${emailReady ? "" : "disabled"}
+                title="${emailReady ? "Send a thank-you to " + esc(o.customer_email)
+                                    : "Email is not set up yet: " + esc(emailWhy)}">
+                ${o.thanked_at ? "Thank-you sent — send again" : "Send thank-you"}
+              </button>` : ""}
             <form class="admin__ship" data-ship="${esc(o.id)}">
               <input type="text" name="tracking" placeholder="Tracking reference (optional)" />
               <button class="btn btn--primary" type="submit">Mark dispatched</button>
@@ -1348,6 +1509,29 @@ if (adminGate) {
           </article>`).join("")
         : `<p class="muted">Nothing yet.</p>`}`;
   }
+
+  /* The thank-you button. Reports what actually happened — the endpoint
+     answers 502 with a reason when the provider refuses, and post() shows
+     that message, so a failed send is never reported as a success. */
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-thank]");
+    if (!btn) return;
+    e.preventDefault();
+
+    const previous = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+
+    const result = await post("/api/admin/orders", { id: btn.dataset.thank, action: "thank" });
+
+    if (result?.sent) {
+      say(`Thank-you sent to ${result.to}.`);
+      loadOrders();
+    } else {
+      btn.disabled = false;
+      btn.textContent = previous;
+    }
+  });
 
   /* ----------------------------------------------------------- stock */
 

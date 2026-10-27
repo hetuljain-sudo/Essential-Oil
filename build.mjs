@@ -42,7 +42,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -1382,6 +1382,10 @@ page("/admin/", layout({
 
           <div class="admin__stats" data-admin-stats></div>
 
+          <div class="admin__bar">
+            <button class="btn btn--quiet" data-export-orders>Download for Excel</button>
+          </div>
+
           <div class="admin__tabs" role="tablist">
             <button class="admin__tab is-on" role="tab" data-tab="orders">Orders</button>
             <button class="admin__tab" role="tab" data-tab="messages">Messages</button>
@@ -1540,8 +1544,9 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // keep a second copy of the redirect check in the browser — the kind of
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
-const sharedForBrowser = (await readFile(join(root, "src/redirect.mjs"), "utf8"))
-  .replace(/^export /gm, "");
+const sharedForBrowser = (await Promise.all(
+  ["src/redirect.mjs", "src/csv.mjs"].map((f) => readFile(join(root, f), "utf8"))
+)).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),
   `${sharedForBrowser}\n${await readFile(join(root, "src/assets/app.js"), "utf8")}`,

@@ -1256,7 +1256,39 @@ if (adminGate) {
     }
   }
 
+  /* ---------------------------------------------------- excel export */
+  /* Built here from the orders already on the page rather than from a new
+     endpoint: the data is in hand, and another admin route is another thing
+     to guard. ordersToCsv is prepended from src/csv.mjs, which the tests
+     cover — the quoting and the formula guard are not worth a second,
+     untested copy. */
+
+  let lastOrders = [];
+
+  const exportBtn = $("[data-export-orders]");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      if (!lastOrders.length) return say("No orders to export yet.");
+
+      const blob = new Blob([ordersToCsv(lastOrders)], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = ordersFilename();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Revoking immediately can cancel the download in some browsers.
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+      say(`${lastOrders.length} order${lastOrders.length === 1 ? "" : "s"} downloaded.`);
+    });
+  }
+
   /* ---------------------------------------------------------- orders */
+
+  let emailReady = false;
+  let emailWhy = "";
 
   const addressOf = (o) =>
     [o.address_line1, o.address_line2, o.address_city, o.address_state, o.address_postcode]
@@ -1264,6 +1296,11 @@ if (adminGate) {
 
   async function loadOrders() {
     const data = await apiGet("/api/admin/orders");
+    lastOrders = data.orders ?? [];
+    // Whether a thank-you can be sent at all. Said once, on the button, so a
+    // click never fails with an error the page could have predicted.
+    emailReady = data.email?.configured === true;
+    emailWhy = data.email?.reason ?? "";
     $("[data-admin-stats]").innerHTML = `
       <div><strong>${data.counts.to_ship}</strong><span>to dispatch</span></div>
       <div><strong>${rupees(data.counts.taken_paise)}</strong><span>taken</span></div>
@@ -1286,6 +1323,13 @@ if (adminGate) {
           <p class="muted small">${addressOf(o)}</p>
           ${o.notes ? `<p class="muted small">Note: ${esc(o.notes)}</p>` : ""}
           ${o.status === "paid" ? `
+            ${o.status === "paid" || o.status === "shipped" ? `
+              <button class="btn btn--quiet admin__thank" data-thank="${esc(o.id)}"
+                ${emailReady ? "" : "disabled"}
+                title="${emailReady ? "Send a thank-you to " + esc(o.customer_email)
+                                    : "Email is not set up yet: " + esc(emailWhy)}">
+                ${o.thanked_at ? "Thank-you sent — send again" : "Send thank-you"}
+              </button>` : ""}
             <form class="admin__ship" data-ship="${esc(o.id)}">
               <input type="text" name="tracking" placeholder="Tracking reference (optional)" />
               <button class="btn btn--primary" type="submit">Mark dispatched</button>
@@ -1320,6 +1364,29 @@ if (adminGate) {
           </article>`).join("")
         : `<p class="muted">Nothing yet.</p>`}`;
   }
+
+  /* The thank-you button. Reports what actually happened — the endpoint
+     answers 502 with a reason when the provider refuses, and post() shows
+     that message, so a failed send is never reported as a success. */
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-thank]");
+    if (!btn) return;
+    e.preventDefault();
+
+    const previous = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+
+    const result = await post("/api/admin/orders", { id: btn.dataset.thank, action: "thank" });
+
+    if (result?.sent) {
+      say(`Thank-you sent to ${result.to}.`);
+      loadOrders();
+    } else {
+      btn.disabled = false;
+      btn.textContent = previous;
+    }
+  });
 
   /* ----------------------------------------------------------- stock */
 
