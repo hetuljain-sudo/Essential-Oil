@@ -312,6 +312,13 @@ Not before all of the above passes:
   Each one stays visible on the page until you fill it in, which is
   deliberate: a placeholder you can see beats a plausible invention that
   becomes a commitment you never agreed to.
+- **Reset the Neon database password**, and put the new connection string in
+  `.env.local` and in Vercel. The password this database was set up with was
+  shared in a chat during setup, which was fine while it held nothing but
+  seed stock and is not fine once it holds customer orders and addresses.
+  Neon → Connect → **Reset password**. Doing this breaks every deployment
+  still holding the old string, so update Vercel in the same sitting and
+  redeploy.
 - Business verification with Razorpay: PAN, bank account, GST above the
   threshold.
 - Swap both keys to `rzp_live_…`, create a **new** webhook secret, and
