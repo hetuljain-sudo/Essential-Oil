@@ -10,3 +10,8 @@ Thumbs.db
 
 # Order exports are generated on demand and may hold customer data.
 sarvha-orders-*.csv
+
+# Google service account keys. These hold a private key; they belong in
+# .env.local or the host dashboard, never in the repository.
+*service-account*.json
+*-key.json
