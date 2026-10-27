@@ -14,9 +14,22 @@ import {
   csvField, toCsv, ordersToRows, ordersToCsv, ordersFilename, ORDER_COLUMNS, CSV_BOM,
 } from "../src/csv.mjs";
 
-test("quotes every field", () => {
+test("quotes every text field", () => {
   assert.equal(csvField("plain"), '"plain"');
-  assert.equal(csvField(42), '"42"');
+  assert.equal(csvField("42"), '"42"');
+});
+
+test("writes real numbers bare, so a column sums anywhere", () => {
+  // Quoted, "778" is a string that looks like a number, and whether the
+  // spreadsheet converts it depends on the application and the locale.
+  assert.equal(csvField(778), "778");
+  assert.equal(csvField(0), "0");
+  assert.equal(csvField(79.5), "79.5");
+});
+
+test("a number that is not finite does not become bare nonsense", () => {
+  assert.equal(csvField(NaN), '"NaN"');
+  assert.equal(csvField(Infinity), '"Infinity"');
 });
 
 test("survives commas, quotes and newlines in an address", () => {

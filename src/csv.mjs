@@ -29,12 +29,19 @@ const FORMULA_START = /^[=+\-@\t\r]/;
 /**
  * One field, safe to place in a CSV.
  *
- * Always quoted. Unquoted fields are legal but a name containing a comma, a
- * quote or a newline then breaks the row, and quoting everything costs two
- * bytes per field and removes the whole class of problem.
+ * Text is always quoted. Unquoted text is legal, but a name containing a
+ * comma, a quote or a newline then breaks the row, and quoting all of it
+ * costs two bytes per field and removes the whole class of problem. Numbers
+ * are the exception, and the comment below says why.
  */
 export function csvField(value) {
   if (value === null || value === undefined) return '""';
+
+  // A number goes in bare. Quoted, it is a string that merely looks numeric,
+  // and whether a spreadsheet converts it back depends on the application and
+  // the locale — which is a poor thing to stake a Total column on. Bare, it is
+  // unambiguously a number everywhere. Nothing else is written unquoted.
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
 
   let text = String(value);
   if (FORMULA_START.test(text)) text = "'" + text;
