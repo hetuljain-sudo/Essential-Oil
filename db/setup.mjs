@@ -32,10 +32,22 @@ const statements = source
   .map((s) => s.replace(/^\s*--.*$/gm, "").trim())
   .filter(Boolean);
 
+/*
+ * sql.query(), not sql(). The driver accepts a tagged template for ordinary
+ * queries, and from v1 it refuses to be called as a plain function at all:
+ * sql(statement) throws "This function can now be called only as a
+ * tagged-template function". These statements are read from a file rather
+ * than written in source, so a template is not available and sql.query is
+ * the documented way to send one.
+ *
+ * Nothing is interpolated into them. They are the contents of schema.sql and
+ * come with no values, which is why passing a built string is safe here and
+ * nowhere else in this repository.
+ */
 let applied = 0;
 for (const statement of statements) {
   try {
-    await sql(statement);
+    await sql.query(statement);
     applied++;
   } catch (err) {
     console.error(`\nFailed on:\n${statement.slice(0, 200)}\n`);
