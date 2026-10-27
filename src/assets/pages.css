@@ -627,3 +627,13 @@ body.menu-open .header { z-index: 56; }
   .admin__rowhead { flex-direction: column; }
   .admin__stock th:last-child, .admin__stock td:last-child { display: none; }
 }
+
+/* The guides index with nothing on it yet. */
+.guides-empty {
+  padding: 1.8rem 2rem; background: var(--tint); border-radius: var(--radius);
+  max-width: 46rem;
+}
+.guides-empty h2 { font-size: 1.3rem; margin-bottom: .8rem; }
+.guides-empty ul { list-style: none; padding: 0; margin: 0 0 1.2rem; }
+.guides-empty li { padding: .5rem 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.guides-empty li:last-child { border-bottom: 0; }

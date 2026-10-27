@@ -892,10 +892,12 @@ const renderGuide = (body) => body.map(([kind, value]) => {
 
 const guidesTrail = [HOME, { label: "Guides" }];
 
-if (liveGuides.length) page("/guides/", layout({
+page("/guides/", layout({
   path: "/guides/",
   title: "Essential Oil Guides",
-  description: `Plain reference guides from ${site.name} — dilution, phototoxicity, pregnancy and pet safety, and how to use a diffuser. Written from our own catalogue data.`,
+  description: liveGuides.length
+    ? `Plain reference guides from ${site.name} — dilution, phototoxicity, pregnancy and pet safety, and how to use a diffuser. Written from our own catalogue data.`
+    : `Reference guides from ${site.name} on using essential oils safely. We're writing them now — in the meantime the FAQ covers dilution, safe use and storage.`,
   breadcrumb: guidesTrail,
   ogImage: defaultOg,
   jsonLd: {
@@ -903,9 +905,13 @@ if (liveGuides.length) page("/guides/", layout({
     name: "Essential oil guides",
     url: site.url + "/guides/",
     isPartOf: { "@id": site.url + "/#website" },
-    hasPart: liveGuides.map((g) => ({
-      "@type": "Article", headline: g.title, url: site.url + guideUrl(g),
-    })),
+    // Omitted rather than sent empty: an empty hasPart claims a collection
+    // of nothing, which is worse than not making the claim.
+    ...(liveGuides.length ? {
+      hasPart: liveGuides.map((g) => ({
+        "@type": "Article", headline: g.title, url: site.url + guideUrl(g),
+      })),
+    } : {}),
   },
   body: `
     <section class="section section--first">
@@ -914,10 +920,15 @@ if (liveGuides.length) page("/guides/", layout({
         <div class="page-head">
           <p class="eyebrow">Guides</p>
           <h1>Reference, not marketing</h1>
-          <p class="lead">Four pages answering the questions people actually ask before buying.
-          The tables on them are generated from our own catalogue, so they cannot fall out of
-          step with what we sell.</p>
+          <p class="lead">${liveGuides.length
+            ? `Pages answering the questions people actually ask before buying. The tables on
+               them are generated from our own catalogue, so they cannot fall out of step with
+               what we sell.`
+            : `Straight answers to the questions people ask before buying — dilution, safe use,
+               storage. We're writing them now, and would rather publish nothing than publish
+               something half-checked about safety.`}</p>
         </div>
+        ${liveGuides.length ? `
         <div class="post-list">
           ${liveGuides.map((g) => `
             <article class="post-card">
@@ -928,7 +939,19 @@ if (liveGuides.length) page("/guides/", layout({
                 <span class="post-card__more">Read it</span>
               </a>
             </article>`).join("")}
-        </div>
+        </div>` : `
+        <!-- Nothing published yet. Rather than an empty page, point at the
+             pages that do answer these questions today. -->
+        <div class="guides-empty">
+          <h2>In the meantime</h2>
+          <ul>
+            <li><a href="/faq/#usage-safety">Safe use and dilution</a> — how much to use, and in what.</li>
+            <li><a href="/faq/#product-quality-sourcing">Purity and sourcing</a> — what we know about what we sell, and what we don't.</li>
+            <li><a href="/faq/">The full FAQ</a>.</li>
+          </ul>
+          <p class="muted small">Every oil's own page carries its specific safety note —
+          phototoxicity, dilution limits, and who should avoid it.</p>
+        </div>`}
       </div>
     </section>
     ${newsletter()}`,

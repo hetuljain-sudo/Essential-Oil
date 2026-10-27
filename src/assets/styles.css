@@ -1,6 +1,11 @@
 :root {
   --cream: #f6f1e7;
   --sand: #ece3d2;
+  /* A panel sitting on --cream: lighter than --sand, enough to read as a
+     block without becoming a box. Five rules referenced this before it
+     existed, so collection headers, the checkout summary and the admin
+     panels were all quietly transparent. */
+  --tint: #f1ead9;
   --paper: #fffdf8;
   --ink: #23301f;
   --forest: #2f3e2c;
