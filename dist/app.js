@@ -412,8 +412,41 @@ if (pdp) {
   const product = byId(pdp.dataset.pdp);
   let size = firstAvailable(product).size;
   let qty = 1;
+  // Whether the shopper picked this size or we did. Live stock may move the
+  // selection off a sold-out size, but only if they have not chosen one
+  // themselves — silently changing someone's explicit choice is worse than
+  // showing them it is unavailable.
+  let chosen = false;
 
   const refresh = () => {
+    // Build time renders each size disabled with "Sold out" in place of its
+    // price. Live stock arrives afterwards and changes product.variants, so
+    // that markup has to be kept in step here — otherwise an oil that sold
+    // out since the last deploy still shows its price and looks buyable, and
+    // only reveals itself when clicked.
+    $$(".size", pdp).forEach((label) => {
+      const input = $("input", label);
+      const variant = product.variants.find((x) => x.size === input.value);
+      const out = !variant || variant.stock <= 0;
+      label.classList.toggle("is-sold", out);
+      input.disabled = out;
+      const price = $(".size__price", label);
+      if (price) price.textContent = out ? "Sold out" : money(variant.price);
+    });
+
+    // If we picked this size and it has since sold out, move to one that has
+    // not. Nothing to do if every size is gone — the button says so.
+    const current = product.variants.find((x) => x.size === size);
+    if (!chosen && current && current.stock <= 0) {
+      const next = product.variants.find((x) => x.stock > 0);
+      if (next) {
+        size = next.size;
+        qty = 1;
+        const input = $$(".size input", pdp).find((i) => i.value === size);
+        if (input) input.checked = true;
+      }
+    }
+
     const v = product.variants.find((x) => x.size === size);
     $("[data-qty-value]", pdp).textContent = qty;
     $("[data-live-price]", pdp).textContent = money(v.price * qty);
@@ -429,7 +462,7 @@ if (pdp) {
   };
 
   pdp.addEventListener("change", (e) => {
-    if (e.target.matches("[data-size-pick]")) { size = e.target.value; qty = 1; refresh(); }
+    if (e.target.matches("[data-size-pick]")) { size = e.target.value; qty = 1; chosen = true; refresh(); }
   });
 
   pdp.addEventListener("click", (e) => {
