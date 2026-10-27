@@ -15,7 +15,9 @@
     "seed": "node --env-file-if-exists=.env.local db/seed-stock.mjs",
     "db:setup": "node --env-file-if-exists=.env.local db/setup.mjs",
     "db:check": "node --env-file-if-exists=.env.local db/check.mjs",
-    "smoke": "node --env-file-if-exists=.env.local db/smoke.mjs"
+    "smoke": "node --env-file-if-exists=.env.local db/smoke.mjs",
+    "demo": "node --env-file-if-exists=.env.local db/demo.mjs",
+    "demo:clear": "node --env-file-if-exists=.env.local db/demo.mjs --remove"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
