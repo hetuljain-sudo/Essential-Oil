@@ -12,8 +12,20 @@ export const esc = (s) =>
 const shortLabel = (p) => p.short || p.name.split(" ")[0];
 
 /** Generated bottle artwork — the fallback when photography fails to load. */
-export function bottleSVG([light, dark], label = "") {
-  const uid = "g" + Math.random().toString(36).slice(2, 8);
+/**
+ * A drawn bottle, used where an oil has no photograph.
+ *
+ * `key` names this bottle within the page and decides the gradient's id.
+ * It was Math.random(), which made every build rewrite all 68 dist files
+ * with no real change and buried genuine diffs in the noise. It also meant
+ * the server and the client produced different markup for the same card.
+ *
+ * The id only has to be unique within a document, so callers pass something
+ * stable and distinct — a product id, or a cart key where one product can
+ * appear twice at different sizes.
+ */
+export function bottleSVG([light, dark], label = "", key = label) {
+  const uid = "g-" + (String(key).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bottle");
   return `<svg class="bottle" viewBox="0 0 80 160" aria-hidden="true" focusable="false">
     <rect x="30" y="2" width="20" height="10" rx="3" fill="#2a2a2a"/>
     <rect x="26" y="10" width="28" height="26" rx="4" fill="#1f1f1f"/>
@@ -36,7 +48,7 @@ export function bottleSVG([light, dark], label = "") {
 }
 
 export function productMedia(p, sizes = "(max-width: 860px) 50vw, 25vw", eager = false) {
-  if (!p.image) return bottleSVG(p.swatch, shortLabel(p));
+  if (!p.image) return bottleSVG(p.swatch, shortLabel(p), p.id);
   // width/height are the source dimensions — the browser reserves the right
   // box before the image arrives, so nothing shifts as the grid loads.
   return `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"

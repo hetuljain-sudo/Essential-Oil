@@ -4,12 +4,16 @@
  * The guard itself needs a database, so it is not covered here. What is
  * covered is the arithmetic an admin types: a wrong quantity here silently
  * oversells or hides stock, and nothing downstream questions it.
+ *
+ * Imported from validate.mjs rather than admin.mjs on purpose: admin.mjs
+ * reaches the database, and importing it would make these tests need
+ * node_modules to check a piece of arithmetic.
  */
 
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parseQuantity, parseTracking } from "../api/_lib/admin.mjs";
+import { parseQuantity, parseTracking } from "../api/_lib/validate.mjs";
 
 test("accepts a plain count", () => {
   assert.deepEqual(parseQuantity(0), { quantity: 0 });

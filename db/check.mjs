@@ -27,10 +27,15 @@ for (const name of ["DATABASE_URL", "RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "R
   else bad(`${name} is missing`);
 }
 
-const keyId = process.env.RAZORPAY_KEY_ID ?? "";
-if (keyId.startsWith("rzp_test")) ok("Razorpay is in TEST mode — no real money can move");
-else if (keyId.startsWith("rzp_live")) warn("Razorpay is in LIVE mode — real cards will be charged");
-else if (keyId) bad("RAZORPAY_KEY_ID does not look like a Razorpay key");
+// Asked of the Razorpay module rather than re-derived here: one definition of
+// what a test key looks like, in the file that already holds the others.
+if (process.env.RAZORPAY_KEY_ID) {
+  const { isTestMode, keyId } = await import("../api/_lib/razorpay.mjs");
+  const id = keyId();
+  if (isTestMode()) ok("Razorpay is in TEST mode — no real money can move");
+  else if (id.startsWith("rzp_live")) warn("Razorpay is in LIVE mode — real cards will be charged");
+  else bad("RAZORPAY_KEY_ID does not look like a Razorpay key");
+}
 
 if (!process.env.DATABASE_URL) {
   console.log("\nSkipping database checks — DATABASE_URL is not set.\n");

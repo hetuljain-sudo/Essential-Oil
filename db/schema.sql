@@ -84,9 +84,11 @@ create table if not exists webhook_events (
 
 -- ---------------------------------------------------------------- accounts
 --
--- Accounts are optional. Checkout works without one, and must keep working
--- without one: forcing registration on a first-time buyer is the most
--- reliable way to lose the sale.
+-- Ordering requires an account; browsing and filling a cart do not. The gate
+-- is in api/checkout.js, which refuses a request without a session, and the
+-- cost is known and accepted: some first-time buyers leave rather than
+-- register. What it buys is a customer record against every order, an order
+-- history and one delivery address on file.
 
 create table if not exists customers (
   id             uuid primary key default gen_random_uuid(),
@@ -122,8 +124,9 @@ create table if not exists sessions (
 create index if not exists sessions_customer_idx on sessions (customer_id);
 create index if not exists sessions_expiry_idx on sessions (expires_at);
 
--- Orders may belong to an account, or to nobody. Null is a guest order and
--- is a perfectly normal row, not a missing value to be backfilled.
+-- Nullable, though checkout now always sets it. Orders placed before the
+-- login requirement existed have no customer, and a null there records that
+-- truthfully rather than being a gap to backfill.
 alter table orders add column if not exists customer_id uuid references customers (id) on delete set null;
 create index if not exists orders_customer_idx on orders (customer_id);
 

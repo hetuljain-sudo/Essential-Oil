@@ -10,6 +10,10 @@ import { db } from "./db.mjs";
 import { readCookie, sha256, SESSION_COOKIE } from "./auth.mjs";
 import { json } from "./http.mjs";
 
+// Re-exported so endpoints keep importing their validation from one place,
+// while the validators themselves stay free of the database.
+export { parseQuantity, parseTracking } from "./validate.mjs";
+
 /**
  * The signed-in admin, or null.
  *
@@ -50,24 +54,4 @@ export async function requireAdmin(req, res) {
     return null;
   }
   return { sql, admin };
-}
-
-/** A quantity an admin typed. Must be a sane whole number of bottles. */
-export function parseQuantity(value) {
-  if (typeof value !== "number" || !Number.isInteger(value)) {
-    return { error: "Quantity must be a whole number." };
-  }
-  if (value < 0) return { error: "Quantity cannot be negative." };
-  // Not a real limit, a typo guard: 100000 is a slipped keystroke, not stock.
-  if (value > 10000) return { error: "That looks like a typo — 10,000 is the most we'll accept." };
-  return { quantity: value };
-}
-
-/** A tracking reference, or nothing. Stored as typed, trimmed. */
-export function parseTracking(value) {
-  if (value == null || value === "") return { tracking: null };
-  if (typeof value !== "string") return { error: "Tracking must be text." };
-  const tracking = value.trim();
-  if (tracking.length > 120) return { error: "That tracking reference is too long." };
-  return { tracking: tracking || null };
 }

@@ -21,8 +21,20 @@ const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: r
 
 const shortLabel = (p) => p.short || p.name.split(" ")[0];
 
-function bottleSVG([light, dark], label = "") {
-  const uid = "g" + Math.random().toString(36).slice(2, 8);
+/**
+ * A drawn bottle, used where an oil has no photograph.
+ *
+ * `key` names this bottle within the page and decides the gradient's id.
+ * It was Math.random(), which made every build rewrite all 68 dist files
+ * with no real change and buried genuine diffs in the noise. It also meant
+ * the server and the client produced different markup for the same card.
+ *
+ * The id only has to be unique within a document, so callers pass something
+ * stable and distinct — a product id, or a cart key where one product can
+ * appear twice at different sizes.
+ */
+function bottleSVG([light, dark], label = "", key = label) {
+  const uid = "g-" + (String(key).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bottle");
   return `<svg class="bottle" viewBox="0 0 80 160" aria-hidden="true" focusable="false">
     <rect x="30" y="2" width="20" height="10" rx="3" fill="#2a2a2a"/>
     <rect x="26" y="10" width="28" height="26" rx="4" fill="#1f1f1f"/>
@@ -46,7 +58,7 @@ window.artFallback = function (img) {
   const holder = img.parentElement;
   img.remove();
   if (p && !holder.querySelector(".bottle")) {
-    holder.insertAdjacentHTML("beforeend", bottleSVG(p.swatch, shortLabel(p)));
+    holder.insertAdjacentHTML("beforeend", bottleSVG(p.swatch, shortLabel(p), p.id));
     holder.classList.add("has-art");
   }
 };
@@ -151,7 +163,7 @@ function renderCart() {
         const p = lineProduct(key);
         const v = lineVariant(key);
         return `<div class="line">
-          <a class="line__thumb" href="${p.url}" style="background:${p.bg}">${bottleSVG(p.swatch, "")}</a>
+          <a class="line__thumb" href="${p.url}" style="background:${p.bg}">${bottleSVG(p.swatch, "", key)}</a>
           <div class="line__main">
             <h5><a href="${p.url}">${esc(p.name)}</a></h5>
             <small class="muted">${v.size} · ${money(v.price)}</small>
@@ -253,7 +265,7 @@ function productCard(p) {
     ? `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"
          loading="lazy" decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
-    : bottleSVG(p.swatch, shortLabel(p));
+    : bottleSVG(p.swatch, shortLabel(p), p.id);
   return `<article class="card${sold ? " is-sold" : ""}">
     <a class="card__media" style="background:${p.bg}" href="${p.url}" aria-label="View ${esc(p.name)}">
       ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
@@ -1183,6 +1195,15 @@ if (adminGate) {
 
   const say = (message) => toast(message);
 
+  /**
+   * POST to an admin endpoint.
+   *
+   * Returns the parsed body on success and null on failure, rather than a
+   * bare boolean. Callers only need "did it work?" today, but the endpoints
+   * already answer with more than that, and the next thing dispatch has to
+   * report — whether the customer's email actually sent — cannot be carried
+   * by a boolean.
+   */
   async function post(path, body) {
     try {
       const res = await fetch(path, {
@@ -1192,11 +1213,13 @@ if (adminGate) {
         body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) { say(data.error || "That didn't work."); return false; }
-      return true;
+      if (!res.ok) { say(data.error || "That didn't work."); return null; }
+      // An endpoint answering 200 with an empty body is still a success, so
+      // never return something falsy here.
+      return data ?? {};
     } catch {
       say("Couldn't reach the server.");
-      return false;
+      return null;
     }
   }
 
@@ -1302,9 +1325,10 @@ if (adminGate) {
 
     const done = e.target.closest("[data-handled]");
     if (done) {
-      if (await post("/api/admin/messages", { id: done.dataset.handled, handled: done.dataset.to === "true" })) {
-        await loadMessages();
-      }
+      const result = await post("/api/admin/messages", {
+        id: done.dataset.handled, handled: done.dataset.to === "true",
+      });
+      if (result) await loadMessages();
     }
   });
 
@@ -1312,18 +1336,26 @@ if (adminGate) {
     const ship = e.target.closest("[data-ship]");
     if (ship) {
       e.preventDefault();
-      if (await post("/api/admin/orders", {
+      const result = await post("/api/admin/orders", {
         id: ship.dataset.ship, action: "ship", tracking: ship.tracking.value,
-      })) { say("Marked dispatched — the customer is not told."); await loadOrders(); }
+      });
+      if (result) {
+        // Still true. When the endpoint starts sending a dispatch email it
+        // will say in its reply whether that worked, and this line reports
+        // what actually happened rather than guessing.
+        say("Marked dispatched — the customer is not told.");
+        await loadOrders();
+      }
       return;
     }
 
     const stock = e.target.closest("[data-stock]");
     if (stock) {
       e.preventDefault();
-      if (await post("/api/admin/stock", {
+      const result = await post("/api/admin/stock", {
         sku: stock.dataset.stock, quantity: Number(stock.quantity.value),
-      })) say("Stock updated.");
+      });
+      if (result) say("Stock updated.");
     }
   });
 

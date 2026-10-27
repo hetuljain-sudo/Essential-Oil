@@ -277,7 +277,7 @@ page("/", layout({
           <div class="hero__circle"></div>
           <div class="hero__bottles">
             ${["lavender-fields", "frankincense-quiet", "peppermint-spark"]
-              .map((id) => { const p = products.find((x) => x.id === id); return bottleSVG(p.swatch, p.name.split(" ")[0]); })
+              .map((id) => { const p = products.find((x) => x.id === id); return bottleSVG(p.swatch, p.name.split(" ")[0], p.id); })
               .join("")}
           </div>
           <svg class="leaf leaf--1" viewBox="0 0 60 100"><path d="M30 2C55 30 55 70 30 98 5 70 5 30 30 2z" fill="currentColor"/><path d="M30 10v86" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/></svg>

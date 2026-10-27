@@ -35,6 +35,11 @@ The webhook is built to be delivered twice, because Razorpay retries. Only an
 order still at `created` moves, so a repeat delivery changes nothing and
 stock cannot be decremented twice.
 
+There is deliberately no verifier for the handshake the browser hands back
+after payment. One existed and was never called: it proves a response was not
+forged in transit, never that money moved, and leaving it there invited a
+later caller to mistake it for proof of payment.
+
 ## Setup
 
 1. **Database.** Create a Postgres database (Neon's free tier is enough), then:
@@ -207,8 +212,8 @@ abandoned carts hold inventory hostage, which at this volume is the more
 common and more costly failure. If orders start colliding, add a reservation
 with an expiry.
 
-**No admin screen yet.** Orders are read with SQL. That is honest for the
-first weeks and gets old quickly.
+**No "sign out everywhere".** Logging out ends one session; a lost device
+has to be dealt with by deleting rows from `sessions` by hand.
 
 **No order confirmation email yet.** The order is recorded; nobody is told.
 This is the first gap worth closing.
@@ -223,7 +228,8 @@ These are not optional, and two of them are legal requirements in India:
 - **Business verification.** Razorpay needs PAN, bank account and, above a
   threshold, GST registration.
 - **Switch the keys.** `rzp_test_…` to `rzp_live_…`, and a fresh webhook
-  secret. `isTestMode()` in `api/_lib/razorpay.mjs` reports which is in use.
+  secret. `npm run db:check` then reports which mode the keys are in, and
+  warns when real cards are live.
 - **Confirm the shipping fee.** `site.shippingFlat` is set to ₹79 below the
   ₹999 free-shipping threshold. That number was chosen as a placeholder — the
   site had never stated a fee — and should be a decision, not an inheritance.

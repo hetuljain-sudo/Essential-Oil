@@ -26,7 +26,6 @@ export class CartError extends Error {
 }
 
 export const toPaise = (rupees) => Math.round(rupees * 100);
-export const fromPaise = (paise) => paise / 100;
 
 /** sku -> { sku, productId, name, size, pricePaise, catalogueStock } */
 export const catalogue = new Map(

@@ -66,21 +66,14 @@ function matches(a, b) {
 }
 
 /**
- * Verify the signature the browser hands back after a successful payment.
- *
- * This proves the response came from Razorpay and was not forged by whoever
- * is sitting in front of the page. It is *not* proof of payment — a browser
- * can simply never come back. The webhook is what settles an order.
- */
-export function verifyCheckoutSignature({ razorpayOrderId, razorpayPaymentId, signature }) {
-  const expected = createHmac("sha256", need("RAZORPAY_KEY_SECRET"))
-    .update(`${razorpayOrderId}|${razorpayPaymentId}`)
-    .digest("hex");
-  return matches(expected, String(signature ?? ""));
-}
-
-/**
  * Verify a webhook delivery against the raw request body.
+ *
+ * This is the only signature check in the codebase. A matching verifier for
+ * the handshake the browser hands back after payment used to live here and
+ * was never called: the webhook settles orders, and a browser-side check
+ * proves only that a response was not forged in transit, never that money
+ * moved. It was removed rather than kept unused, because unused crypto
+ * invites a later caller to mistake it for proof of payment.
  *
  * Must be given the exact bytes received. Re-serialising the parsed JSON
  * changes key order and whitespace, and the signature stops matching — which
