@@ -37,7 +37,16 @@ looks like the deploy silently failed.
 ## 1. Database — Neon
 
 1. Sign up at [neon.tech](https://neon.tech) and create a project.
-   Pick the region nearest your customers: **AWS ap-south-1 (Mumbai)**.
+   Pick the region nearest your customers: **AWS Asia Pacific 1
+   (Singapore)**, which is the closest option Neon offers to India — roughly
+   50–70ms round trip, against about 220ms to anywhere in the US. There is no
+   Mumbai region on the free tier. This is the one setting that cannot be
+   changed later without creating a new project.
+
+   Under **Services**, leave only **Postgres database** on. Object storage,
+   Functions, AI gateway and Realtime are not used by this site, and **Better
+   Auth** in particular must stay off — accounts are already built here, in
+   `api/_lib/auth.mjs` and the `customers` and `sessions` tables.
 2. Copy the **pooled** connection string, the one with `-pooler` in the host.
    It should end in `?sslmode=require`.
 
