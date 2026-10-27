@@ -1,4 +1,15 @@
 /**
+ * Guides.
+ *
+ * `draft: true` keeps a guide in this file and out of the site: it is not
+ * built, not linked and not in the sitemap, but nothing about it is lost.
+ * Every guide is currently shelved that way. Publishing one again is a
+ * matter of deleting its `draft: true` — the index page, the nav item and
+ * the footer links all come back on their own, because they are derived
+ * from `liveGuides` below rather than written out by hand.
+ */
+
+/**
  * Reference guides.
  *
  * These pages answer a question rather than sell a product — "how much
@@ -17,6 +28,7 @@
 
 export const guidePages = [
   {
+    draft: true,
     slug: "dilution-chart",
     title: "Essential Oil Dilution Chart",
     nav: "Dilution chart",
@@ -50,6 +62,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "phototoxic-oils",
     title: "Which Essential Oils Are Phototoxic",
     nav: "Phototoxic oils",
@@ -81,6 +94,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "essential-oils-and-pregnancy",
     title: "Essential Oils to Avoid in Pregnancy",
     nav: "Pregnancy & children",
@@ -111,6 +125,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "how-to-use-a-diffuser",
     title: "How to Use an Essential Oil Diffuser",
     nav: "Using a diffuser",
@@ -206,3 +221,7 @@ export const guidePages = [
     ],
   },
 ];
+
+/** The guides that are actually published. Everything guide-shaped on the
+ *  site derives from this, so there is no list to keep in step. */
+export const liveGuides = guidePages.filter((g) => !g.draft);

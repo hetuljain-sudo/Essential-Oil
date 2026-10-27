@@ -26,7 +26,7 @@ import {
 
 import { guides } from "./src/content.mjs";
 import { hubs } from "./src/collections.mjs";
-import { guidePages } from "./src/guides.mjs";
+import { guidePages, liveGuides } from "./src/guides.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -798,7 +798,8 @@ ${breadcrumbs(trail)}
 const guideUrl = (g) => `/guides/${g.slug}/`;
 
 /** `draft: true` keeps a guide out of the build and off the index. */
-const liveGuides = guidePages.filter((g) => !g.draft);
+// liveGuides comes from src/guides.mjs so the nav, the footer and this
+// file cannot disagree about what is published.
 
 /** Oils carrying a given safety flag, alphabetically. */
 const flagged = (key) =>
@@ -891,7 +892,7 @@ const renderGuide = (body) => body.map(([kind, value]) => {
 
 const guidesTrail = [HOME, { label: "Guides" }];
 
-page("/guides/", layout({
+if (liveGuides.length) page("/guides/", layout({
   path: "/guides/",
   title: "Essential Oil Guides",
   description: `Plain reference guides from ${site.name} — dilution, phototoxicity, pregnancy and pet safety, and how to use a diffuser. Written from our own catalogue data.`,

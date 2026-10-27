@@ -7,6 +7,8 @@
  * Indian market — the originals were GBP.
  */
 
+import { liveGuides } from "./guides.mjs";
+
 export const site = {
   name: "Sarvha",
   tagline: "Small-batch essential oils",
@@ -36,7 +38,9 @@ export const nav = [
   { href: "/shop/", label: "Shop" },
   { href: "/collections/", label: "Collections" },
   { href: "/about/", label: "Our story" },
-  { href: "/guides/", label: "Guides" },
+  // Only while something is published there. An empty section in the header
+  // is a promise of content that is not there.
+  ...(liveGuides.length ? [{ href: "/guides/", label: "Guides" }] : []),
   { href: "/contact/", label: "Contact" },
 ];
 

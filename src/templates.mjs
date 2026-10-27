@@ -4,6 +4,7 @@ import {
   site, nav, categories, products, library, faqs, steps,
   fromPrice, inStock, firstAvailable, categoryOf, money,
 } from "./data.mjs";
+import { liveGuides } from "./guides.mjs";
 
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -206,11 +207,12 @@ function footer() {
       })))}
 
       ${column("Learn", [
-        { href: "/guides/", label: "All guides" },
-        { href: "/guides/dilution-chart/", label: "Dilution chart" },
-        { href: "/guides/phototoxic-oils/", label: "Phototoxic oils" },
-        { href: "/guides/essential-oils-and-pregnancy/", label: "Pregnancy & children" },
-        { href: "/guides/how-to-use-a-diffuser/", label: "Using a diffuser" },
+        // Derived, not listed: a hardcoded guide link outlives the guide and
+        // becomes a 404 in the footer of all 71 pages.
+        ...(liveGuides.length
+          ? [{ href: "/guides/", label: "All guides" },
+             ...liveGuides.map((g) => ({ href: `/guides/${g.slug}/`, label: g.nav }))]
+          : []),
         { href: "/faq/#product-quality-sourcing", label: "Purity & sourcing" },
         { href: "/faq/#usage-safety", label: "Safe use & dilution" },
         { href: "/faq/#shipping-delivery", label: "Shipping & delivery" },
