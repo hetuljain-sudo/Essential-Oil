@@ -187,7 +187,14 @@ own.
 
 Mirrors every order into one spreadsheet you keep open, instead of
 downloading a file. The button in `/admin/` stays hidden until this is set
-up.
+up, and **the Excel download works without any of this** — it already
+contains every order, so this is a convenience, not a requirement.
+
+**Google asks for a card.** Creating a Google Cloud account requires payment
+details for identity verification, even though the Sheets API is free at any
+volume this shop will reach and nothing is charged unless you deliberately
+upgrade to pay-as-you-go. If you would rather not, skip this section
+entirely; nothing else depends on it.
 
 **How it works, so the failure modes make sense.** The database is the
 source of truth and the sheet is a copy of it. Each sync clears the tab and
@@ -241,6 +248,21 @@ says nothing about the cause.
 
 Then `npm run db:check` reports the sheet, and the **Sync to Google Sheet**
 button appears in `/admin/`.
+
+### A hard limit worth knowing about
+
+**Vercel's Hobby plan caps how many Serverless Functions one deployment may
+contain, and every file under `api/` is one.** This project sits at exactly
+twelve. Adding a thirteenth made every deploy fail, silently as far as the
+live site was concerned — it simply kept serving the last good build.
+
+So a new endpoint is not free. Prefer another `action` on an existing
+handler, the way `/api/admin/orders` carries `ship`, `thank` and `sync`. If
+a genuinely new function is needed, something else has to go, or the project
+moves to Pro or to Railway.
+
+Symptom: you push, the site does not change, and nothing in the browser says
+why. Check **Deployments** — the failed build names the limit.
 
 ## 4. Deploy — Vercel
 

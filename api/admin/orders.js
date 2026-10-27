@@ -1,7 +1,16 @@
 /**
  * GET  /api/admin/orders            recent orders, newest first
+ *      ?all=1                        every order, for the export and the sync
  * POST /api/admin/orders  { id, action: "ship", tracking? }
  *                         { id, action: "thank" }
+ *                         { action: "sync" }     write them all to the sheet
+ *
+ * The sync lives here rather than in its own file for a reason worth
+ * recording: Vercel's Hobby plan caps how many Serverless Functions one
+ * deployment may contain, and every file under api/ is one. A separate
+ * api/admin/sheet.js took this project from twelve to thirteen and every
+ * deploy was rejected until it was folded back in. Adding a file under api/
+ * is not free; adding an action to an existing handler is.
  *
  * The working list: what has been paid for and not yet sent.
  *
@@ -16,7 +25,8 @@ import { json } from "../_lib/http.mjs";
 import { requireAdmin, parseTracking } from "../_lib/admin.mjs";
 import { sendEmail, emailStatus } from "../_lib/email.mjs";
 import { listOrders, countOrders } from "../_lib/order-list.mjs";
-import { sheetStatus } from "../_lib/sheets.mjs";
+import { sheetStatus, syncSheet } from "../_lib/sheets.mjs";
+import { ORDER_COLUMNS, ordersToRows } from "../../src/csv.mjs";
 import { thankYouEmail, dispatchEmail } from "../../src/emails.mjs";
 
 /** The order with its items, in the shape the email templates expect. */
@@ -78,6 +88,36 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
       const { id, action } = body;
+
+      /* ----------------------------------------------- sync the sheet */
+      /* Before the id check: this one acts on every order, not one of them. */
+      if (action === "sync") {
+        const status = sheetStatus();
+        if (!status.configured) {
+          return json(res, 400, {
+            error: "Google Sheets isn't set up yet.",
+            detail: status.reason,
+            synced: false,
+          });
+        }
+
+        // No limit. The whole point is a sheet that holds everything.
+        const all = await listOrders(sql, { limit: null });
+        const result = await syncSheet(ORDER_COLUMNS, ordersToRows(all));
+
+        if (!result.synced) {
+          console.error(`sheet sync failed: ${result.reason}`);
+          return json(res, 502, {
+            error: "That didn't reach the sheet.",
+            detail: result.reason,
+            synced: false,
+          });
+        }
+
+        return json(res, 200, {
+          ok: true, synced: true, rows: result.rows, tab: result.tab, url: result.url,
+        });
+      }
 
       if (typeof id !== "string" || !id) return json(res, 400, { error: "Which order?" });
       if (action !== "ship" && action !== "thank") {

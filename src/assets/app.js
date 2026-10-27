@@ -1408,7 +1408,7 @@ if (adminGate) {
       syncBtn.disabled = true;
       syncBtn.textContent = "Syncing…";
 
-      const result = await post("/api/admin/sheet", {});
+      const result = await post("/api/admin/orders", { action: "sync" });
 
       syncBtn.disabled = false;
       syncBtn.textContent = previous;
