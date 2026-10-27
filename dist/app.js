@@ -1460,8 +1460,13 @@ if (adminGate) {
     [o.address_line1, o.address_line2, o.address_city, o.address_state, o.address_postcode]
       .filter(Boolean).map(esc).join(", ");
 
-  async function loadOrders() {
-    const data = await apiGet("/api/admin/orders");
+  /* True once the full list has been fetched, so searching does not refetch
+     on every keystroke. Reset when the search is cleared. */
+  let loadedAll = false;
+
+  async function loadOrders({ all = false } = {}) {
+    const data = await apiGet(`/api/admin/orders${all ? "?all=1" : ""}`);
+    loadedAll = all;
     lastOrders = data.orders ?? [];
     // Whether a thank-you can be sent at all. Said once, on the button, so a
     // click never fails with an error the page could have predicted.
@@ -1473,7 +1478,7 @@ if (adminGate) {
     const showing = $("[data-orders-showing]");
     if (showing) {
       showing.textContent = data.total > data.showing
-        ? `Showing ${data.showing} of ${data.total} orders — the export and the sheet include all of them.`
+        ? `Showing ${data.showing} of ${data.total} orders — the export includes all of them.`
         : "";
     }
 
@@ -1618,6 +1623,72 @@ if (adminGate) {
 
   const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock };
 
+  /* ---------------------------------------------------------- search */
+  /* Filters the rows already drawn, rather than asking the server on every
+     keystroke. Everything searchable is on screen — name, email, city,
+     tracking, the oils in the order, the sku — so matching the row's own
+     text finds all of it without a field list that would go stale the next
+     time a column is added.
+
+     The one thing the DOM cannot answer for is an order beyond the hundred
+     the page draws, so searching the orders tab fetches the rest first. */
+
+  const searchBox = $("[data-admin-search]");
+  let query = "";
+
+  /** Which tab is showing. */
+  const activeTab = () => $("[data-tab].is-on", root)?.dataset.tab ?? "orders";
+
+  function applySearch() {
+    const name = activeTab();
+    const host = panel(name);
+    if (!host) return;
+
+    const rows = $$(".admin__row, .admin__stock tbody tr", host);
+    const needle = query.trim().toLowerCase();
+
+    let shown = 0;
+    for (const row of rows) {
+      const hit = !needle || row.textContent.toLowerCase().includes(needle);
+      row.hidden = !hit;
+      if (hit) shown++;
+    }
+
+    // Say when a search matched nothing, rather than showing a blank panel
+    // that looks like a failure to load.
+    let empty = $("[data-search-empty]", host);
+    if (needle && shown === 0) {
+      if (!empty) {
+        empty = document.createElement("p");
+        empty.className = "muted";
+        empty.setAttribute("data-search-empty", "");
+        host.appendChild(empty);
+      }
+      empty.textContent = `Nothing in ${name} matches “${query.trim()}”.`;
+      empty.hidden = false;
+    } else if (empty) {
+      empty.hidden = true;
+    }
+  }
+
+  if (searchBox) {
+    let timer;
+    searchBox.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        query = searchBox.value;
+
+        // A search of the orders tab must cover every order, not the
+        // hundred on screen — otherwise it quietly reports "no match" for
+        // an order that exists.
+        if (query.trim() && activeTab() === "orders" && !loadedAll) {
+          await loadOrders({ all: true }).catch(() => {});
+        }
+        applySearch();
+      }, 180);
+    });
+  }
+
   /* ------------------------------------------------------ behaviour */
 
   root.addEventListener("click", async (e) => {
@@ -1626,6 +1697,9 @@ if (adminGate) {
       $$("[data-tab]", root).forEach((t) => t.classList.toggle("is-on", t === tab));
       for (const name of Object.keys(loaders)) panel(name).hidden = name !== tab.dataset.tab;
       await loaders[tab.dataset.tab]().catch(() => say("Couldn't load that."));
+      // A search survives a tab change; the box still shows the text, so
+      // the list it filters had better match it.
+      applySearch();
       return;
     }
 

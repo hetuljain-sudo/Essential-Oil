@@ -1383,6 +1383,11 @@ page("/admin/", layout({
           <div class="admin__stats" data-admin-stats></div>
 
           <div class="admin__bar">
+            <label class="admin__search">
+              <span class="sr-only">Search orders, messages and stock</span>
+              <input type="search" data-admin-search placeholder="Search name, email, city, SKU…"
+                autocomplete="off" />
+            </label>
             <span class="admin__showing" data-orders-showing></span>
             <button class="btn btn--quiet" data-sync-sheet hidden>Sync to Google Sheet</button>
             <button class="btn btn--quiet" data-export-orders>Download for Excel</button>

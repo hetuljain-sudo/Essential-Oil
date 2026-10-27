@@ -1167,3 +1167,16 @@ body.menu-open .header { z-index: 56; }
 .admin__showing { margin-right: auto; font-size: .82rem; color: var(--muted); }
 .admin__thank { margin-right: .6rem; }
 .admin__thank[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* Admin search. Sits at the left of the toolbar, before the row count. */
+.admin__search { flex: 1 1 14rem; max-width: 22rem; }
+.admin__search input {
+  width: 100%; padding: .5rem .8rem; font: inherit; font-size: .9rem;
+  border: 1.5px solid var(--line); border-radius: 10px; background: var(--paper);
+  color: inherit;
+}
+.admin__search input:focus-visible {
+  outline: 2px solid var(--terracotta); outline-offset: 1px; border-color: var(--sage);
+}
+/* The count sits next to the search rather than pushing it away. */
+.admin__bar .admin__showing { margin-right: auto; }
