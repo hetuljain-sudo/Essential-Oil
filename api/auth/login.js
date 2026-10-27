@@ -50,12 +50,24 @@ export default async function handler(req, res) {
 
     if (!await verifyPassword(password, customer.password_hash)) {
       const failures = customer.failed_logins + 1;
+      // The lock time is computed by Postgres, not here, so a clock skew
+      // between the function and the database cannot shorten a lockout.
+      //
+      // Expressed as `case when ... end` rather than by interpolating a
+      // nested sql`` fragment. A nested template is not a fragment: the
+      // driver passes it as a bound *value*, so the statement became
+      // `locked_until = $1` with an object for $1 and threw. The practical
+      // effect was that the tenth wrong password answered 500 and never
+      // wrote the lock, leaving failed_logins stuck at nine and the account
+      // guessable without limit.
+      const lockMinutes = failures >= MAX_FAILURES ? LOCK_MINUTES : null;
       await sql`
         update customers
            set failed_logins = ${failures},
-               locked_until = ${failures >= MAX_FAILURES
-                 ? sql`now() + ${LOCK_MINUTES + " minutes"}::interval`
-                 : null}
+               locked_until = case
+                 when ${lockMinutes}::int is null then null
+                 else now() + (${lockMinutes}::int * interval '1 minute')
+               end
          where id = ${customer.id}`;
       return json(res, 401, { error: GENERIC });
     }

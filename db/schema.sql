@@ -1,8 +1,17 @@
 -- Sarvha order store.
 --
--- Run once against a fresh Postgres database:
---   psql "$DATABASE_URL" -f db/schema.sql
---   node db/seed-stock.mjs
+-- Applied by `npm run db:setup`, which runs these statements through the same
+-- driver the application uses so that psql need not be installed:
+--   npm run db:setup
+--   npm run seed
+--   npm run db:check
+--   npm run smoke      -- exercises these tables for real
+--
+-- Safe to re-run. Every statement here is `if not exists` or `add column if
+-- not exists`, so applying it to a live database adds what is missing and
+-- changes nothing else. db/check.mjs reads this file to decide what it ought
+-- to find, so a table added here gets checked for without editing that
+-- script.
 --
 -- Money is bigint paise everywhere. Never numeric, never float: a rupee
 -- column invites rounding, and these numbers are charged to real cards.

@@ -40,8 +40,14 @@ export default async function handler(req, res) {
 
       // Reversible on purpose: marking the wrong row done should cost a click
       // to undo, not a trip to the database.
+      // `case when` rather than a nested sql`now()`: the driver sends an
+      // interpolated template as a bound value, not as SQL, so marking a
+      // message handled used to send an object where a timestamp belonged
+      // and answer 500. Un-marking worked, because that branch was a plain
+      // null.
       const [row] = await sql`
-        update messages set handled_at = ${handled ? sql`now()` : null}
+        update messages
+           set handled_at = case when ${handled}::boolean then now() else null end
          where id = ${id}
          returning id`;
 

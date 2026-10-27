@@ -8,11 +8,21 @@
  * are present and which mode they are in, and whether the SKUs in the stock
  * table still match the catalogue.
  *
+ * What it expects is read out of db/schema.sql rather than listed here. A
+ * hardcoded list goes stale the moment a table is added, and then reports a
+ * healthy database while a new table is missing — which is the exact failure
+ * this script exists to prevent.
+ *
  * Reads secrets from the environment and prints none of them.
  */
 
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
 import { products, site } from "../src/data.mjs";
 import { skuFor } from "../src/sku.mjs";
+import { schemaExpectations } from "./schema-read.mjs";
 
 const ok = (m) => console.log(`  ok    ${m}`);
 const warn = (m) => console.log(`  warn  ${m}`);
@@ -56,7 +66,11 @@ try {
   process.exit(1);
 }
 
-const expected = ["orders", "order_items", "stock", "webhook_events", "customers", "sessions"];
+const here = dirname(fileURLToPath(import.meta.url));
+const { tables: expected, columns: expectedColumns } = schemaExpectations(
+  await readFile(join(here, "schema.sql"), "utf8"),
+);
+
 const tables = (await sql`
   select table_name from information_schema.tables where table_schema = 'public'`
 ).map((r) => r.table_name);
@@ -64,6 +78,41 @@ const tables = (await sql`
 for (const t of expected) {
   if (tables.includes(t)) ok(`table ${t}`);
   else bad(`table ${t} is missing — run: npm run db:setup`);
+}
+
+/*
+ * Columns added by `alter table ... add column if not exists` after the
+ * first tables were written. A database set up from an older schema.sql
+ * passes the table check above and then fails at runtime on a missing
+ * column: admin cannot ship without orders.shipped_at, and /admin/ cannot be
+ * reached at all without customers.is_admin. One query here, or one failed
+ * order there.
+ */
+console.log("\nColumns added after the first schema");
+
+const heldColumns = await sql`
+  select table_name, column_name from information_schema.columns
+   where table_schema = 'public'`;
+const haveColumn = new Set(heldColumns.map((r) => `${r.table_name}.${r.column_name}`));
+
+if (expectedColumns.length === 0) warn("schema.sql declares no added columns — has it been edited?");
+
+for (const [table, column] of expectedColumns) {
+  if (!tables.includes(table)) continue; // already reported as a missing table
+  if (haveColumn.has(`${table}.${column}`)) ok(`${table}.${column}`);
+  else bad(`${table}.${column} is missing — run: npm run db:setup`);
+}
+
+/*
+ * /admin/ is a flag on an ordinary account, so a database with no admin has
+ * no way in and nothing on the site says why. A warning, not a failure: a
+ * fresh database legitimately has none until someone registers.
+ */
+if (tables.includes("customers") && haveColumn.has("customers.is_admin")) {
+  const [{ admins }] = await sql`
+    select count(*)::int as admins from customers where is_admin = true`;
+  if (admins > 0) ok(`${admins} admin account(s) — /admin/ is reachable`);
+  else warn("no admin account — register on the site, then: node db/make-admin.mjs you@example.com");
 }
 
 console.log("\nStock");
@@ -100,6 +149,26 @@ if (tables.includes("orders")) {
       from orders`;
   ok(`${counts.total} orders — ${counts.paid} paid, ${counts.pending} awaiting payment`);
   if (counts.oversold) warn(`${counts.oversold} flagged oversold and need a refund decision`);
+}
+
+if (tables.includes("messages") && tables.includes("subscribers")) {
+  console.log("\nMessages & subscribers");
+
+  const [m] = await sql`
+    select count(*)::int as total,
+           count(*) filter (where handled_at is null)::int as unhandled
+      from messages`;
+  ok(`${m.total} contact message(s) — ${m.unhandled} unhandled`);
+
+  const [subs] = await sql`
+    select count(*)::int as total,
+           count(*) filter (where unsubscribed_at is null)::int as active
+      from subscribers`;
+  ok(`${subs.total} subscriber(s) — ${subs.active} still subscribed`);
+
+  // Every signup writes an unsubscribe token and nothing consumes it. Said
+  // here because the way out has to exist before anything is ever sent.
+  if (subs.active) warn("no /api/unsubscribe endpoint exists — do not send marketing mail yet");
 }
 
 console.log(`\nShipping: free over ${site.currency}${site.freeShippingAt}, otherwise ${site.currency}${site.shippingFlat}`);

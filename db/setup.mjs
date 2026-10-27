@@ -15,6 +15,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { db } from "../api/_lib/db.mjs";
+import { schemaExpectations } from "./schema-read.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const sql = db();
@@ -42,13 +43,21 @@ for (const statement of statements) {
   }
 }
 
-const [{ count }] = await sql`
-  select count(*)::int as count from information_schema.tables
-   where table_schema = 'public'
-     and table_name in ('orders','order_items','stock','webhook_events','customers','sessions')`;
+// Counted against what this very file declares, so adding a table to
+// schema.sql cannot leave the confirmation below quietly understating it.
+const expected = schemaExpectations(source).tables;
 
-console.log(`Applied ${applied} statements. ${count} of 6 expected tables present.`);
-if (count < 6) {
-  console.error("Some tables are missing — check the errors above.");
+const present = (await sql`
+  select table_name from information_schema.tables where table_schema = 'public'`
+).map((r) => r.table_name);
+
+const missing = expected.filter((t) => !present.includes(t));
+
+console.log(
+  `Applied ${applied} statements. ${expected.length - missing.length} of ${expected.length} expected tables present.`,
+);
+if (missing.length) {
+  console.error(`Missing: ${missing.join(", ")} — check the errors above.`);
   process.exit(1);
 }
+console.log("Next: npm run seed, then npm run db:check");
