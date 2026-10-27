@@ -7,3 +7,6 @@ Thumbs.db
 .env.local
 .vscode/
 .idea/
+
+# Order exports are generated on demand and may hold customer data.
+sarvha-orders-*.csv
