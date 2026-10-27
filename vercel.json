@@ -3,10 +3,13 @@
   "buildCommand": "node build.mjs",
   "outputDirectory": "dist",
   "framework": null,
-  "headers": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "headers": [{ "key": "x-robots-tag", "value": "noindex" }]
-    }
+      "src": "/api/(.*)",
+      "headers": { "x-robots-tag": "noindex" },
+      "continue": true
+    },
+    { "handle": "filesystem" },
+    { "src": "/.*", "status": 404, "dest": "/404.html" }
   ]
 }
