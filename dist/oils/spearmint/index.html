@@ -328,7 +328,12 @@
              and given nothing. Changed to what the list actually is. Put the
              offer back the day it can be honoured, not before. -->
         <h2>First to know when a new oil lands</h2>
-        <p>Blending notes, new arrivals and how to use them. No more than once a month, and one click to leave.</p>
+        <!-- "and one click to leave" was here until it was noticed that there
+             is no /api/unsubscribe: every subscriber gets a token generated
+             and stored, and nothing consumes it. Promising a way out that
+             does not exist is the same fault as the 10% offer this copy
+             replaced. Goes back when the way out does. -->
+        <p>Blending notes, new arrivals and how to use them. No more than once a month.</p>
       </div>
       <form class="newsletter__form" data-newsletter novalidate>
         <input type="email" required placeholder="Your email address" aria-label="Email address" />
