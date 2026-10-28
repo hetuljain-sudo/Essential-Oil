@@ -292,8 +292,7 @@ page("/", layout({
     <section class="section" data-reveal>
       <div class="container">
         <div class="section__head">
-          <p class="eyebrow eyebrow--wide">Favourites</p>
-          <div><h2>Start here</h2></div>
+          <div><p class="eyebrow">Favourites</p><h2>Start here</h2></div>
           <a class="btn btn--ghost" href="/shop/">See all ${products.length} oils</a>
         </div>
         ${productGrid(products.filter((p) => p.featured).slice(0, 4), "grid--row")}
