@@ -47,7 +47,24 @@ export default async function handler(request) {
 
   const raw = await request.text();
 
-  if (!verifyWebhookSignature(raw, request.headers.get("x-razorpay-signature"))) {
+  /*
+   * Verifying needs RAZORPAY_WEBHOOK_SECRET, and asking for one that is not
+   * set throws rather than returning false. Caught here so a misconfigured
+   * deployment says so in the log instead of answering an opaque 500 that
+   * looks like our bug rather than our configuration.
+   *
+   * Either way this is a 400: we cannot establish that the message came from
+   * Razorpay, and that is the only question this check asks.
+   */
+  let verified = false;
+  try {
+    verified = verifyWebhookSignature(raw, request.headers.get("x-razorpay-signature"));
+  } catch (err) {
+    console.error(`webhook cannot be verified: ${err.message}`);
+    return reply(400, { error: "Invalid signature." });
+  }
+
+  if (!verified) {
     console.warn("webhook rejected: bad signature");
     return reply(400, { error: "Invalid signature." });
   }

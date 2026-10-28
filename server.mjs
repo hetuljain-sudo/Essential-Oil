@@ -20,7 +20,7 @@
 
 import express from "express";
 import { readdir } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join, relative, sep } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -110,7 +110,11 @@ for await (const file of endpointFiles(join(here, "api"))) {
 
   if (route === "/api/razorpay-webhook") continue; // already mounted above
 
-  const handler = (await import(file)).default;
+  // pathToFileURL, not the bare path. ESM refuses an absolute Windows path
+  // outright — "C:\..." parses as a URL with scheme "c:" — so importing a
+  // path read from the filesystem has to go through a file:// URL. It fails
+  // identically for every endpoint, so the server did not start at all.
+  const handler = (await import(pathToFileURL(file).href)).default;
   if (typeof handler !== "function") {
     console.warn(`skipping ${route}: no default export`);
     continue;
