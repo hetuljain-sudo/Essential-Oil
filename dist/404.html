@@ -8,6 +8,24 @@
   <link rel="canonical" href="https://sarvha.com/404.html" />
   <meta name="robots" content="noindex, follow" />
   <meta name="theme-color" content="#2f3e2c" />
+
+  <!--
+    Catch a failed image before app.js exists.
+
+    Photography is hotlinked, and onerror="artFallback(this)" swaps in the
+    generated bottle art when one fails. artFallback lives in app.js, which
+    loads at the end of the document — but the product page's main image is
+    fetchpriority="high" and starts downloading immediately. An image that
+    fails in that window would fire onerror against an undefined function:
+    a ReferenceError, and a broken image left on the page for good.
+
+    Precisely the one image where it matters most, because it is the only
+    one that is not lazy.
+
+    So the name exists from the first line: this version only remembers what
+    failed, and app.js replaces it and works through the queue.
+  -->
+  <script>window.__artFailed=[];window.artFallback=function(i){window.__artFailed.push(i)};</script>
   <meta name="color-scheme" content="light" />
 
   <meta property="og:type" content="website" />
@@ -28,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=49ab6e41" />
+  <link rel="stylesheet" href="/styles.css?v=d706492d" />
   
 </head>
 <body>
@@ -163,7 +181,7 @@
     </div>
   </aside>
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=49ab6e41"></script>
-  <script src="/app.js?v=49ab6e41"></script>
+  <script src="/catalog.js?v=d706492d"></script>
+  <script src="/app.js?v=d706492d"></script>
 </body>
 </html>

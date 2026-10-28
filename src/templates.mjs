@@ -6,6 +6,7 @@ import {
 } from "./data.mjs";
 import { liveGuides } from "./guides.mjs";
 import { policies } from "./policies.mjs";
+import { srcsetFor } from "./image.mjs";
 
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -52,7 +53,7 @@ export function productMedia(p, sizes = "(max-width: 860px) 50vw, 25vw", eager =
   if (!p.image) return bottleSVG(p.swatch, shortLabel(p), p.id);
   // width/height are the source dimensions — the browser reserves the right
   // box before the image arrives, so nothing shifts as the grid loads.
-  return `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"
+  return `<img src="${p.image.src}"${srcsetFor(p.image.src)} alt="${esc(p.image.alt)}" width="900" height="1200"
     ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"
     sizes="${sizes}" data-pid="${p.id}" onerror="artFallback(this)" />`;
 }
@@ -321,6 +322,24 @@ export function layout({
   <link rel="canonical" href="${canonical}" />
   <meta name="robots" content="${noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1"}" />
   <meta name="theme-color" content="#2f3e2c" />
+
+  <!--
+    Catch a failed image before app.js exists.
+
+    Photography is hotlinked, and onerror="artFallback(this)" swaps in the
+    generated bottle art when one fails. artFallback lives in app.js, which
+    loads at the end of the document — but the product page's main image is
+    fetchpriority="high" and starts downloading immediately. An image that
+    fails in that window would fire onerror against an undefined function:
+    a ReferenceError, and a broken image left on the page for good.
+
+    Precisely the one image where it matters most, because it is the only
+    one that is not lazy.
+
+    So the name exists from the first line: this version only remembers what
+    failed, and app.js replaces it and works through the queue.
+  -->
+  <script>window.__artFailed=[];window.artFallback=function(i){window.__artFailed.push(i)};</script>
   <meta name="color-scheme" content="light" />
 
   <meta property="og:type" content="${ogType}" />

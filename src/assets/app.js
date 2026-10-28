@@ -52,7 +52,14 @@ function bottleSVG([light, dark], label = "", key = label) {
   </svg>`;
 }
 
-/** Photography that fails to load is replaced with generated bottle art. */
+/**
+ * Photography that fails to load is replaced with generated bottle art.
+ *
+ * Replaces the stub defined in the document head, which exists only to catch
+ * failures that happen before this file has run, and drains whatever it
+ * caught. Without that pair, an image that failed early fired onerror
+ * against nothing and stayed broken.
+ */
 window.artFallback = function (img) {
   const p = byId(img.dataset.pid);
   const holder = img.parentElement;
@@ -62,6 +69,11 @@ window.artFallback = function (img) {
     holder.classList.add("has-art");
   }
 };
+
+// Anything that failed before this file loaded. The elements are still in
+// the document, so the same swap works on them now.
+for (const img of window.__artFailed ?? []) window.artFallback(img);
+window.__artFailed = [];
 
 function toast(msg) {
   const t = $("[data-toast]");
@@ -262,7 +274,10 @@ function productCard(p) {
   const sold = !inStock(p);
   const low = !sold && v.stock > 0 && v.stock <= 8;
   const media = p.image
-    ? `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"
+    // srcsetFor is prepended from src/image.mjs — the same function the build
+    // uses. The grid re-renders here on filter, sort and live stock, so a
+    // srcset only in the built HTML would vanish on the first interaction.
+    ? `<img src="${p.image.src}"${srcsetFor(p.image.src)} alt="${esc(p.image.alt)}" width="900" height="1200"
          loading="lazy" decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
     : bottleSVG(p.swatch, shortLabel(p), p.id);

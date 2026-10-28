@@ -151,6 +151,45 @@ function ordersFilename(now = new Date()) {
 }
 
 /**
+ * Responsive image sources.
+ *
+ * Shared, because a product card is built twice: once by src/templates.mjs
+ * for the HTML that ships, and again by src/assets/app.js when the shop grid
+ * re-renders after filtering or when live stock arrives. Two copies of the
+ * same markup is how the first version of this shipped a srcset on the built
+ * page and none on the one the browser actually drew.
+ *
+ * Prepended to app.js by the build with its exports stripped, the same way
+ * redirect.mjs and csv.mjs are, so both sides read one definition.
+ */
+
+/** The widths offered. Enough steps to matter, few enough to stay cacheable. */
+const IMAGE_WIDTHS = [400, 600, 900, 1200];
+
+/**
+ * A srcset attribute, when the host can resize for us.
+ *
+ * Unsplash serves any width from a `w=` query parameter, so one photo can be
+ * offered at four sizes for the cost of rewriting a string. Anything else —
+ * a self-hosted file one day — gets no srcset at all, rather than four URLs
+ * that return identical bytes and waste the browser's time choosing between
+ * them.
+ *
+ * Returns the whole attribute including its leading space, or "", so the
+ * caller can drop it into a template without worrying which.
+ */
+function srcsetFor(src) {
+  if (typeof src !== "string") return "";
+  if (!/images\.unsplash\.com/.test(src) || !/[?&]w=\d+/.test(src)) return "";
+
+  const set = IMAGE_WIDTHS
+    .map((w) => `${src.replace(/([?&]w=)\d+/, `$1${w}`)} ${w}w`)
+    .join(", ");
+
+  return ` srcset="${set}"`;
+}
+
+/**
  * Shared behaviour for every page: cart drawer, mobile menu, shop filtering,
  * and the product page's size/quantity picker.
  *
@@ -204,7 +243,14 @@ function bottleSVG([light, dark], label = "", key = label) {
   </svg>`;
 }
 
-/** Photography that fails to load is replaced with generated bottle art. */
+/**
+ * Photography that fails to load is replaced with generated bottle art.
+ *
+ * Replaces the stub defined in the document head, which exists only to catch
+ * failures that happen before this file has run, and drains whatever it
+ * caught. Without that pair, an image that failed early fired onerror
+ * against nothing and stayed broken.
+ */
 window.artFallback = function (img) {
   const p = byId(img.dataset.pid);
   const holder = img.parentElement;
@@ -214,6 +260,11 @@ window.artFallback = function (img) {
     holder.classList.add("has-art");
   }
 };
+
+// Anything that failed before this file loaded. The elements are still in
+// the document, so the same swap works on them now.
+for (const img of window.__artFailed ?? []) window.artFallback(img);
+window.__artFailed = [];
 
 function toast(msg) {
   const t = $("[data-toast]");
@@ -414,7 +465,10 @@ function productCard(p) {
   const sold = !inStock(p);
   const low = !sold && v.stock > 0 && v.stock <= 8;
   const media = p.image
-    ? `<img src="${p.image.src}" alt="${esc(p.image.alt)}" width="900" height="1200"
+    // srcsetFor is prepended from src/image.mjs — the same function the build
+    // uses. The grid re-renders here on filter, sort and live stock, so a
+    // srcset only in the built HTML would vanish on the first interaction.
+    ? `<img src="${p.image.src}"${srcsetFor(p.image.src)} alt="${esc(p.image.alt)}" width="900" height="1200"
          loading="lazy" decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
     : bottleSVG(p.swatch, shortLabel(p), p.id);

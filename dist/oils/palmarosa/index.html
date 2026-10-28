@@ -8,6 +8,24 @@
   <link rel="canonical" href="https://sarvha.com/oils/palmarosa/" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <meta name="theme-color" content="#2f3e2c" />
+
+  <!--
+    Catch a failed image before app.js exists.
+
+    Photography is hotlinked, and onerror="artFallback(this)" swaps in the
+    generated bottle art when one fails. artFallback lives in app.js, which
+    loads at the end of the document — but the product page's main image is
+    fetchpriority="high" and starts downloading immediately. An image that
+    fails in that window would fire onerror against an undefined function:
+    a ReferenceError, and a broken image left on the page for good.
+
+    Precisely the one image where it matters most, because it is the only
+    one that is not lazy.
+
+    So the name exists from the first line: this version only remembers what
+    failed, and app.js replaces it and works through the queue.
+  -->
+  <script>window.__artFailed=[];window.artFallback=function(i){window.__artFailed.push(i)};</script>
   <meta name="color-scheme" content="light" />
 
   <meta property="og:type" content="product" />
@@ -29,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=49ab6e41" />
+  <link rel="stylesheet" href="/styles.css?v=d706492d" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Product","@id":"https://sarvha.com/oils/palmarosa/#product","name":"Palmarosa Essential Oil","alternateName":"Palmarosa","description":"Sweet, soft and floral despite being a relative of lemongrass. High in geraniol, which is what gives it the rose character, and one of the gentlest oils we carry for skin.","category":"Skincare essential oils","sku":"SRV-PALMARO-15ML","brand":{"@type":"Brand","name":"Sarvha"},"manufacturer":{"@id":"https://sarvha.com/#organization"},"countryOfOrigin":{"@type":"Country","name":"India"},"image":["https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900"],"additionalProperty":[{"@type":"PropertyValue","name":"Botanical name","value":"Cymbopogon martinii"},{"@type":"PropertyValue","name":"Origin","value":"Madhya Pradesh, India"},{"@type":"PropertyValue","name":"Extraction method","value":"Steam distilled"},{"@type":"PropertyValue","name":"Aroma","value":"Soft rose, Green grass, Sweet floral"},{"@type":"PropertyValue","name":"Purity","value":"100% pure and undiluted"}],"offers":{"@type":"AggregateOffer","priceCurrency":"INR","lowPrice":499,"highPrice":899,"offerCount":2,"availability":"https://schema.org/InStock","offers":[{"@type":"Offer","name":"Palmarosa — 15 ml","sku":"SRV-PALMARO-15ML","price":499,"priceCurrency":"INR","priceValidUntil":"2027-10-28","url":"https://sarvha.com/oils/palmarosa/","itemCondition":"https://schema.org/NewCondition","availability":"https://schema.org/InStock","seller":{"@id":"https://sarvha.com/#organization"},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"IN","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":30,"returnMethod":"https://schema.org/ReturnByMail","returnFees":"https://schema.org/FreeReturn"},"shippingDetails":[{"@type":"OfferShippingDetails","shippingDestination":{"@type":"DefinedRegion","addressCountry":"IN"},"shippingRate":{"@type":"MonetaryAmount","value":0,"currency":"INR","eligibleTransactionVolume":{"@type":"PriceSpecification","minPrice":999,"priceCurrency":"INR"}},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":1,"maxValue":2,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":3,"maxValue":5,"unitCode":"DAY"}}},{"@type":"OfferShippingDetails","shippingDestination":{"@type":"DefinedRegion","addressCountry":"IN"},"shippingRate":{"@type":"MonetaryAmount","value":79,"currency":"INR"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":1,"maxValue":2,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":3,"maxValue":5,"unitCode":"DAY"}}}]},{"@type":"Offer","name":"Palmarosa — 30 ml","sku":"SRV-PALMARO-30ML","price":899,"priceCurrency":"INR","priceValidUntil":"2027-10-28","url":"https://sarvha.com/oils/palmarosa/","itemCondition":"https://schema.org/NewCondition","availability":"https://schema.org/InStock","seller":{"@id":"https://sarvha.com/#organization"},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"IN","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":30,"returnMethod":"https://schema.org/ReturnByMail","returnFees":"https://schema.org/FreeReturn"},"shippingDetails":[{"@type":"OfferShippingDetails","shippingDestination":{"@type":"DefinedRegion","addressCountry":"IN"},"shippingRate":{"@type":"MonetaryAmount","value":0,"currency":"INR","eligibleTransactionVolume":{"@type":"PriceSpecification","minPrice":999,"priceCurrency":"INR"}},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":1,"maxValue":2,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":3,"maxValue":5,"unitCode":"DAY"}}},{"@type":"OfferShippingDetails","shippingDestination":{"@type":"DefinedRegion","addressCountry":"IN"},"shippingRate":{"@type":"MonetaryAmount","value":79,"currency":"INR"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":1,"maxValue":2,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":3,"maxValue":5,"unitCode":"DAY"}}}]}]}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is palmarosa related to rose?","acceptedAnswer":{"@type":"Answer","text":"Not at all. It is a grass in the same genus as lemongrass and citronella. The rose-like smell comes from geraniol, a compound it shares with rose oil."}},{"@type":"Question","name":"Is it gentle enough for the face?","acceptedAnswer":{"@type":"Answer","text":"It is among the milder oils we carry and is widely used in facial formulations, typically at around 1%. Patch-test first, as with anything new."}},{"@type":"Question","name":"How long does it keep once opened?","acceptedAnswer":{"@type":"Answer","text":"Two to three years stored properly — cool, dark and tightly closed. Distilled oils keep considerably better than cold-pressed citrus."}},{"@type":"Question","name":"What dilution should I use on skin?","acceptedAnswer":{"@type":"Answer","text":"Around 2% for the body — roughly 12 drops per 30 ml of carrier oil — and 1% for the face. Always patch-test before wider use, and never apply neat."}},{"@type":"Question","name":"Can I take it internally?","acceptedAnswer":{"@type":"Answer","text":"No. None of our oils are food grade and none are sold for internal use. Essential oils are extremely concentrated, and advice to add them to water or food is not advice we endorse."}},{"@type":"Question","name":"How quickly will it arrive?","acceptedAnswer":{"@type":"Answer","text":"Orders are dispatched from Delhi within two business days and usually arrive within a further three to five, depending on where you are. Shipping is free over ₹999."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Shop","item":"https://sarvha.com/shop/"},{"@type":"ListItem","position":3,"name":"Skincare","item":"https://sarvha.com/collections/skincare/"},{"@type":"ListItem","position":4,"name":"Palmarosa"}]}]}</script>
 </head>
 <body>
@@ -79,7 +97,7 @@
 
           <div class="pdp" data-pdp="palmarosa">
             <div class="pdp__media" style="background:#f3e9df">
-              <img src="https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900" alt="A clump of fine aromatic grass seen from above" width="900" height="1200"
+              <img src="https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=1200 1200w" alt="A clump of fine aromatic grass seen from above" width="900" height="1200"
     fetchpriority="high" decoding="async"
     sizes="(max-width: 860px) 100vw, 45vw" data-pid="palmarosa" onerror="artFallback(this)" />
               
@@ -224,7 +242,7 @@
     <a class="card__media" style="background:#f5e3e8" href="/oils/rosehip-renewal/" aria-label="View Rosehip Renewal">
       
       
-      <img src="https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=900" alt="Amber dropper bottle and jar on hessian with green leaves resting behind" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=1200 1200w" alt="Amber dropper bottle and jar on hessian with green leaves resting behind" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="rosehip-renewal" onerror="artFallback(this)" />
     </a>
@@ -243,7 +261,7 @@
     <a class="card__media" style="background:#efe6d8" href="/oils/frankincense-quiet/" aria-label="View Frankincense Quiet">
       <span class="badge">Premium</span>
       
-      <img src="https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=900" alt="Open amber oil bottle in warm light with foliage softly blurred behind" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=1200 1200w" alt="Open amber oil bottle in warm light with foliage softly blurred behind" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="frankincense-quiet" onerror="artFallback(this)" />
     </a>
@@ -262,7 +280,7 @@
     <a class="card__media" style="background:#f5e3e8" href="/oils/geranium-balance/" aria-label="View Geranium Balance">
       
       
-      <img src="https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=900" alt="Amber oil bottles on linen beside a bowl of dried florals and a pink rose" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=1200 1200w" alt="Amber oil bottles on linen beside a bowl of dried florals and a pink rose" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="geranium-balance" onerror="artFallback(this)" />
     </a>
@@ -281,7 +299,7 @@
     <a class="card__media" style="background:#e4eee2" href="/oils/rosemary/" aria-label="View Rosemary">
       
       
-      <img src="https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=900" alt="Close-up of fresh rosemary needles on the stem" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=1200 1200w" alt="Close-up of fresh rosemary needles on the stem" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="rosemary" onerror="artFallback(this)" />
     </a>
@@ -396,7 +414,7 @@
     </div>
   </aside>
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=49ab6e41"></script>
-  <script src="/app.js?v=49ab6e41"></script>
+  <script src="/catalog.js?v=d706492d"></script>
+  <script src="/app.js?v=d706492d"></script>
 </body>
 </html>

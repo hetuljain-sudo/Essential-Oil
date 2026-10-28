@@ -8,6 +8,24 @@
   <link rel="canonical" href="https://sarvha.com/collections/relaxation/" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <meta name="theme-color" content="#2f3e2c" />
+
+  <!--
+    Catch a failed image before app.js exists.
+
+    Photography is hotlinked, and onerror="artFallback(this)" swaps in the
+    generated bottle art when one fails. artFallback lives in app.js, which
+    loads at the end of the document — but the product page's main image is
+    fetchpriority="high" and starts downloading immediately. An image that
+    fails in that window would fire onerror against an undefined function:
+    a ReferenceError, and a broken image left on the page for good.
+
+    Precisely the one image where it matters most, because it is the only
+    one that is not lazy.
+
+    So the name exists from the first line: this version only remembers what
+    failed, and app.js replaces it and works through the queue.
+  -->
+  <script>window.__artFailed=[];window.artFallback=function(i){window.__artFailed.push(i)};</script>
   <meta name="color-scheme" content="light" />
 
   <meta property="og:type" content="website" />
@@ -29,7 +47,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=49ab6e41" />
+  <link rel="stylesheet" href="/styles.css?v=d706492d" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":"Relaxation essential oils","description":"The oils we reach for when the day needs to end. Soft florals, dry woods and the kind of scent that makes a room feel quieter than it did a minute ago.","url":"https://sarvha.com/collections/relaxation/","isPartOf":{"@id":"https://sarvha.com/#website"}},{"@type":"ItemList","name":"Relaxation oils","numberOfItems":13,"itemListElement":[{"@type":"ListItem","position":1,"url":"https://sarvha.com/oils/lavender-fields/","name":"Lavender Fields"},{"@type":"ListItem","position":2,"url":"https://sarvha.com/oils/roman-chamomile/","name":"Roman Chamomile"},{"@type":"ListItem","position":3,"url":"https://sarvha.com/oils/cedarwood-grounding/","name":"Cedarwood Grounding"},{"@type":"ListItem","position":4,"url":"https://sarvha.com/oils/ylang-ylang/","name":"Ylang Ylang Extra"},{"@type":"ListItem","position":5,"url":"https://sarvha.com/oils/vetiver-khus/","name":"Vetiver (Khus)"},{"@type":"ListItem","position":6,"url":"https://sarvha.com/oils/sandalwood-mysore/","name":"Sandalwood"},{"@type":"ListItem","position":7,"url":"https://sarvha.com/oils/clary-sage/","name":"Clary Sage"},{"@type":"ListItem","position":8,"url":"https://sarvha.com/oils/patchouli/","name":"Patchouli"},{"@type":"ListItem","position":9,"url":"https://sarvha.com/oils/marjoram/","name":"Sweet Marjoram"},{"@type":"ListItem","position":10,"url":"https://sarvha.com/oils/jasmine-sambac/","name":"Jasmine Sambac (Mogra) Absolute"},{"@type":"ListItem","position":11,"url":"https://sarvha.com/oils/rose-absolute/","name":"Rose Absolute"},{"@type":"ListItem","position":12,"url":"https://sarvha.com/oils/tuberose-absolute/","name":"Tuberose (Rajnigandha) Absolute"},{"@type":"ListItem","position":13,"url":"https://sarvha.com/oils/davana/","name":"Davana"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which oil is best for sleep?","acceptedAnswer":{"@type":"Answer","text":"We cannot make that claim, and nobody honestly can. What we can say is that lavender is overwhelmingly the one people buy for their evening routine, followed by cedarwood and the Deep Sleep style blends. Scent is good at signalling to you that the day is ending; it is not a sedative."}},{"@type":"Question","name":"What is the difference between an essential oil and an absolute?","acceptedAnswer":{"@type":"Answer","text":"Extraction. Essential oils are distilled; absolutes are extracted with solvents, because flowers like jasmine, rose and tuberose are destroyed by the heat of distillation. Absolutes carry trace solvent residue by nature of the process, which is worth knowing before you buy one."}},{"@type":"Question","name":"Can I diffuse these overnight?","acceptedAnswer":{"@type":"Answer","text":"We would not. Run a diffuser for 30 to 60 minutes and let it stop. Olfactory fatigue means you stop registering the smell within minutes anyway, so an all-night session mostly wastes oil."}},{"@type":"Question","name":"Which of these are safe in pregnancy?","acceptedAnswer":{"@type":"Answer","text":"Several in this collection are commonly advised against — clary sage, marjoram, davana and the absolutes among them. Each product page states its own position, but speak to a doctor rather than relying on a website."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Collections","item":"https://sarvha.com/collections/"},{"@type":"ListItem","position":3,"name":"Relaxation"}]}]}</script>
 </head>
 <body>
@@ -92,7 +110,7 @@
           
           <section class="start-here">
             <div class="start-here__media" style="background:#ece6f4">
-              <img src="https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900" alt="Amber dropper bottle of lavender oil on cream linen with dried lavender sprigs behind it" width="900" height="1200"
+              <img src="https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=1200 1200w" alt="Amber dropper bottle of lavender oil on cream linen with dried lavender sprigs behind it" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 100vw, 32vw" data-pid="lavender-fields" onerror="artFallback(this)" />
             </div>
@@ -118,7 +136,7 @@
     <a class="card__media" style="background:#ece6f4" href="/oils/lavender-fields/" aria-label="View Lavender Fields">
       
       
-      <img src="https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900" alt="Amber dropper bottle of lavender oil on cream linen with dried lavender sprigs behind it" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=1200 1200w" alt="Amber dropper bottle of lavender oil on cream linen with dried lavender sprigs behind it" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="lavender-fields" onerror="artFallback(this)" />
     </a>
@@ -137,7 +155,7 @@
     <a class="card__media" style="background:#f4eed6" href="/oils/ylang-ylang/" aria-label="View Ylang Ylang Extra">
       
       
-      <img src="https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=900" alt="The drooping yellow petals of a ylang ylang flower on the branch" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=1200 1200w" alt="The drooping yellow petals of a ylang ylang flower on the branch" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="ylang-ylang" onerror="artFallback(this)" />
     </a>
@@ -156,7 +174,7 @@
     <a class="card__media" style="background:#f5f1e0" href="/oils/jasmine-sambac/" aria-label="View Jasmine Sambac (Mogra) Absolute">
       <span class="badge">Premium</span>
       
-      <img src="https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=900" alt="White jasmine flowers with yellow centres against a blue sky" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=1200 1200w" alt="White jasmine flowers with yellow centres against a blue sky" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="jasmine-sambac" onerror="artFallback(this)" />
     </a>
@@ -175,7 +193,7 @@
     <a class="card__media" style="background:#f6e2e7" href="/oils/rose-absolute/" aria-label="View Rose Absolute">
       <span class="badge">Premium</span>
       
-      <img src="https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=900" alt="Pink damask roses in bloom, still wet with dew" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=1200 1200w" alt="Pink damask roses in bloom, still wet with dew" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="rose-absolute" onerror="artFallback(this)" />
     </a>
@@ -194,7 +212,7 @@
     <a class="card__media" style="background:#f6f2e6" href="/oils/tuberose-absolute/" aria-label="View Tuberose (Rajnigandha) Absolute">
       <span class="badge">Premium</span>
       
-      <img src="https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=900" alt="White tuberose blooms laid out on white cloth" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=1200 1200w" alt="White tuberose blooms laid out on white cloth" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="tuberose-absolute" onerror="artFallback(this)" />
     </a>
@@ -220,7 +238,7 @@
     <a class="card__media" style="background:#f2f0d8" href="/oils/roman-chamomile/" aria-label="View Roman Chamomile">
       <span class="badge">Rare</span>
       
-      <img src="https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=900" alt="Open amber dropper bottle on wood with small white blossoms and green leaves behind" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=1200 1200w" alt="Open amber dropper bottle on wood with small white blossoms and green leaves behind" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="roman-chamomile" onerror="artFallback(this)" />
     </a>
@@ -239,7 +257,7 @@
     <a class="card__media" style="background:#eaf0df" href="/oils/clary-sage/" aria-label="View Clary Sage">
       
       
-      <img src="https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=900" alt="Close-up of a purple and white clary sage flower" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=1200 1200w" alt="Close-up of a purple and white clary sage flower" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="clary-sage" onerror="artFallback(this)" />
     </a>
@@ -258,7 +276,7 @@
     <a class="card__media" style="background:#ebf0e0" href="/oils/marjoram/" aria-label="View Sweet Marjoram">
       
       
-      <img src="https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=900" alt="Marjoram in flower, small pale blooms above green leaves" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=1200 1200w" alt="Marjoram in flower, small pale blooms above green leaves" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="marjoram" onerror="artFallback(this)" />
     </a>
@@ -277,7 +295,7 @@
     <a class="card__media" style="background:#f1e3d8" href="/oils/davana/" aria-label="View Davana">
       
       
-      <img src="https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=900" alt="Delicate pale green foliage with tiny white buds" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=1200 1200w" alt="Delicate pale green foliage with tiny white buds" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="davana" onerror="artFallback(this)" />
     </a>
@@ -303,7 +321,7 @@
     <a class="card__media" style="background:#efe6d8" href="/oils/cedarwood-grounding/" aria-label="View Cedarwood Grounding">
       
       
-      <img src="https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=900" alt="Amber dropper bottle on weathered wood with a conifer sprig behind it" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=1200 1200w" alt="Amber dropper bottle on weathered wood with a conifer sprig behind it" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="cedarwood-grounding" onerror="artFallback(this)" />
     </a>
@@ -322,7 +340,7 @@
     <a class="card__media" style="background:#ece5d6" href="/oils/vetiver-khus/" aria-label="View Vetiver (Khus)">
       
       
-      <img src="https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=900" alt="Tall green grass bending in the wind" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=1200 1200w" alt="Tall green grass bending in the wind" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="vetiver-khus" onerror="artFallback(this)" />
     </a>
@@ -341,7 +359,7 @@
     <a class="card__media" style="background:#f3e9d8" href="/oils/sandalwood-mysore/" aria-label="View Sandalwood">
       <span class="badge">Premium</span>
       
-      <img src="https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=900" alt="Close-up of fine-grained brown heartwood" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=1200 1200w" alt="Close-up of fine-grained brown heartwood" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="sandalwood-mysore" onerror="artFallback(this)" />
     </a>
@@ -360,7 +378,7 @@
     <a class="card__media" style="background:#eee6da" href="/oils/patchouli/" aria-label="View Patchouli">
       
       
-      <img src="https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=900" alt="Broad soft green leaves filling the frame" width="900" height="1200"
+      <img src="https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=900" srcset="https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=400 400w, https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=600 600w, https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=900 900w, https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=1200 1200w" alt="Broad soft green leaves filling the frame" width="900" height="1200"
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="patchouli" onerror="artFallback(this)" />
     </a>
@@ -641,7 +659,7 @@
     </div>
   </aside>
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=49ab6e41"></script>
-  <script src="/app.js?v=49ab6e41"></script>
+  <script src="/catalog.js?v=d706492d"></script>
+  <script src="/app.js?v=d706492d"></script>
 </body>
 </html>

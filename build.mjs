@@ -42,7 +42,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -1433,11 +1433,24 @@ for (const pol of policies) {
   const trail = [HOME, { label: pol.nav }];
   const others = policies.filter((x) => x.slug !== pol.slug);
 
+  /*
+   * A policy with unanswered questions is not a policy, and Google should
+   * not be offered one. Derived from the content rather than set by hand, so
+   * the page becomes indexable the moment the last TODO is answered and
+   * nobody has to remember to flip a flag.
+   *
+   * The sitemap already reads each page's robots meta, so a page marked here
+   * leaves the sitemap on its own.
+   */
+  const unfinished = pol.sections.some((sec) =>
+    sec.body.some(([kind]) => kind === "todo"));
+
   page(url, layout({
     path: url,
     title: pol.title,
     description: pol.description,
     breadcrumb: trail,
+    noindex: unfinished,
     ogImage: defaultOg,
     jsonLd: {
       "@type": "WebPage",
@@ -1552,7 +1565,7 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
 const sharedForBrowser = (await Promise.all(
-  ["src/redirect.mjs", "src/csv.mjs"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs"].map((f) => readFile(join(root, f), "utf8"))
 )).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),
