@@ -220,8 +220,32 @@ because that is what the checkout does. One of the two has to change.
 **No "sign out everywhere".** Logging out ends one session; a lost device
 has to be dealt with by deleting rows from `sessions` by hand.
 
-**No order confirmation email yet.** The order is recorded; nobody is told.
-This is the first gap worth closing.
+**Order confirmation is sent.** `markPaid()` emails the customer the moment
+payment settles — reference, line items with line totals, subtotal, shipping,
+total and the delivery address, read from `order_items` as recorded at the
+time of sale.
+
+It is sent once: the send is claimed with a conditional update
+(`confirmed_email_at is null`) that only one caller can win, and the claim is
+released if the provider refuses, so a null column genuinely means "this
+customer is still owed one". `npm run db:check` reports any that are. An
+oversold order is deliberately **not** sent one — that customer needs a
+person. An email failure never stops the webhook answering 200, because a
+non-2xx asks Razorpay to redeliver the whole event.
+
+**The contact form notifies you.** `api/contact.js` emails `EMAIL_REPLY_TO`
+(or `EMAIL_FROM`) when a message arrives, with reply-to set to the sender so
+answering it answers them. The message is stored first and the 201 is
+returned either way: a visitor is never told their message failed because our
+own notification did.
+
+Neither sends anything until `EMAIL_PROVIDER`, `EMAIL_API_KEY` and
+`EMAIL_FROM` are set. Until then both log the reason and carry on, and the
+admin page says email is not configured rather than failing on click.
+
+**Nothing has been delivered by a real provider yet.** The paths are covered
+by `npm run smoke` against a real database with an injected sender, which is
+not the same as an inbox receiving one.
 
 ## Before taking real money
 
@@ -246,9 +270,24 @@ These are not optional, and two of them are legal requirements in India:
   site had never stated a fee — and should be a decision, not an inheritance.
 
 **Accounts have no password reset.** Someone who forgets their password
-cannot get back in without us editing the database by hand. That needs an
-email sender, which the order confirmation needs too — one piece of work
-covering both.
+cannot get back in without us editing the database by hand.
+
+The blocker is gone: `api/_lib/email.mjs` exists and is wired into two flows.
+What remains is the reset itself — a signed, expiring, single-use token, a
+form to set the new password, and the endpoints to serve both. That is the
+piece of work, not the sending.
+
+**A new endpoint is not free.** Vercel's Hobby plan caps Serverless Functions
+per deployment and every file under `api/` is one; the project sits at
+exactly **12**. Password reset needs at least one more, as does the
+unsubscribe route below. Something gives, or the project moves to Pro or to
+Railway — `server.mjs` already runs the same endpoints as one process.
+
+**No unsubscribe endpoint.** Every newsletter signup generates and stores an
+`unsubscribe_token` and nothing consumes it, so there is no way off the list.
+Harmless while nothing is sent to subscribers; a compliance problem the
+moment a marketing email goes out. This has to exist **before** the first
+one, not after.
 
 **Email addresses are not verified.** Anyone can register with an address they
 do not own. That matters more once email is being sent to it.

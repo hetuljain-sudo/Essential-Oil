@@ -173,6 +173,19 @@ if (tables.includes("orders")) {
       from orders`;
   ok(`${counts.total} orders — ${counts.paid} paid, ${counts.pending} awaiting payment`);
   if (counts.oversold) warn(`${counts.oversold} flagged oversold and need a refund decision`);
+
+  /*
+   * Orders that were paid and whose customer was never told. The column is
+   * released when a send fails, so this is the list of people still owed a
+   * confirmation — which is the point of keeping it honest.
+   */
+  if (tables.includes("orders") && haveColumn.has("orders.confirmed_email_at")) {
+    const [owed] = await sql`
+      select count(*)::int as n from orders
+       where status in ('paid', 'shipped') and confirmed_email_at is null`;
+    if (owed.n) warn(`${owed.n} paid order(s) never got a confirmation email`);
+    else if (counts.paid) ok("every paid order was confirmed by email");
+  }
 }
 
 if (tables.includes("messages") && tables.includes("subscribers")) {

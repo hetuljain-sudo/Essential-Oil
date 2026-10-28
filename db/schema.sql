@@ -199,6 +199,13 @@ alter table orders add column if not exists tracking text;
 -- email existed.
 alter table orders add column if not exists thanked_at timestamptz;
 
+-- When the order confirmation was sent, the one that goes automatically the
+-- moment payment settles. The column means exactly what it says: a provider
+-- accepted a message. It is claimed before sending and released again if the
+-- send fails, so null genuinely reads as "this customer is still owed a
+-- confirmation" and db/check.mjs reports any that are.
+alter table orders add column if not exists confirmed_email_at timestamptz;
+
 -- 'shipped' is new. A check constraint cannot be extended in place, so it is
 -- replaced; dropping by name first keeps this re-runnable.
 alter table orders drop constraint if exists orders_status_check;

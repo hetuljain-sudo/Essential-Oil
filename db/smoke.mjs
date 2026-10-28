@@ -99,6 +99,28 @@ const created = { customerId: null, orderIds: [], messageIds: [], subscriber: nu
 /** sku -> quantity as it was before we touched it, so it can be put back. */
 const stockBefore = new Map();
 
+/**
+ * A stand-in for the email sender.
+ *
+ * markPaid takes its sender as an argument so this file can run the whole
+ * confirmation path against a real database while no message leaves the
+ * machine. Nothing in production passes one; the default is the real
+ * sendEmail.
+ *
+ * `outcome` lets a step force a failure and watch what the code does about
+ * it, which is the half of this that matters — anyone can test the happy
+ * path.
+ */
+function recorder(outcome = { sent: true, id: "smoke-message" }) {
+  const sent = [];
+  const fn = async (message) => {
+    sent.push(message);
+    return typeof outcome === "function" ? outcome(message) : outcome;
+  };
+  fn.sent = sent;
+  return fn;
+}
+
 console.log(`\nSmoke test — marker ${email}`);
 console.log("Writing to the database named in DATABASE_URL.\n");
 
@@ -330,12 +352,14 @@ await step("note the stock level before settling", async () => {
   return `${buy.sku} at ${row.quantity}`;
 });
 
+const confirmMail = recorder();
+
 await step("markPaid settles the order and takes the stock down", async () => {
   const result = await markPaid(sql, {
     order_id: rpOrderId,
     id: `smoke_pay_${stamp}`,
     amount: priced.totalPaise,
-  });
+  }, { sendMail: confirmMail });
   assert(result.settled, "markPaid did not settle an order sitting at 'created'");
   assert(!result.oversold, "it flagged oversold with stock on the shelf");
 
@@ -350,18 +374,37 @@ await step("markPaid settles the order and takes the stock down", async () => {
   return `paid, ${buy.sku} ${stockBefore.get(buy.sku)} -> ${stock.quantity}`;
 });
 
+await step("the customer is sent exactly one confirmation", async () => {
+  assert(confirmMail.sent.length === 1, `${confirmMail.sent.length} confirmations sent, expected 1`);
+
+  const message = confirmMail.sent[0];
+  assert(message.to === email, `addressed to ${message.to}`);
+  assert(/confirmed/i.test(message.subject), `subject was "${message.subject}"`);
+  // The things a confirmation is useless without.
+  assert(message.text.includes(buy.name), "the oil they bought is not in the email");
+  assert(message.text.includes("Pune"), "the delivery address is not in the email");
+  assert(/Total/.test(message.text), "there is no total in the email");
+
+  const [row] = await sql`select confirmed_email_at from orders where id = ${created.orderIds[0]}`;
+  assert(row.confirmed_email_at, "confirmed_email_at was not stamped");
+  return `subject: ${message.subject}`;
+});
+
 await step("a SECOND delivery of the same payment changes nothing", async () => {
   // The redelivery guard. Razorpay retries on any non-2xx and re-sends the
   // same event; without `and status = 'created'` this would decrement stock
   // again, for one order, forever. Never executed until now.
   const before = (await sql`select quantity from stock where sku = ${buy.sku}`)[0].quantity;
 
+  const sentBefore = confirmMail.sent.length;
+
   const result = await markPaid(sql, {
     order_id: rpOrderId,
     id: `smoke_pay_${stamp}`,
     amount: priced.totalPaise,
-  });
+  }, { sendMail: confirmMail });
   assert(!result.settled, "a repeat delivery settled the order a second time");
+  assert(confirmMail.sent.length === sentBefore, "a repeat delivery sent a second confirmation");
 
   const after = (await sql`select quantity from stock where sku = ${buy.sku}`)[0].quantity;
   assert(after === before, `stock moved on redelivery: ${before} -> ${after}`);
@@ -501,11 +544,17 @@ await step("a second order, stock pulled out from under it, lands at 'oversold'"
   // Fewer on the shelf than the order needs.
   await sql`update stock set quantity = ${1} where sku = ${buy.sku}`;
 
+  const oversoldMail = recorder();
   const result = await markPaid(sql, {
     order_id: rpSecond, id: `smoke_pay_${stamp}_oversold`, amount: priced.totalPaise,
-  });
+  }, { sendMail: oversoldMail });
   assert(result.settled, "markPaid did not pick the order up at all");
   assert(result.oversold, "markPaid did not notice it could not fulfil the order");
+
+  // The customer is owed a person, not a cheerful confirmation.
+  assert(oversoldMail.sent.length === 0,
+    "an oversold order was sent a confirmation anyway");
+  assert(result.confirmed === false, "it reported confirming an oversold order");
 
   const [row] = await sql`select status from orders where id = ${order.id}`;
   assert(row.status === "oversold", `status is ${row.status}, expected oversold`);
@@ -514,6 +563,45 @@ await step("a second order, stock pulled out from under it, lands at 'oversold'"
   const [stock] = await sql`select quantity from stock where sku = ${buy.sku}`;
   assert(stock.quantity === 1, `stock is ${stock.quantity}, expected the untouched 1`);
   return "flagged for a refund decision, stock left alone";
+});
+
+await step("a confirmation that fails to send does not undo the payment", async () => {
+  // The case that matters: the provider is down, the key is wrong, the
+  // sender is unverified. The money has moved and the stock has moved, and
+  // neither may be rolled back because an email bounced.
+  const rpFourth = `smoke_order_${stamp}_nomail`;
+  const [order] = await sql`
+    insert into orders (
+      customer_id, razorpay_order_id, subtotal_paise, shipping_paise, total_paise,
+      customer_name, customer_email, customer_phone,
+      address_line1, address_city, address_state, address_postcode
+    ) values (
+      ${created.customerId}, ${rpFourth}, ${50000}, ${0}, ${50000},
+      ${"Smoke Test"}, ${email}, ${"9876543210"},
+      ${"1 Test Lane"}, ${"Pune"}, ${"Maharashtra"}, ${"411001"}
+    ) returning id`;
+  created.orderIds.push(order.id);
+
+  await sql`
+    insert into order_items (order_id, sku, product_id, name, size, qty, unit_price_paise, line_paise)
+    values (${order.id}, ${buy.sku}, ${buy.productId}, ${buy.name}, ${buy.size},
+            ${1}, ${50000}, ${50000})`;
+
+  const failing = recorder({ sent: false, reason: "smoke test: pretending the provider refused" });
+  const result = await markPaid(sql, {
+    order_id: rpFourth, id: `smoke_pay_${stamp}_nomail`, amount: 50000,
+  }, { sendMail: failing });
+
+  assert(result.settled, "a failing email stopped the order settling");
+  assert(result.confirmed === false, "it claimed to have confirmed when the send failed");
+  assert(failing.sent.length === 1, "it did not even try to send");
+
+  const [row] = await sql`select status, confirmed_email_at from orders where id = ${order.id}`;
+  assert(row.status === "paid", `status is ${row.status} after a failed email`);
+  // Released, so db:check can report this customer as still owed one.
+  assert(row.confirmed_email_at === null,
+    "confirmed_email_at was left set after a failed send — the column would be lying");
+  return "order stays paid, confirmation left unclaimed";
 });
 
 await step("markFailed gives up on an unpaid order", async () => {
@@ -580,6 +668,27 @@ await step("insert a contact message, flood guard included", async () => {
   assert(row?.id, "the message insert returned no id");
   created.messageIds.push(row.id);
   return row.id;
+});
+
+await step("a failed notification does not lose the message", async () => {
+  // api/contact.js stores first and notifies after, so that a visitor is
+  // never told their message failed because our own email did. This covers
+  // the ordering: the row survives a send that goes nowhere.
+  const [row] = await sql`
+    insert into messages (name, email, subject, body)
+    values (${"Smoke Test"}, ${email}, ${"smoke-nomail"}, ${"Stored even when the notification fails."})
+    returning id`;
+  created.messageIds.push(row.id);
+
+  const { sendEmail } = await import("../api/_lib/email.mjs");
+  // Unconfigured in this environment, so this genuinely fails rather than
+  // pretending to.
+  const result = await sendEmail({ to: "nobody@example.invalid", subject: "x", text: "x" });
+  assert(!result.sent, "the smoke test expected sending to be unconfigured here");
+
+  const [still] = await sql`select id from messages where id = ${row.id}`;
+  assert(still, "the message disappeared when the notification failed");
+  return `stored; notification refused with: ${result.reason}`;
 });
 
 await step("the admin messages list query runs", async () => {

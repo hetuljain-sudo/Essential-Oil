@@ -75,6 +75,20 @@ export function emailStatus() {
 export const emailConfigured = () => emailStatus().configured;
 
 /**
+ * Where a message meant for us, rather than for a customer, should go.
+ *
+ * The contact form notifies this address. EMAIL_REPLY_TO first because that
+ * is the one a human actually reads; EMAIL_FROM is the sender the provider
+ * verified, which may well be a no-reply.
+ *
+ * Exposed here rather than read from the environment at the call site, so
+ * there is one answer to "which of our addresses is this?" and endpoints do
+ * not each grow their own.
+ */
+export const ownAddress = () =>
+  process.env.EMAIL_REPLY_TO || process.env.EMAIL_FROM || null;
+
+/**
  * Send one message.
  *
  * Never throws. Returns `{ sent: true, id }` or `{ sent: false, reason }`,
