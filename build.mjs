@@ -29,6 +29,7 @@ import { guides } from "./src/content.mjs";
 import { hubs } from "./src/collections.mjs";
 import { guidePages, liveGuides } from "./src/guides.mjs";
 import { policies } from "./src/policies.mjs";
+import { saleOn, bestSale } from "./src/sale.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -42,7 +43,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -706,7 +707,9 @@ ${breadcrumbs(trail)}
                     <input type="radio" name="size" value="${x.size}" data-price="${x.price}" data-stock="${x.stock}"
                       ${x === v ? "checked" : ""} ${x.stock <= 0 ? "disabled" : ""} data-size-pick />
                     <span class="size__label">${x.size}</span>
-                    <span class="size__price">${x.stock > 0 ? money(x.price) : "Sold out"}</span>
+                    <span class="size__price">${x.stock > 0
+                      ? money(x.price) + (saleOn(x) ? ` <s class="price__was">${money(saleOn(x).was)}</s>` : "")
+                      : "Sold out"}</span>
                   </label>`).join("")}
               </fieldset>` : `<p class="pdp__single">${v.size} bottle</p>`}
 
@@ -716,7 +719,8 @@ ${breadcrumbs(trail)}
                   <span data-qty-value aria-live="polite">1</span>
                   <button data-mqty="1" aria-label="Increase quantity">+</button>
                 </div>
-                <div class="pdp__price"><span class="price" data-live-price>${money(v.price)}</span></div>
+                <div class="pdp__price"><span class="price" data-live-price>${money(v.price)}${
+                  saleOn(v) ? ` <s class="price__was">${money(saleOn(v).was)}</s>` : ""}</span></div>
               </div>
               <p class="stock-note" data-stock-note${v.stock > 8 ? " hidden" : ""}>${v.stock > 0 ? `Only ${v.stock} left` : ""}</p>
 
@@ -1565,7 +1569,7 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
 const sharedForBrowser = (await Promise.all(
-  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs"].map((f) => readFile(join(root, f), "utf8"))
 )).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),

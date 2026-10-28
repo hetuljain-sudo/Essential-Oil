@@ -281,7 +281,7 @@ function productCard(p) {
          loading="lazy" decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
     : bottleSVG(p.swatch, shortLabel(p), p.id);
-  return `<article class="card${sold ? " is-sold" : ""}">
+  return `<article class="card${sold ? " is-sold" : ""}${bestSale(p) ? " is-sale" : ""}">
     <a class="card__media" style="background:${p.bg}" href="${p.url}" aria-label="View ${esc(p.name)}">
       ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
       ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
@@ -294,7 +294,8 @@ function productCard(p) {
       <p class="card__desc">${esc(p.tagline)}</p>
       ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">
-        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span></span>
+        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span>${
+          bestSale(p) ? `<s class="price__was">${money(bestSale(p).was)}</s>` : ""}</span>
         ${sold
           ? `<button class="add-btn" disabled>Sold out</button>`
           : multi
@@ -418,7 +419,12 @@ if (pdp) {
       label.classList.toggle("is-sold", out);
       input.disabled = out;
       const price = $(".size__price", label);
-      if (price) price.textContent = out ? "Sold out" : money(variant.price);
+      if (price) {
+        const sale = saleOn(variant);
+        price.innerHTML = out
+          ? "Sold out"
+          : money(variant.price) + (sale ? ` <s class="price__was">${money(sale.was)}</s>` : "");
+      }
     });
 
     // If we picked this size and it has since sold out, move to one that has
@@ -436,7 +442,11 @@ if (pdp) {
 
     const v = product.variants.find((x) => x.size === size);
     $("[data-qty-value]", pdp).textContent = qty;
-    $("[data-live-price]", pdp).textContent = money(v.price * qty);
+    // The struck price scales with quantity too, or "₹1,198 ₹699" would
+    // read as a two-for-one rather than a reduction.
+    const sale = saleOn(v);
+    $("[data-live-price]", pdp).innerHTML = money(v.price * qty)
+      + (sale ? ` <s class="price__was">${money(sale.was * qty)}</s>` : "");
     const plus = $('[data-mqty="1"]', pdp);
     plus.disabled = qty >= v.stock;
     const note = $("[data-stock-note]", pdp);

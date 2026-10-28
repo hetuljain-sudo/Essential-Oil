@@ -190,6 +190,66 @@ function srcsetFor(src) {
 }
 
 /**
+ * Oils on offer.
+ *
+ * A variant may carry `was`: the price it used to be, in rupees.
+ *
+ *     { size: "15 ml", price: 599, was: 699 }
+ *
+ * `price` is still the price. Nothing about what a customer is charged
+ * changes — api/_lib/pricing.mjs reads `price` as it always did, so the
+ * server keeps computing every rupee from the catalogue and a sale cannot
+ * become a way to buy lavender for ₹1. `was` is display only.
+ *
+ * ---
+ *
+ * **`was` must be a price you actually charged.**
+ *
+ * A struck-through number that was never real is a misleading price, and
+ * India's consumer-protection rules on dark patterns name exactly that
+ * practice. The field is called `was`, not `mrp` or `compareAt`, because the
+ * name should make the obligation obvious to whoever edits it next.
+ *
+ * Anything that is not a genuine reduction is ignored rather than rendered:
+ * a `was` below or equal to `price` is a typo or an invention, and drawing
+ * "₹699 ₹699" would be both.
+ *
+ * Shared with the browser the same way image.mjs is, because the shop grid
+ * redraws client-side and a badge that only existed in the built HTML would
+ * vanish the first time somebody filtered.
+ */
+
+/** The genuine reduction on a variant, or null. */
+function saleOn(variant) {
+  if (!variant) return null;
+
+  const price = Number(variant.price);
+  const was = Number(variant.was);
+
+  if (!Number.isFinite(price) || !Number.isFinite(was)) return null;
+  if (!(was > price)) return null;
+
+  const off = was - price;
+  return {
+    was,
+    price,
+    off,
+    // Rounded for display only. Nothing is computed from this.
+    percent: Math.round((off / was) * 100),
+  };
+}
+
+/** True when any size of this product is reduced. */
+const onSale = (p) => (p?.variants ?? []).some((v) => saleOn(v));
+
+/** The best percentage across a product's sizes, for a card badge. */
+function bestSale(p) {
+  const sales = (p?.variants ?? []).map(saleOn).filter(Boolean);
+  if (!sales.length) return null;
+  return sales.reduce((a, b) => (b.percent > a.percent ? b : a));
+}
+
+/**
  * Shared behaviour for every page: cart drawer, mobile menu, shop filtering,
  * and the product page's size/quantity picker.
  *
@@ -472,7 +532,7 @@ function productCard(p) {
          loading="lazy" decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
     : bottleSVG(p.swatch, shortLabel(p), p.id);
-  return `<article class="card${sold ? " is-sold" : ""}">
+  return `<article class="card${sold ? " is-sold" : ""}${bestSale(p) ? " is-sale" : ""}">
     <a class="card__media" style="background:${p.bg}" href="${p.url}" aria-label="View ${esc(p.name)}">
       ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
       ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
@@ -485,7 +545,8 @@ function productCard(p) {
       <p class="card__desc">${esc(p.tagline)}</p>
       ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">
-        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span></span>
+        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span>${
+          bestSale(p) ? `<s class="price__was">${money(bestSale(p).was)}</s>` : ""}</span>
         ${sold
           ? `<button class="add-btn" disabled>Sold out</button>`
           : multi
@@ -609,7 +670,12 @@ if (pdp) {
       label.classList.toggle("is-sold", out);
       input.disabled = out;
       const price = $(".size__price", label);
-      if (price) price.textContent = out ? "Sold out" : money(variant.price);
+      if (price) {
+        const sale = saleOn(variant);
+        price.innerHTML = out
+          ? "Sold out"
+          : money(variant.price) + (sale ? ` <s class="price__was">${money(sale.was)}</s>` : "");
+      }
     });
 
     // If we picked this size and it has since sold out, move to one that has
@@ -627,7 +693,11 @@ if (pdp) {
 
     const v = product.variants.find((x) => x.size === size);
     $("[data-qty-value]", pdp).textContent = qty;
-    $("[data-live-price]", pdp).textContent = money(v.price * qty);
+    // The struck price scales with quantity too, or "₹1,198 ₹699" would
+    // read as a two-for-one rather than a reduction.
+    const sale = saleOn(v);
+    $("[data-live-price]", pdp).innerHTML = money(v.price * qty)
+      + (sale ? ` <s class="price__was">${money(sale.was * qty)}</s>` : "");
     const plus = $('[data-mqty="1"]', pdp);
     plus.disabled = qty >= v.stock;
     const note = $("[data-stock-note]", pdp);

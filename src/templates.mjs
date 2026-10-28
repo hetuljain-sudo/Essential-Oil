@@ -7,6 +7,7 @@ import {
 import { liveGuides } from "./guides.mjs";
 import { policies } from "./policies.mjs";
 import { srcsetFor } from "./image.mjs";
+import { bestSale, saleOn } from "./sale.mjs";
 
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -71,7 +72,7 @@ export function productCard(p) {
   const multi = p.variants.length > 1;
   const sold = !inStock(p);
   const low = !sold && v.stock > 0 && v.stock <= 8;
-  return `<article class="card${sold ? " is-sold" : ""}">
+  return `<article class="card${sold ? " is-sold" : ""}${bestSale(p) ? " is-sale" : ""}">
     <a class="card__media${mediaClass(p)}" style="background:${p.bg}" href="${productUrl(p)}" aria-label="View ${esc(p.name)}">
       ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
       ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
@@ -84,7 +85,8 @@ export function productCard(p) {
       <p class="card__desc">${esc(p.tagline)}</p>
       ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">
-        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span></span>
+        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span>${
+          bestSale(p) ? `<s class="price__was">${money(bestSale(p).was)}</s>` : ""}</span>
         ${sold
           ? `<button class="add-btn" disabled>Sold out</button>`
           : multi
@@ -383,8 +385,13 @@ export const newsletter = () => `
   <section class="newsletter">
     <div class="container newsletter__inner">
       <div>
-        <h2>Get 10% off your first order</h2>
-        <p>Blending recipes, new arrivals and the occasional offer. No more than once a month.</p>
+        <!-- This said "Get 10% off your first order". There is no discount
+             code system, no field to enter one at checkout and no way to
+             issue one, so every person who subscribed was promised money off
+             and given nothing. Changed to what the list actually is. Put the
+             offer back the day it can be honoured, not before. -->
+        <h2>First to know when a new oil lands</h2>
+        <p>Blending notes, new arrivals and how to use them. No more than once a month, and one click to leave.</p>
       </div>
       <form class="newsletter__form" data-newsletter novalidate>
         <input type="email" required placeholder="Your email address" aria-label="Email address" />

@@ -495,3 +495,19 @@ body.no-scroll { overflow: hidden; }
 .logo { font-size: 1.7rem; gap: .5rem; }
 .logo span { letter-spacing: .07em; }
 @media (max-width: 420px) { .logo { font-size: 1.45rem; } }
+
+/* A price that has come down. The old one is struck through and quieter, so
+   the number being charged is still the one the eye lands on. Only ever
+   rendered for a genuine reduction — see src/sale.mjs. */
+.price__was {
+  color: var(--muted); font-weight: 400; text-decoration-thickness: 1px;
+  margin-left: .35em; font-size: .85em;
+}
+/* The card badge, in the corner the sold-out label does not use. */
+.card.is-sale .card__media::after {
+  content: "Reduced";
+  position: absolute; top: .7rem; left: .7rem; z-index: 2;
+  background: var(--terracotta); color: #fff;
+  font-size: .64rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: .3rem .55rem; border-radius: 999px;
+}

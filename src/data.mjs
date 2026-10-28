@@ -1135,7 +1135,7 @@ export const faqs = [
   { cat: "Shipping & delivery", q: "Do you ship across India?",
     a: "Yes, we ship across India, and internationally on request — write to us and we'll confirm feasibility and cost." },
   { cat: "Shipping & delivery", q: "What are the shipping charges?",
-    a: "Shipping is free on orders over ₹999. Below that, charges are calculated at checkout based on your location." },
+    a: "Shipping is free on orders over ₹999. Below that it is a flat ₹79 anywhere in India." },
   { cat: "Shipping & delivery", q: "How long does delivery take?",
     a: "Orders are dispatched within two business days. Delivery usually takes a further three to five days depending on where you are." },
   { cat: "Shipping & delivery", q: "How will I know once my order has shipped?",
