@@ -165,7 +165,7 @@ const slug = (x) => x.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g
 /* The number of link columns beside the brand block. The grid reads it, so a
    new column lands in the same row rather than wrapping underneath — which is
    exactly what adding Legal did. Keep in step with the column() calls below. */
-const footerColumnCount = 6;
+const footerColumnCount = 5;
 
 function footer() {
   // Each scent family lives as an anchor on its collection page.
@@ -181,12 +181,6 @@ function footer() {
       n: products.filter((x) => x.family === p.family).length,
     });
   }
-
-  // A spread of products rather than one collection's worth.
-  const popular = [
-    ...products.filter((p) => p.featured),
-    ...categories.map((c) => products.find((p) => p.category === c.id && !p.featured)),
-  ].filter(Boolean).slice(0, 9);
 
   const column = (heading, links) => `
     <details class="footer__col" open>
@@ -222,10 +216,6 @@ function footer() {
       ])}
 
       ${column("By scent", familyLinks)}
-
-      ${column("Popular oils", popular.map((p) => ({
-        href: `/oils/${p.id}/`, label: p.name,
-      })))}
 
       ${column("Learn", [
         // Derived, not listed: a hardcoded guide link outlives the guide and
