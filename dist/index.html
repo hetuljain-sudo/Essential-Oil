@@ -305,63 +305,79 @@
       <div class="section__head section__head--center">
         <p class="eyebrow eyebrow--light">The oil library</p>
         <h2>Five distillations, five stories</h2>
-        <p class="lib__note">Five of the 50 oils we make, changing every day. No two days repeat.</p>
+        <!--
+          Said three things; two were untrue.
+
+          "oils we make" — we do not make them. They are bought from growers
+          and distillers, which the hero on this same page says plainly, so
+          the homepage contradicted itself.
+
+          "No two days repeat" — five a day stepping by five through fifty
+          entries means a day's set comes round again every ten days.
+          Consecutive days never share an oil, which is what was meant, so
+          that is what it says now.
+
+          "changing every day" stays, and is true: app.js recomputes the
+          rotation from the visitor's own clock and swaps the DOM when the
+          build is older than today, so it does not depend on a deploy.
+        -->
+        <p class="lib__note">Five of our 50 oils, changing every day — never the same two days running.</p>
       </div>
       <div class="library" data-library>
         
   <article class="lib is-open" data-lib="0">
-    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Sandalwood"></div>
+    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1557800636-894a64c1696f?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Mandarin"></div>
     <div class="lib__veil"></div>
-    <button class="lib__toggle" aria-expanded="true"><span class="lib__name">Sandalwood</span></button>
+    <button class="lib__toggle" aria-expanded="true"><span class="lib__name">Mandarin</span></button>
     <div class="lib__panel">
-      <p class="lib__story">Sandalwood is a <em>creamy wood</em> story</p>
-      <p class="lib__latin">Santalum album · Karnataka, India</p>
-      <p class="lib__blurb">Indian sandalwood, from legally harvested plantation timber.</p>
-      <a class="btn btn--light" href="/oils/sandalwood-mysore/">View oil</a>
+      <p class="lib__story">Mandarin is a <em>sweet peel</em> story</p>
+      <p class="lib__latin">Citrus reticulata · Nagpur, India</p>
+      <p class="lib__blurb">The softest of the citrus oils, and the only one we&#39;d call gentle.</p>
+      <a class="btn btn--light" href="/oils/mandarin/">View oil</a>
     </div>
   </article>
   <article class="lib" data-lib="1">
-    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Grapefruit"></div>
+    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1649951806971-ad0e00408773?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Black Pepper"></div>
     <div class="lib__veil"></div>
-    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Grapefruit</span></button>
+    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Black Pepper</span></button>
     <div class="lib__panel">
-      <p class="lib__story">Grapefruit is a <em>tart peel</em> story</p>
-      <p class="lib__latin">Citrus paradisi · Maharashtra, India</p>
-      <p class="lib__blurb">Cold-pressed pink peel, tart rather than sweet.</p>
-      <a class="btn btn--light" href="/oils/grapefruit/">View oil</a>
+      <p class="lib__story">Black Pepper is a <em>dry spice</em> story</p>
+      <p class="lib__latin">Piper nigrum · Kerala, India</p>
+      <p class="lib__blurb">Dry, woody heat — more peppercorn than pepper mill.</p>
+      <a class="btn btn--light" href="/oils/black-pepper/">View oil</a>
     </div>
   </article>
   <article class="lib" data-lib="2">
-    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1615041443219-2a63ee45bb60?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Tulsi"></div>
+    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Palmarosa"></div>
     <div class="lib__veil"></div>
-    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Tulsi</span></button>
+    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Palmarosa</span></button>
     <div class="lib__panel">
-      <p class="lib__story">Tulsi is a <em>peppery herb</em> story</p>
-      <p class="lib__latin">Ocimum sanctum · Uttar Pradesh, India</p>
-      <p class="lib__blurb">Tulsi, distilled from leaf picked before flowering.</p>
-      <a class="btn btn--light" href="/oils/basil-holy/">View oil</a>
+      <p class="lib__story">Palmarosa is a <em>soft rose</em> story</p>
+      <p class="lib__latin">Cymbopogon martinii · Madhya Pradesh, India</p>
+      <p class="lib__blurb">A grass that smells convincingly of roses.</p>
+      <a class="btn btn--light" href="/oils/palmarosa/">View oil</a>
     </div>
   </article>
   <article class="lib" data-lib="3">
-    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Almond"></div>
+    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Patchouli"></div>
     <div class="lib__veil"></div>
-    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Almond</span></button>
+    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Patchouli</span></button>
     <div class="lib__panel">
-      <p class="lib__story">Almond is a <em>faint nut</em> story</p>
-      <p class="lib__latin">Prunus amygdalus dulcis · Jammu &amp; Kashmir, India</p>
-      <p class="lib__blurb">Cold-pressed from sweet almonds — the everyday carrier.</p>
-      <a class="btn btn--light" href="/oils/sweet-almond/">View oil</a>
+      <p class="lib__story">Patchouli is a <em>damp earth</em> story</p>
+      <p class="lib__latin">Pogostemon cablin · Indonesia</p>
+      <p class="lib__blurb">Dark, sweet and earthy — and better the longer it sits.</p>
+      <a class="btn btn--light" href="/oils/patchouli/">View oil</a>
     </div>
   </article>
   <article class="lib" data-lib="4">
-    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Clary Sage"></div>
+    <div class="lib__img" data-bg="https://images.unsplash.com/photo-1578855691621-8a08ea00d1fb?auto=format&fit=crop&q=70&w=900" role="img" aria-label="Lime"></div>
     <div class="lib__veil"></div>
-    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Clary Sage</span></button>
+    <button class="lib__toggle" aria-expanded="false"><span class="lib__name">Lime</span></button>
     <div class="lib__panel">
-      <p class="lib__story">Clary Sage is a <em>nutty herb</em> story</p>
-      <p class="lib__latin">Salvia sclarea · Uttarakhand, India</p>
-      <p class="lib__blurb">Nutty, herbaceous and faintly sweet — nothing like garden sage.</p>
-      <a class="btn btn--light" href="/oils/clary-sage/">View oil</a>
+      <p class="lib__story">Lime is a <em>green peel</em> story</p>
+      <p class="lib__latin">Citrus aurantifolia · Andhra Pradesh, India</p>
+      <p class="lib__blurb">Sharper and greener than lemon, with a bitter edge.</p>
+      <a class="btn btn--light" href="/oils/lime/">View oil</a>
     </div>
   </article>
       </div>
