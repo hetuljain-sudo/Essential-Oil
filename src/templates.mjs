@@ -470,23 +470,6 @@ export const oilLibrary = () => `
       <div class="section__head section__head--center">
         <p class="eyebrow eyebrow--light">The oil library</p>
         <h2>Five distillations, five stories</h2>
-        <!--
-          Said three things; two were untrue.
-
-          "oils we make" — we do not make them. They are bought from growers
-          and distillers, which the hero on this same page says plainly, so
-          the homepage contradicted itself.
-
-          "No two days repeat" — five a day stepping by five through fifty
-          entries means a day's set comes round again every ten days.
-          Consecutive days never share an oil, which is what was meant, so
-          that is what it says now.
-
-          "changing every day" stays, and is true: app.js recomputes the
-          rotation from the visitor's own clock and swaps the DOM when the
-          build is older than today, so it does not depend on a deploy.
-        -->
-        <p class="lib__note">Five of our ${library.length} oils, changing every day — never the same two days running.</p>
       </div>
       <div class="library" data-library>
         ${libraryFor(libraryDay())

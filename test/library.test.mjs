@@ -1,17 +1,14 @@
 /**
  * The oil library rotation.
  *
- * The homepage says: "Five of our 50 oils, changing every day — never the
- * same two days running."
+ * The homepage once carried a line describing this — "changing every day,
+ * never the same two days running" — and these tests were written to keep
+ * that sentence honest. The sentence has since been removed; the behaviour
+ * it described has not, and is still worth holding to.
  *
- * That is a promise to a visitor, so it is tested rather than assumed. It
- * held when it was written; what these tests defend against is somebody
- * shortening the library later and turning the sentence into a lie without
- * touching the sentence.
- *
- * It said "No two days repeat" until it was checked — five a day stepping by
- * five through fifty entries brings a set round again every ten days, so
- * only the consecutive-day part was ever true.
+ * A visitor who looks twice in a week should see different oils. That only
+ * works while the rotation steps cleanly through a library long enough to
+ * avoid itself, which is what is tested here.
  */
 
 import test from "node:test";
