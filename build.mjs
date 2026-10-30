@@ -1260,6 +1260,67 @@ accountPage({
 
       <button class="btn btn--primary btn--block" type="submit">Log in</button>
       <p class="muted small">No account yet? <a href="/account/register/">Create one</a>.</p>
+      <p class="muted small"><a href="/account/forgot/">Forgotten your password?</a></p>
+    </form>`,
+});
+
+/* Asking for a link. Separate from the login form rather than a panel that
+   unfolds inside it, so the page someone lands on from a bookmark or a
+   search is the one they wanted. */
+
+accountPage({
+  path: "/account/forgot/",
+  title: "Reset Your Password",
+  description: "Ask for a link to set a new password on your Sarvha account.",
+  label: "Forgotten password",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Accounts</p>
+      <h1>Forgotten your password?</h1>
+    </div>
+
+    <form class="auth-form" data-forgot-form novalidate>
+      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
+
+      <p class="muted">Give us the address you ordered with and we'll send a link
+         to set a new password. It works once, and lasts an hour.</p>
+
+      <label>Email
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+
+      <button class="btn btn--primary btn--block" type="submit">Send me a link</button>
+      <p class="muted small">Remembered it? <a href="/account/login/">Log in</a>.</p>
+    </form>`,
+});
+
+/* Where the emailed link lands, with the token in the query string.
+   accountPage marks every account page noindex, which this one needs more
+   than most: a crawler following a link out of somebody's inbox would be
+   worse than the token being in a URL at all. */
+
+accountPage({
+  path: "/account/reset/",
+  title: "Set a New Password",
+  description: "Set a new password on your Sarvha account.",
+  label: "Set a new password",
+  body: `
+    <div class="page-head">
+      <p class="eyebrow">Accounts</p>
+      <h1>Set a new password</h1>
+    </div>
+
+    <form class="auth-form" data-reset-form novalidate>
+      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
+
+      <label>New password
+        <input type="password" name="password" autocomplete="new-password"
+          minlength="10" required />
+      </label>
+      <p class="muted small">At least ten characters. Length matters more than symbols.</p>
+
+      <button class="btn btn--primary btn--block" type="submit">Set password</button>
+      <p class="muted small"><a href="/account/forgot/">Ask for a new link</a> if this one has expired.</p>
     </form>`,
 });
 

@@ -150,6 +150,40 @@ Read and mark it handled at ${publicUrl()}/admin/`;
 }
 
 /**
+ * A link for someone who cannot get in.
+ *
+ * Says the lifetime out loud, because a link that has silently expired is
+ * indistinguishable from a broken site, and says plainly what to do if they
+ * did not ask — which is nothing. Telling someone to "secure their account"
+ * over an unrequested reset is alarming and useless; nothing has happened to
+ * them, and the link dies on its own.
+ *
+ * No marketing, no footer links, nothing to click but the one thing. A
+ * password email that looks like a newsletter is a password email people
+ * learn to ignore.
+ */
+export function resetEmail({ name, url, minutes }) {
+  const subject = `Reset your ${site.name} password`;
+
+  const text = `Hi ${firstName(name)},
+
+Someone asked to reset the password for this email address at ${site.name}.
+If that was you, open this link:
+
+${url}
+
+It works once, and stops working in ${minutes} minutes.
+
+If it was not you, you do not need to do anything. The link expires on its
+own and your password has not changed.
+
+${site.name}
+${publicUrl()}`;
+
+  return { subject, text };
+}
+
+/**
  * The thank-you an admin sends by hand from the orders page.
  *
  * Deliberately not automatic. It is sent when someone has actually looked at

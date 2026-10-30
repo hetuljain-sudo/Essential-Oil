@@ -271,19 +271,28 @@ These are not optional, and two of them are legal requirements in India:
   ₹999 free-shipping threshold. That number was chosen as a placeholder — the
   site had never stated a fee — and should be a decision, not an inheritance.
 
-**Accounts have no password reset.** Someone who forgets their password
-cannot get back in without us editing the database by hand.
+**Password reset exists.** `/account/forgot/` asks for a link,
+`/api/auth/recover` mints one, and `/account/reset/` spends it. The token is
+32 random bytes and only its SHA-256 is stored — a reset token *is* the
+account for the hour it lives, so it gets the same treatment as a session.
 
-The blocker is gone: `api/_lib/email.mjs` exists and is wired into two flows.
-What remains is the reset itself — a signed, expiring, single-use token, a
-form to set the new password, and the endpoints to serve both. That is the
-piece of work, not the sending.
+Single use, one hour, three requests per address per hour. A successful reset
+ends **every** session for that customer and burns any other outstanding
+links, because someone resetting a password sometimes cannot get in
+*because somebody else can*.
 
-**A new endpoint is not free.** Vercel's Hobby plan caps Serverless Functions
-per deployment and every file under `api/` is one; the project sits at
-exactly **12**. Password reset needs at least one more, as does the
-unsubscribe route below. Something gives, or the project moves to Pro or to
-Railway — `server.mjs` already runs the same endpoints as one process.
+The request step answers the same whether or not the address has an account.
+It refuses up front when email is not configured, rather than saying a link
+is on its way and sending nothing — that is a fact about the shop, not about
+the address, so saying it reveals nothing.
+
+**No link can actually be sent until email is configured.** The flow is
+proven against a real database with tokens minted directly; no reset email
+has reached an inbox.
+
+**`api/` is now full: 12 of 12 Serverless Functions.** Anything new has to
+share an existing handler, as `/api/auth/recover` and `/api/admin/orders`
+already do, or the project moves to Pro or to Railway.
 
 **No unsubscribe endpoint.** Every newsletter signup generates and stores an
 `unsubscribe_token` and nothing consumes it, so there is no way off the list.

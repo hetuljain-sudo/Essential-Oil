@@ -682,8 +682,7 @@ async function postJson(path, body) {
 
 /** A failed submit must not look like a successful one. */
 function formFeedback(form, err) {
-  const known = [API_MISSING, API_UNREACHABLE, API_DOWN].includes(err?.message);
-  toast(known ? apiMessage(err) : err.message);
+  toast(errorText(err));
   form.querySelector("button[type=submit]").disabled = false;
 }
 
@@ -886,6 +885,22 @@ const apiMessage = (err) => ({
   [API_UNREACHABLE]: "We couldn't reach the server. Check your connection and try again.",
 })[err?.message] ?? "Something went wrong at our end. Please try again in a moment.";
 
+/**
+ * What to show a person when a request fails.
+ *
+ * The three sentinels above describe the connection rather than the request,
+ * and only those get the friendly rewrite. Anything else is a message the
+ * server wrote for this exact situation — "That current password isn't
+ * right", "Only 3 of Lavender 15 ml left" — and replacing it with a generic
+ * apology throws away the one useful thing in the response.
+ *
+ * Passing every error through apiMessage did exactly that, because its
+ * fallback catches everything it does not recognise.
+ */
+const SENTINELS = [API_MISSING, API_UNREACHABLE, API_DOWN];
+const errorText = (err) =>
+  SENTINELS.includes(err?.message) ? apiMessage(err) : (err?.message || apiMessage(err));
+
 /* ------------------------------------------------------------- accounts */
 /* Progressive enhancement: these pages are plain forms. Without JavaScript
    they do nothing useful, which is why nothing else on the site depends on
@@ -959,6 +974,91 @@ if (authForm) {
  * typed as "+91 98765 43210" comes back as "9876543210", which is what
  * will actually be on the parcel.
  */
+/* ------------------------------------------------- forgotten password */
+/*
+ * Two small forms: ask for a link, and use one.
+ *
+ * Both say what actually happened. The request form reports the same thing
+ * whether or not the address has an account — that is the endpoint's rule,
+ * and repeating it here would be the place it quietly stopped being true, so
+ * the message comes from the server.
+ */
+
+const forgotForm = $("[data-forgot-form]");
+if (forgotForm) {
+  const errorBox = $("[data-auth-error]", forgotForm);
+  const submit = $("button[type=submit]", forgotForm);
+
+  forgotForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.hidden = true;
+    submit.disabled = true;
+    const label = submit.textContent;
+    submit.textContent = "Sending…";
+
+    try {
+      const result = await postJson("/api/auth/recover", {
+        action: "request", email: forgotForm.email.value,
+      });
+      // Replace the form rather than leave it sitting there inviting a
+      // second attempt at something that has already worked.
+      forgotForm.innerHTML = `
+        <p>${esc(result.message)}</p>
+        <p class="muted small">It lasts an hour and works once. Check the spam folder
+           if it has not arrived in a few minutes.</p>
+        <p><a class="btn btn--ghost" href="/account/login/">Back to log in</a></p>`;
+    } catch (err) {
+      errorBox.textContent = errorText(err);
+      errorBox.hidden = false;
+      submit.disabled = false;
+      submit.textContent = label;
+    }
+  });
+}
+
+const resetForm = $("[data-reset-form]");
+if (resetForm) {
+  const errorBox = $("[data-auth-error]", resetForm);
+  const submit = $("button[type=submit]", resetForm);
+  const token = new URLSearchParams(location.search).get("token") ?? "";
+
+  // No token at all is a link that was mangled in transit, or somebody
+  // arriving here by hand. Say so before they type a password into a form
+  // that cannot submit.
+  if (!token) {
+    resetForm.innerHTML = `
+      <p>This link is missing its code, so it cannot be used.</p>
+      <p><a class="btn btn--primary" href="/account/forgot/">Ask for a new one</a></p>`;
+  }
+
+  resetForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.hidden = true;
+    submit.disabled = true;
+    const label = submit.textContent;
+    submit.textContent = "Setting…";
+
+    try {
+      const result = await postJson("/api/auth/recover", {
+        action: "reset", token, password: resetForm.password.value,
+      });
+
+      setSignedIn(result.customer?.name ?? null);
+      resetForm.innerHTML = `
+        <p>Your password is set, and you are logged in.</p>
+        ${result.sessionsEnded
+          ? `<p class="muted small">Any other device that was signed in has been signed out.</p>`
+          : ""}
+        <p><a class="btn btn--primary" href="/account/">Go to your account</a></p>`;
+    } catch (err) {
+      errorBox.textContent = errorText(err);
+      errorBox.hidden = false;
+      submit.disabled = false;
+      submit.textContent = label;
+    }
+  });
+}
+
 const accountPanel = $("[data-account-panel]");
 
 if (accountPanel) {
@@ -1100,7 +1200,7 @@ if (accountPanel) {
       // address shows what will actually be on the parcel.
       renderAccount();
     } catch (err) {
-      toast(apiMessage(err) === err.message ? err.message : apiMessage(err));
+      toast(errorText(err));
     } finally {
       button.disabled = false;
       button.textContent = label;

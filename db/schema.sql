@@ -227,3 +227,28 @@ alter table orders add constraint orders_status_check
 
 create index if not exists orders_to_ship_idx on orders (paid_at)
   where status = 'paid';
+
+-- ------------------------------------------------------- password resets
+--
+-- A link emailed to someone who cannot get in.
+--
+-- The token itself is never stored, only its SHA-256 — the same reasoning as
+-- sessions. A copy of this table is useless for taking an account over,
+-- which matters more here than anywhere else: a reset token IS the account
+-- for the hour it lives.
+--
+-- Rows are kept after use rather than deleted. used_at is what makes a link
+-- single-use, and a deleted row would simply look like a link that never
+-- existed, which is the same answer for a very different situation.
+create table if not exists password_resets (
+  token_hash   text primary key,
+  customer_id  uuid not null references customers (id) on delete cascade,
+  expires_at   timestamptz not null,
+  used_at      timestamptz,
+  requested_ip text,
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists password_resets_customer_idx on password_resets (customer_id);
+-- Sweeping expired rows needs no index scan of the whole table.
+create index if not exists password_resets_expiry_idx on password_resets (expires_at);
