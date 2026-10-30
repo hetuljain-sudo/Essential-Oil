@@ -86,7 +86,7 @@ app.post(
 
 app.use(express.json({ limit: "1mb" }));
 
-/** api/auth/login.js -> /api/auth/login */
+/** api/auth/session.js -> /api/auth/session */
 async function* endpointFiles(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);

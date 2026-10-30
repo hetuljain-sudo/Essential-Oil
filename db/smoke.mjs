@@ -321,7 +321,7 @@ await step("insert the order items", async () => {
   return `${n} item(s)`;
 });
 
-await step("the order is visible to /api/auth/me's query", async () => {
+await step("the order is visible to /api/auth/session's query", async () => {
   // Not reachable until it is paid, so this only proves the join and the
   // json_agg parse. The status filter is checked after markPaid below.
   const rows = await sql`
@@ -411,11 +411,11 @@ await step("a SECOND delivery of the same payment changes nothing", async () => 
   return `stock held at ${after}`;
 });
 
-await step("a paid order reaches /api/auth/me's status filter", async () => {
+await step("a paid order reaches /api/auth/session's status filter", async () => {
   const rows = await sql`
     select o.id from orders o
      where o.customer_id = ${created.customerId}
-       and o.status in ('paid', 'oversold')`;
+       and o.status in ('paid', 'oversold', 'shipped')`;
   assert(rows.length === 1, "a paid order is not visible on the account page");
   return "visible in order history";
 });

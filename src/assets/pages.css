@@ -692,3 +692,23 @@ body.menu-open .header { z-index: 56; }
 }
 .admin__resolve input:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 1px; }
 .admin__resolved { margin: .6rem 0 0; font-size: .82rem; color: var(--muted); }
+
+/* Account editing. Narrow on purpose: these are short fields, and a name
+   box the full width of a desktop page reads as a mistake. */
+.account__form { max-width: 26rem; margin: 0 0 2.5rem; }
+.account__form label {
+  display: block; margin-bottom: .9rem;
+  font-size: .82rem; font-weight: 600; color: var(--sage);
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.account__form input {
+  display: block; width: 100%; margin-top: .35rem;
+  padding: .55rem .8rem; font: inherit; font-size: .95rem;
+  text-transform: none; letter-spacing: normal; font-weight: 400; color: inherit;
+  border: 1.5px solid var(--line); border-radius: 10px; background: var(--paper);
+}
+.account__form input:focus-visible {
+  outline: 2px solid var(--terracotta); outline-offset: 1px; border-color: var(--sage);
+}
+/* The email, which this form deliberately cannot change. */
+.account__fixed { margin: 0 0 1rem; font-size: .9rem; }

@@ -162,7 +162,7 @@ offer above it is not yet something the site can honour.
 
 ## Saved addresses
 
-Checkout writes the delivery address back to the account, and `/api/auth/me`
+Checkout writes the delivery address back to the account, and `/api/auth/session`
 returns it so the next checkout is prefilled. One address per customer,
 overwritten each time: a chooser is worth building when someone asks for one.
 
@@ -217,8 +217,10 @@ with an expiry.
 a flat ₹79 anywhere in India. The new shipping policy states the flat fee,
 because that is what the checkout does. One of the two has to change.
 
-**No "sign out everywhere".** Logging out ends one session; a lost device
-has to be dealt with by deleting rows from `sessions` by hand.
+**"Sign out everywhere" is the password change.** Changing a password from
+`/account/` ends every other session and keeps the current browser's. There
+is no separate button for it, because the case that matters — you think
+someone has your session — is the case where you want a new password too.
 
 **Order confirmation is sent.** `markPaid()` emails the customer the moment
 payment settles — reference, line items with line totals, subtotal, shipping,
@@ -297,7 +299,7 @@ fifteen minutes, which also means someone can deliberately lock out an address
 they know. The real fix is rate limiting at the edge, by IP.
 
 **The checkout flow is unproven end to end.** The gate, the order summary and
-the prefill were checked in a browser against a stubbed `/api/auth/me`. What
+the prefill were checked in a browser against a stubbed `/api/auth/session`. What
 has never run is the real sequence: a session cookie from Postgres, a
 Razorpay order, their payment screen, and the webhook settling it. That needs
 credentials and a database.

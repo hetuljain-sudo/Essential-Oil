@@ -1212,7 +1212,10 @@ if (authForm) {
     submit.textContent = kind === "login" ? "Logging in…" : "Creating account…";
 
     try {
-      const res = await fetch(`/api/auth/${kind}`, {
+      // Signing in is a session; registering is a new customer. Different
+      // resources, so different routes — login.js, logout.js and me.js were
+      // merged into one /api/auth/session that the method decides between.
+      const res = await fetch(kind === "login" ? "/api/auth/session" : "/api/auth/register", {
         method: "POST",
         headers: { "content-type": "application/json" },
         // The session cookie is HttpOnly; this is what lets the browser
@@ -1241,6 +1244,18 @@ if (authForm) {
   });
 }
 
+/*
+ * Saving a change from the account page.
+ *
+ * One listener for all three forms, delegated on the panel, because the
+ * panel is re-rendered after every save and a listener bound to a form
+ * would die with it.
+ *
+ * The endpoint answers with what it stored rather than echoing what was
+ * sent, so re-reading after a save shows the normalised value — a phone
+ * typed as "+91 98765 43210" comes back as "9876543210", which is what
+ * will actually be on the parcel.
+ */
 const accountPanel = $("[data-account-panel]");
 
 if (accountPanel) {
@@ -1249,9 +1264,11 @@ if (accountPanel) {
       ? `<p class="account__flag">We're short on part of this order and will be in touch.</p>`
       : "";
 
-  (async () => {
+  // Named rather than an IIFE so a save can redraw the panel with what the
+  // server actually stored.
+  async function renderAccount() {
     try {
-      const data = await apiGet("/api/auth/me");
+      const data = await apiGet("/api/auth/session");
 
       setSignedIn(data.customer?.name ?? null);
 
@@ -1279,17 +1296,118 @@ if (accountPanel) {
                 <strong>${money(o.total_paise / 100)}</strong>
               </li>`).join("")}</ul>`
           : `<p class="muted">Nothing yet. <a href="/shop/">Have a look around</a>.</p>`}
+        <h2>Your details</h2>
+        <form class="account__form" data-account-form="profile">
+          <label>Name
+            <input name="name" type="text" required minlength="2"
+              value="${esc(data.customer.name)}" />
+          </label>
+          <label>Mobile
+            <input name="phone" type="tel" placeholder="Optional"
+              value="${esc(data.customer.phone ?? "")}" />
+          </label>
+          <p class="account__fixed">Email: ${esc(data.customer.email)}
+            <span class="muted">— get in touch if this needs changing.</span></p>
+          <button class="btn btn--ghost" type="submit">Save details</button>
+        </form>
+
+        <h2>Delivery address</h2>
+        <form class="account__form" data-account-form="address">
+          <label>Address
+            <input name="line1" type="text" required
+              value="${esc(data.customer.address?.line1 ?? "")}" />
+          </label>
+          <label>Address line 2
+            <input name="line2" type="text" placeholder="Optional"
+              value="${esc(data.customer.address?.line2 ?? "")}" />
+          </label>
+          <label>City
+            <input name="city" type="text" required
+              value="${esc(data.customer.address?.city ?? "")}" />
+          </label>
+          <label>State
+            <input name="state" type="text" required
+              value="${esc(data.customer.address?.state ?? "")}" />
+          </label>
+          <label>PIN code
+            <input name="postcode" type="text" inputmode="numeric" required
+              value="${esc(data.customer.address?.postcode ?? "")}" />
+          </label>
+          <button class="btn btn--ghost" type="submit">Save address</button>
+        </form>
+
+        <h2>Password</h2>
+        <form class="account__form" data-account-form="password">
+          <label>Current password
+            <input name="current" type="password" required autocomplete="current-password" />
+          </label>
+          <label>New password
+            <input name="next" type="password" required minlength="10"
+              autocomplete="new-password" />
+          </label>
+          <p class="muted small">Changing it signs you out everywhere else, but not here.</p>
+          <button class="btn btn--ghost" type="submit">Change password</button>
+        </form>
+
         <p class="muted"><button class="btn btn--ghost" data-logout>Log out</button></p>`;
     } catch (err) {
       accountPanel.innerHTML = `
         <p class="muted">${esc(apiMessage(err))}</p>
         <p><a class="btn btn--ghost" href="/shop/">Browse the oils</a></p>`;
     }
-  })();
+  }
+
+  renderAccount();
+
+  /*
+   * Saving a change. Delegated on the panel, which renderAccount() replaces
+   * wholesale, so a listener bound to a form would die with the form.
+   *
+   * postJson throws with the server's own message, which is what a bad
+   * current password or a rejected PIN code needs to reach the person.
+   */
+  accountPanel.addEventListener("submit", async (e) => {
+    const form = e.target.closest("[data-account-form]");
+    if (!form) return;
+    e.preventDefault();
+
+    const action = form.dataset.accountForm;
+    const button = $("button[type=submit]", form);
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = "Saving…";
+
+    try {
+      const result = await postJson("/api/auth/account", {
+        action, ...Object.fromEntries(new FormData(form)),
+      });
+
+      if (action === "password") {
+        toast(result.otherSessionsEnded
+          ? `Password changed, and ${result.otherSessionsEnded} other session${
+              result.otherSessionsEnded === 1 ? "" : "s"} ended.`
+          : "Password changed.");
+        form.reset();
+        return;
+      }
+
+      toast(action === "address" ? "Address saved." : "Details saved.");
+      if (result.customer?.name) setSignedIn(result.customer.name);
+      // Redraw from the server, so a normalised phone number or a trimmed
+      // address shows what will actually be on the parcel.
+      renderAccount();
+    } catch (err) {
+      toast(apiMessage(err) === err.message ? err.message : apiMessage(err));
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  });
+
 
   accountPanel.addEventListener("click", async (e) => {
     if (!e.target.closest("[data-logout]")) return;
-    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
+    await fetch("/api/auth/session", { method: "DELETE", credentials: "same-origin" }).catch(() => {});
     setSignedIn(null);
     location.href = "/";
   });
@@ -1362,7 +1480,7 @@ if (checkoutGate) {
 
     let me = null;
     try {
-      me = (await apiGet("/api/auth/me")).customer;
+      me = (await apiGet("/api/auth/session")).customer;
     } catch (err) {
       // Fail closed: no form, because an order could not be placed anyway.
       checkoutGate.innerHTML = `

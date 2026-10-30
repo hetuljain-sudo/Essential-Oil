@@ -1274,7 +1274,7 @@ accountPage({
       <h1>Your account</h1>
     </div>
 
-    <!-- Filled by /api/auth/me. Rendered server-side it would be a page that
+    <!-- Filled by /api/auth/session. Rendered server-side it would be a page that
          must never be cached, for one small panel of content. -->
     <div data-account-panel>
       <p class="muted">Loading your account…</p>
