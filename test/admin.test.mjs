@@ -13,7 +13,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parseQuantity, parseTracking } from "../api/_lib/validate.mjs";
+import { parseQuantity, parseTracking, parseResolution } from "../api/_lib/validate.mjs";
 
 test("accepts a plain count", () => {
   assert.deepEqual(parseQuantity(0), { quantity: 0 });
@@ -51,4 +51,23 @@ test("tracking is optional and trimmed", () => {
 test("refuses tracking that is not text or is absurd", () => {
   assert.ok(parseTracking(12345).error);
   assert.ok(parseTracking("x".repeat(200)).error);
+});
+
+test("a resolution note is optional", () => {
+  // "Dealt with" is sometimes the whole truth, and forcing prose produces ".".
+  assert.deepEqual(parseResolution(undefined), { note: null });
+  assert.deepEqual(parseResolution(null), { note: null });
+  assert.deepEqual(parseResolution(""), { note: null });
+  assert.deepEqual(parseResolution("   "), { note: null });
+});
+
+test("a resolution note is kept, trimmed", () => {
+  assert.deepEqual(parseResolution("  Refunded via UPI  "), { note: "Refunded via UPI" });
+});
+
+test("a resolution note refuses what is not text, or is absurd", () => {
+  assert.ok(parseResolution(12345).error);
+  assert.ok(parseResolution({}).error);
+  assert.ok(parseResolution("x".repeat(501)).error);
+  assert.equal(parseResolution("x".repeat(500)).error, undefined);
 });

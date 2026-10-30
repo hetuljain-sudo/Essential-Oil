@@ -12,7 +12,7 @@ import { json } from "./http.mjs";
 
 // Re-exported so endpoints keep importing their validation from one place,
 // while the validators themselves stay free of the database.
-export { parseQuantity, parseTracking } from "./validate.mjs";
+export { parseQuantity, parseTracking, parseResolution } from "./validate.mjs";
 
 /**
  * The signed-in admin, or null.

@@ -3,6 +3,7 @@
  *      ?all=1                        every order, for the export and the sync
  * POST /api/admin/orders  { id, action: "ship", tracking? }
  *                         { id, action: "thank" }
+ *                         { id, action: "resolve", note? }
  *                         { action: "sync" }     write them all to the sheet
  *
  * The sync lives here rather than in its own file for a reason worth
@@ -22,7 +23,7 @@
  */
 
 import { json } from "../_lib/http.mjs";
-import { requireAdmin, parseTracking } from "../_lib/admin.mjs";
+import { requireAdmin, parseTracking, parseResolution } from "../_lib/admin.mjs";
 import { sendEmail, emailStatus } from "../_lib/email.mjs";
 import { listOrders, countOrders } from "../_lib/order-list.mjs";
 import { sheetStatus, syncSheet } from "../_lib/sheets.mjs";
@@ -66,7 +67,7 @@ export default async function handler(req, res) {
 
       const [counts] = await sql`
         select count(*) filter (where status = 'paid')::int as to_ship,
-               count(*) filter (where status = 'oversold')::int as oversold,
+               count(*) filter (where status = 'oversold' and resolved_at is null)::int as oversold,
                coalesce(sum(total_paise) filter (where status in ('paid','shipped')), 0)::bigint as taken_paise
           from orders`;
 
@@ -120,8 +121,36 @@ export default async function handler(req, res) {
       }
 
       if (typeof id !== "string" || !id) return json(res, 400, { error: "Which order?" });
-      if (action !== "ship" && action !== "thank") {
+      if (action !== "ship" && action !== "thank" && action !== "resolve") {
         return json(res, 400, { error: "Unknown action." });
+      }
+
+      /* ------------------------------------------------ oversold, dealt with */
+
+      if (action === "resolve") {
+        const { note, error } = parseResolution(body.note);
+        if (error) return json(res, 400, { error });
+
+        // Only an unresolved oversold order. Resolving anything else would
+        // be recording a decision about a problem that never happened, and
+        // a second click must not overwrite the first person's note.
+        const [row] = await sql`
+          update orders
+             set resolved_at = now(), resolution = ${note}
+           where id = ${id} and status = 'oversold' and resolved_at is null
+           returning id`;
+
+        if (!row) {
+          return json(res, 409, {
+            error: "That order isn't an unresolved oversold one — reload the page.",
+          });
+        }
+
+        // Said out loud: the customer is not told anything by this. It
+        // records what you decided, it does not carry it out.
+        console.log(`order ${id} marked resolved; no refund issued and no email sent`);
+
+        return json(res, 200, { ok: true, resolved: true });
       }
 
       /* ------------------------------------------------------- thank you */

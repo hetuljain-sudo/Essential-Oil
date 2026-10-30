@@ -169,10 +169,14 @@ if (tables.includes("orders")) {
     select count(*)::int as total,
            count(*) filter (where status = 'paid')::int as paid,
            count(*) filter (where status = 'created')::int as pending,
-           count(*) filter (where status = 'oversold')::int as oversold
+           count(*) filter (where status = 'oversold' and resolved_at is null)::int as oversold,
+           count(*) filter (where status = 'oversold' and resolved_at is not null)::int as settled
       from orders`;
   ok(`${counts.total} orders — ${counts.paid} paid, ${counts.pending} awaiting payment`);
   if (counts.oversold) warn(`${counts.oversold} flagged oversold and need a refund decision`);
+  // Counted separately rather than silently: they happened, and a shop that
+  // oversells often should know how often even once each one is dealt with.
+  if (counts.settled) ok(`${counts.settled} oversold order(s) already dealt with`);
 
   /*
    * Orders that were paid and whose customer was never told. The column is

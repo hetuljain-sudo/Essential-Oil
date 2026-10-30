@@ -25,6 +25,7 @@ export async function listOrders(sql, { limit = 100 } = {}) {
   const rows = await sql`
     select o.id, o.status, o.subtotal_paise, o.shipping_paise, o.total_paise,
            o.created_at, o.paid_at, o.shipped_at, o.tracking, o.thanked_at, o.notes,
+           o.resolved_at, o.resolution,
            o.customer_name, o.customer_email, o.customer_phone,
            o.address_line1, o.address_line2, o.address_city,
            o.address_state, o.address_postcode,
@@ -39,7 +40,14 @@ export async function listOrders(sql, { limit = 100 } = {}) {
       left join order_items i on i.order_id = o.id
      group by o.id
      order by
-       case o.status when 'oversold' then 0 when 'paid' then 1 else 2 end,
+       -- An oversold order needs a decision, so it leads — until someone
+       -- records one, at which point it stops demanding attention and
+       -- settles in with everything else.
+       case
+         when o.status = 'oversold' and o.resolved_at is null then 0
+         when o.status = 'paid' then 1
+         else 2
+       end,
        o.created_at desc
      limit ${limit}::int`;
 

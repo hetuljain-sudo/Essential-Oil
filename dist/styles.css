@@ -1195,3 +1195,14 @@ body.menu-open .header { z-index: 56; }
 }
 /* The count sits next to the search rather than pushing it away. */
 .admin__bar .admin__showing { margin-right: auto; }
+
+/* Recording what was done about an oversold order. Deliberately quiet: it is
+   a note to yourself, not a customer-facing action. */
+.admin__resolve { display: flex; gap: .5rem; margin: .6rem 0 0; flex-wrap: wrap; }
+.admin__resolve input {
+  flex: 1 1 16rem; padding: .45rem .7rem; font: inherit; font-size: .85rem;
+  border: 1.5px solid var(--line); border-radius: 9px; background: var(--paper);
+  color: inherit;
+}
+.admin__resolve input:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 1px; }
+.admin__resolved { margin: .6rem 0 0; font-size: .82rem; color: var(--muted); }

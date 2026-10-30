@@ -206,6 +206,19 @@ alter table orders add column if not exists thanked_at timestamptz;
 -- confirmation" and db/check.mjs reports any that are.
 alter table orders add column if not exists confirmed_email_at timestamptz;
 
+-- An oversold order, dealt with.
+--
+-- The status stays 'oversold' on purpose. That is a fact about what
+-- happened — the money was taken and the stock was not there — and
+-- overwriting it with 'refunded' would erase the only record that the shop
+-- sold something it could not send. Resolving says what was done about it,
+-- and nothing more.
+--
+-- Null means still waiting on a human, which is what the admin page sorts
+-- to the top and what db/check.mjs counts.
+alter table orders add column if not exists resolved_at timestamptz;
+alter table orders add column if not exists resolution text;
+
 -- 'shipped' is new. A check constraint cannot be extended in place, so it is
 -- replaced; dropping by name first keeps this re-runnable.
 alter table orders drop constraint if exists orders_status_check;

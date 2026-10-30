@@ -19,7 +19,6 @@ const firstAvailable = (p) => p.variants.find((v) => v.stock > 0) || p.variants[
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const shortLabel = (p) => p.short || p.name.split(" ")[0];
 
 /**
  * A drawn bottle, used where an oil has no photograph.
@@ -33,25 +32,6 @@ const shortLabel = (p) => p.short || p.name.split(" ")[0];
  * stable and distinct — a product id, or a cart key where one product can
  * appear twice at different sizes.
  */
-function bottleSVG([light, dark], label = "", key = label) {
-  const uid = "g-" + (String(key).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bottle");
-  return `<svg class="bottle" viewBox="0 0 80 160" aria-hidden="true" focusable="false">
-    <rect x="30" y="2" width="20" height="10" rx="3" fill="#2a2a2a"/>
-    <rect x="26" y="10" width="28" height="26" rx="4" fill="#1f1f1f"/>
-    <path d="M30 36h20v6c0 4 14 8 14 20v82a12 12 0 0 1-12 12H28a12 12 0 0 1-12-12V62c0-12 14-16 14-20z" fill="#7a3d12"/>
-    <path d="M30 36h20v6c0 4 14 8 14 20v82a12 12 0 0 1-12 12H28a12 12 0 0 1-12-12V62c0-12 14-16 14-20z" fill="url(#${uid})"/>
-    <rect x="16" y="78" width="48" height="52" fill="${light}"/>
-    <rect x="16" y="78" width="48" height="52" fill="${dark}" opacity=".35"/>
-    <text x="40" y="102" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="10" font-weight="600" fill="#fff">${esc(label)}</text>
-    <rect x="20" y="70" width="3" height="70" rx="1.5" fill="#fff" opacity=".18"/>
-    <defs><linearGradient id="${uid}" x1="0" x2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity=".12"/>
-      <stop offset=".5" stop-color="#000" stop-opacity="0"/>
-      <stop offset="1" stop-color="#000" stop-opacity=".25"/>
-    </linearGradient></defs>
-  </svg>`;
-}
-
 /**
  * Photography that fails to load is replaced with generated bottle art.
  *
@@ -1386,6 +1366,14 @@ if (adminGate) {
           <p class="muted small">${addressOf(o)}</p>
           ${o.notes ? `<p class="muted small">Note: ${esc(o.notes)}</p>` : ""}
           ${o.status === "paid" ? `
+            ${o.status === "oversold" ? (o.resolved_at ? `
+              <p class="admin__resolved">Dealt with ${date(o.resolved_at)}${
+                o.resolution ? ` — ${esc(o.resolution)}` : ""}</p>` : `
+              <form class="admin__resolve" data-resolve="${esc(o.id)}">
+                <input name="note" type="text" maxlength="500"
+                  placeholder="What did you do? (refunded, reshipped, called them…)" />
+                <button class="btn btn--ghost" type="submit">Mark dealt with</button>
+              </form>`) : ""}
             ${o.status === "paid" || o.status === "shipped" ? `
               <button class="btn btn--quiet admin__thank" data-thank="${esc(o.id)}"
                 ${emailReady ? "" : "disabled"}
@@ -1427,6 +1415,26 @@ if (adminGate) {
           </article>`).join("")
         : `<p class="muted">Nothing yet.</p>`}`;
   }
+
+  /* Recording what was done about an oversold order. It does not refund
+     anybody or send anything — it records a decision a person already made,
+     so the order stops sitting at the top of the list forever. */
+  root.addEventListener("submit", async (e) => {
+    const form = e.target.closest("[data-resolve]");
+    if (!form) return;
+    e.preventDefault();
+
+    const result = await post("/api/admin/orders", {
+      id: form.dataset.resolve,
+      action: "resolve",
+      note: form.note.value,
+    });
+
+    if (result?.resolved) {
+      say("Recorded. The customer has not been told anything by this.");
+      loadOrders();
+    }
+  });
 
   /* Sync to the sheet. Reports the row count on success and Google's own
      complaint on failure — "sync failed" with no reason means opening a log

@@ -43,7 +43,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -1569,7 +1569,7 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
 const sharedForBrowser = (await Promise.all(
-  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs"].map((f) => readFile(join(root, f), "utf8"))
 )).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),
