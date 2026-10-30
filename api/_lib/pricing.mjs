@@ -12,9 +12,11 @@
 
 import { products, site } from "../../src/data.mjs";
 import { skuFor } from "../../src/sku.mjs";
+// One definition, shared with the browser so the cart cannot be built in a
+// shape the checkout will refuse.
+import { MAX_LINES, MAX_QTY_PER_LINE } from "../../src/limits.mjs";
 
-export const MAX_LINES = 20; // distinct products in one order
-export const MAX_QTY_PER_LINE = 10; // per product+size
+export { MAX_LINES, MAX_QTY_PER_LINE };
 
 /** A fault in what the shopper sent, not in our code — safe to show them. */
 export class CartError extends Error {

@@ -100,10 +100,21 @@ function addToCart(id, size, qty = 1) {
   if (!variant || variant.stock <= 0) return toast(`${p.name} is sold out`);
 
   const key = `${id}::${variant.size}`;
+
+  // An order holds twenty different oils. Said here rather than discovered
+  // at checkout, which is where it used to be enforced and nowhere else.
+  if (!(key in cart) && Object.keys(cart).length >= MAX_LINES) {
+    return toast(`An order can hold ${MAX_LINES} different oils. Remove one first.`);
+  }
+
+  // Whichever runs out first, the shelf or the per-order rule. Clamping on
+  // stock alone let ten be added on top of two and the cart reach twelve,
+  // which the checkout would then refuse.
+  const cap = maxForVariant(variant);
   const next = (cart[key] || 0) + qty;
-  if (next > variant.stock) {
-    cart[key] = variant.stock;
-    toast(`Only ${variant.stock} of ${p.name} ${variant.size} in stock`);
+  if (next > cap) {
+    cart[key] = cap;
+    toast(limitReason(variant, p.name, variant.size));
   } else {
     cart[key] = next;
     toast(`${p.name} ${p.variants.length > 1 ? variant.size + " " : ""}added to cart`);
@@ -116,7 +127,7 @@ function addToCart(id, size, qty = 1) {
 function setQty(key, qty) {
   const variant = lineVariant(key);
   if (qty <= 0) delete cart[key];
-  else cart[key] = Math.min(qty, variant ? variant.stock : qty);
+  else cart[key] = Math.min(qty, variant ? maxForVariant(variant) : qty);
   saveCart();
   renderCart();
 }
@@ -162,7 +173,7 @@ function renderCart() {
             <div class="qty">
               <button data-qty="${key}" data-delta="-1" aria-label="Decrease quantity of ${esc(p.name)}">−</button>
               <span aria-live="polite">${q}</span>
-              <button data-qty="${key}" data-delta="1" aria-label="Increase quantity of ${esc(p.name)}"${q >= v.stock ? " disabled" : ""}>+</button>
+              <button data-qty="${key}" data-delta="1" aria-label="Increase quantity of ${esc(p.name)}"${q >= maxForVariant(v) ? " disabled" : ""}>+</button>
             </div>
           </div>
           <div class="line__right">
@@ -428,10 +439,17 @@ if (pdp) {
     $("[data-live-price]", pdp).innerHTML = money(v.price * qty)
       + (sale ? ` <s class="price__was">${money(sale.was * qty)}</s>` : "");
     const plus = $('[data-mqty="1"]', pdp);
-    plus.disabled = qty >= v.stock;
+    // Whichever runs out first, the shelf or the per-order rule. Capping on
+    // stock alone let someone pick thirteen of something the checkout would
+    // then refuse at ten.
+    const cap = maxForVariant(v);
+    plus.disabled = qty >= cap;
     const note = $("[data-stock-note]", pdp);
-    note.hidden = !(v.stock > 0 && v.stock <= 8);
-    note.textContent = v.stock > 0 ? `Only ${v.stock} left` : "";
+    // Show the reason only once it is about to bite, so the page is not
+    // lecturing someone who wants one bottle.
+    const nearCap = v.stock > 0 && (v.stock <= 8 || qty >= cap);
+    note.hidden = !nearCap;
+    note.textContent = nearCap ? limitReason(v, product.name, size) : "";
     $$(".size", pdp).forEach((l) => l.classList.toggle("is-active", $("input", l).value === size));
     const addBtn = $("[data-pdp-add]", pdp);
     addBtn.disabled = v.stock <= 0;
@@ -446,7 +464,7 @@ if (pdp) {
     const step = e.target.closest("[data-mqty]");
     if (step) {
       const v = product.variants.find((x) => x.size === size);
-      qty = Math.max(1, Math.min(v.stock, qty + +step.dataset.mqty));
+      qty = Math.max(1, Math.min(maxForVariant(v), qty + +step.dataset.mqty));
       return refresh();
     }
     if (e.target.closest("[data-pdp-add]")) addToCart(product.id, size, qty);
