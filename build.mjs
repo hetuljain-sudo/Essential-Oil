@@ -1434,42 +1434,31 @@ page("/admin/", layout({
   description: "Sarvha admin.",
   noindex: true,
   bodyClass: "admin-page",
+  // Its own chrome: see templates.mjs. The tabs now live in the admin bar.
+  chrome: "admin",
   body: `
-    <section class="section section--first">
-      <div class="container">
-        <div data-admin-gate><p class="muted">Checking…</p></div>
+    <div class="awrap">
+      <div data-admin-gate><p class="muted">Checking…</p></div>
 
-        <div data-admin hidden>
-          <div class="page-head">
-            <p class="eyebrow">Admin</p>
-            <h1>Shop</h1>
-          </div>
+      <div data-admin hidden>
+        <div class="admin__stats" data-admin-stats></div>
 
-          <div class="admin__stats" data-admin-stats></div>
-
-          <div class="admin__bar">
-            <label class="admin__search">
-              <span class="sr-only">Search orders, messages and stock</span>
-              <input type="search" data-admin-search placeholder="Search name, email, city, SKU…"
-                autocomplete="off" />
-            </label>
-            <span class="admin__showing" data-orders-showing></span>
-            <button class="btn btn--quiet" data-sync-sheet hidden>Sync to Google Sheet</button>
-            <button class="btn btn--quiet" data-export-orders>Download for Excel</button>
-          </div>
-
-          <div class="admin__tabs" role="tablist">
-            <button class="admin__tab is-on" role="tab" data-tab="orders">Orders</button>
-            <button class="admin__tab" role="tab" data-tab="messages">Messages</button>
-            <button class="admin__tab" role="tab" data-tab="stock">Stock</button>
-          </div>
-
-          <div data-panel="orders"></div>
-          <div data-panel="messages" hidden></div>
-          <div data-panel="stock" hidden></div>
+        <div class="admin__bar">
+          <label class="admin__search">
+            <span class="sr-only">Search orders, messages and stock</span>
+            <input type="search" data-admin-search placeholder="Search name, email, city, SKU…"
+              autocomplete="off" />
+          </label>
+          <span class="admin__showing" data-orders-showing></span>
+          <button class="btn btn--quiet" data-sync-sheet hidden>Sync to Google Sheet</button>
+          <button class="btn btn--quiet" data-export-orders>Download for Excel</button>
         </div>
+
+        <div data-panel="orders"></div>
+        <div data-panel="messages" hidden></div>
+        <div data-panel="stock" hidden></div>
       </div>
-    </section>`,
+    </div>`,
 }));
 
 /* -------------------------------------------------------------- policies */

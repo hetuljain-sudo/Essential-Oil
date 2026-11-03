@@ -132,7 +132,17 @@ function setQty(key, qty) {
   renderCart();
 }
 
+/*
+ * The cart lives in the shop's chrome, which the admin page does not render.
+ * These three touch nodes that only exist there, and two of them run at load
+ * — so without a guard app.js throws on /admin/ before the admin code is
+ * reached, and the page sits on "Checking…" forever with one line in the
+ * console. Cheaper to ask than to assume.
+ */
+const hasCart = () => !!$("[data-cart-items]");
+
 function bumpBadge() {
+  if (!hasCart()) return;
   const badge = $("[data-cart-count]");
   badge.classList.remove("bump");
   void badge.offsetWidth;
@@ -140,6 +150,7 @@ function bumpBadge() {
 }
 
 function renderCart() {
+  if (!hasCart()) return;
   const lines = Object.entries(cart).filter(([k]) => lineProduct(k) && lineVariant(k));
   const count = lines.reduce((s, [, q]) => s + q, 0);
   const subtotal = lines.reduce((s, [k, q]) => s + lineVariant(k).price * q, 0);
@@ -653,11 +664,14 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-$("[data-checkout]").addEventListener("click", () => {
-  // The checkout page handles the rest, including sending a logged-out
-  // shopper to log in and bringing them back.
-  location.href = "/checkout/";
-});
+const checkoutBtn = $("[data-checkout]");
+if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", () => {
+    // The checkout page handles the rest, including sending a logged-out
+    // shopper to log in and bringing them back.
+    location.href = "/checkout/";
+  });
+}
 
 /* Both of these used to say "sent" and then throw the message away. They now
    post to the API, and say nothing that has not actually happened. */
@@ -1586,45 +1600,105 @@ if (adminGate) {
       ${data.counts.oversold
         ? `<div class="is-warn"><strong>${data.counts.oversold}</strong><span>oversold</span></div>` : ""}`;
 
+    /*
+     * A table, because this is a list you read across: who, when, how much,
+     * what needs doing. Cards stack the same facts vertically and make you
+     * scan down a column of prose to compare two orders.
+     *
+     * The detail row carries everything that does not belong in a scan — the
+     * address, the line items, and the things you can do about the order —
+     * and stays closed until asked for.
+     *
+     * The previous version nested the resolve form inside a
+     * `status === "paid"` branch and then tested for "oversold" inside it, a
+     * condition that can never hold, so the form it drew never appeared on
+     * screen at all. Flattening the conditions is what stops that shape of
+     * mistake: each action now tests exactly one thing.
+     */
     panel("orders").innerHTML = data.orders.length
-      ? data.orders.map((o) => `
-        <article class="admin__row${o.status === "oversold" ? " is-warn" : ""}">
-          <div class="admin__rowhead">
-            <div>
-              <strong>${esc(o.customer_name)}</strong>
-              <span class="admin__badge admin__badge--${esc(o.status)}">${esc(o.status)}</span>
-              <div class="muted small">${date(o.created_at)} · ${esc(o.customer_email)} · ${esc(o.customer_phone)}</div>
-            </div>
-            <strong>${rupees(o.total_paise)}</strong>
-          </div>
-          <ul class="admin__items">${o.items.map((i) =>
-            `<li>${esc(i.name)} ${esc(i.size)} × ${i.qty}</li>`).join("")}</ul>
-          <p class="muted small">${addressOf(o)}</p>
-          ${o.notes ? `<p class="muted small">Note: ${esc(o.notes)}</p>` : ""}
-          ${o.status === "paid" ? `
-            ${o.status === "oversold" ? (o.resolved_at ? `
-              <p class="admin__resolved">Dealt with ${date(o.resolved_at)}${
-                o.resolution ? ` — ${esc(o.resolution)}` : ""}</p>` : `
-              <form class="admin__resolve" data-resolve="${esc(o.id)}">
-                <input name="note" type="text" maxlength="500"
-                  placeholder="What did you do? (refunded, reshipped, called them…)" />
-                <button class="btn btn--ghost" type="submit">Mark dealt with</button>
-              </form>`) : ""}
-            ${o.status === "paid" || o.status === "shipped" ? `
-              <button class="btn btn--quiet admin__thank" data-thank="${esc(o.id)}"
-                ${emailReady ? "" : "disabled"}
-                title="${emailReady ? "Send a thank-you to " + esc(o.customer_email)
-                                    : "Email is not set up yet: " + esc(emailWhy)}">
-                ${o.thanked_at ? "Thank-you sent — send again" : "Send thank-you"}
-              </button>` : ""}
-            <form class="admin__ship" data-ship="${esc(o.id)}">
-              <input type="text" name="tracking" placeholder="Tracking reference (optional)" />
-              <button class="btn btn--primary" type="submit">Mark dispatched</button>
-            </form>` : ""}
-          ${o.status === "shipped" ? `<p class="muted small">Dispatched ${date(o.shipped_at)}${
-            o.tracking ? ` · ${esc(o.tracking)}` : ""}</p>` : ""}
-        </article>`).join("")
-      : `<p class="muted">No orders yet.</p>`;
+      ? `<div class="apanel">
+          <table class="atable">
+            <thead><tr>
+              <th>Order</th><th>Status</th><th>Placed</th><th>Customer</th>
+              <th class="atable--num">Total</th><th></th>
+            </tr></thead>
+            <tbody>${data.orders.map((o) => {
+              const needsDecision = o.status === "oversold" && !o.resolved_at;
+              return `
+              <tr class="arow${needsDecision ? " is-warn" : ""}">
+                <td>
+                  <strong>${o.items.map((i) =>
+                    `${i.qty}× ${esc(i.name)} ${esc(i.size)}`).join(", ") || "—"}</strong>
+                  <div class="amono">${esc(o.id.slice(0, 8).toUpperCase())}</div>
+                </td>
+                <td>
+                  <span class="abadge abadge--${esc(o.status)}">${esc(o.status)}</span>
+                  ${o.resolved_at ? `<span class="abadge abadge--done">dealt with</span>` : ""}
+                </td>
+                <td class="amuted">${date(o.created_at)}</td>
+                <td>${esc(o.customer_name)}
+                  <div class="amuted">${esc(o.address_city)}</div></td>
+                <td class="atable--num">${rupees(o.total_paise)}</td>
+                <td class="atable--act">
+                  <button class="abtn" data-order-detail="${esc(o.id)}"
+                    aria-expanded="false">Details</button>
+                </td>
+              </tr>
+              <tr class="adetail" data-detail-for="${esc(o.id)}" hidden>
+                <td colspan="6">
+                  <div class="adetail__grid">
+                    <div>
+                      <h4>Deliver to</h4>
+                      <p>${addressOf(o)}</p>
+                      <p class="amuted">${esc(o.customer_email)}${
+                        o.customer_phone ? ` · ${esc(o.customer_phone)}` : ""}</p>
+                      ${o.notes ? `<p class="amuted">Note: ${esc(o.notes)}</p>` : ""}
+                    </div>
+
+                    <div>
+                      <h4>Items</h4>
+                      <ul class="adetail__items">${o.items.map((i) =>
+                        `<li>${i.qty} × ${esc(i.name)} ${esc(i.size)}</li>`).join("")}</ul>
+                      <p class="amuted">Shipping ${
+                        o.shipping_paise ? rupees(o.shipping_paise) : "free"}</p>
+                      ${o.shipped_at ? `<p class="amuted">Dispatched ${date(o.shipped_at)}${
+                        o.tracking ? ` · ${esc(o.tracking)}` : ""}</p>` : ""}
+                    </div>
+
+                    <div>
+                      <h4>Actions</h4>
+                      ${needsDecision ? `
+                        <form class="admin__resolve" data-resolve="${esc(o.id)}">
+                          <input name="note" type="text" maxlength="500"
+                            placeholder="What did you do? (refunded, reshipped…)" />
+                          <button class="btn btn--ghost" type="submit">Mark dealt with</button>
+                        </form>` : ""}
+                      ${o.status === "oversold" && o.resolved_at ? `
+                        <p class="admin__resolved">Dealt with ${date(o.resolved_at)}${
+                          o.resolution ? ` — ${esc(o.resolution)}` : ""}</p>` : ""}
+                      ${o.status === "paid" ? `
+                        <form class="admin__ship" data-ship="${esc(o.id)}">
+                          <input type="text" name="tracking"
+                            placeholder="Tracking reference (optional)" />
+                          <button class="btn btn--primary" type="submit">Mark dispatched</button>
+                        </form>` : ""}
+                      ${o.status === "paid" || o.status === "shipped" ? `
+                        <button class="btn btn--ghost admin__thank" data-thank="${esc(o.id)}"
+                          ${emailReady ? "" : "disabled"}
+                          title="${emailReady ? "Send a thank-you to " + esc(o.customer_email)
+                                              : "Email is not set up yet: " + esc(emailWhy)}">
+                          ${o.thanked_at ? "Thank-you sent — send again" : "Send thank-you"}
+                        </button>` : ""}
+                      ${o.status === "created" || o.status === "failed"
+                        ? `<p class="amuted">Never paid for — nothing to do.</p>` : ""}
+                    </div>
+                  </div>
+                </td>
+              </tr>`;
+            }).join("")}</tbody>
+          </table>
+        </div>`
+      : `<p class="muted apanel apanel--empty">No orders yet.</p>`;
   }
 
   /* -------------------------------------------------------- messages */
@@ -1651,6 +1725,19 @@ if (adminGate) {
           </article>`).join("")
         : `<p class="muted">Nothing yet.</p>`}`;
   }
+
+  /* Opening an order's detail row. Delegated, because the table is redrawn
+     after every action. */
+  root.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-order-detail]");
+    if (!btn) return;
+    const row = $(`[data-detail-for="${btn.dataset.orderDetail}"]`, root);
+    if (!row) return;
+    const open = row.hidden;
+    row.hidden = !open;
+    btn.setAttribute("aria-expanded", String(open));
+    btn.textContent = open ? "Close" : "Details";
+  });
 
   /* Recording what was done about an oversold order. It does not refund
      anybody or send anything — it records a decision a person already made,
@@ -1808,17 +1895,24 @@ if (adminGate) {
 
   /* ------------------------------------------------------ behaviour */
 
-  root.addEventListener("click", async (e) => {
+  /*
+   * Tab switching is bound to the document, not to [data-admin], because the
+   * tabs live in the admin bar — outside the panel they control. Bound to
+   * the panel, as they were when the tabs sat inside it, every click did
+   * nothing at all and nothing said why.
+   */
+  document.addEventListener("click", async (e) => {
     const tab = e.target.closest("[data-tab]");
-    if (tab) {
-      $$("[data-tab]", root).forEach((t) => t.classList.toggle("is-on", t === tab));
-      for (const name of Object.keys(loaders)) panel(name).hidden = name !== tab.dataset.tab;
-      await loaders[tab.dataset.tab]().catch(() => say("Couldn't load that."));
-      // A search survives a tab change; the box still shows the text, so
-      // the list it filters had better match it.
-      applySearch();
-      return;
-    }
+    if (!tab) return;
+    $$("[data-tab]").forEach((t) => t.classList.toggle("is-on", t === tab));
+    for (const name of Object.keys(loaders)) panel(name).hidden = name !== tab.dataset.tab;
+    await loaders[tab.dataset.tab]().catch(() => say("Couldn't load that."));
+    // A search survives a tab change; the box still shows the text, so the
+    // list it filters had better match it.
+    applySearch();
+  });
+
+  root.addEventListener("click", async (e) => {
 
     const done = e.target.closest("[data-handled]");
     if (done) {

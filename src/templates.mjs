@@ -242,7 +242,47 @@ const drawerAndModal = `
       <button class="btn btn--primary btn--block" data-checkout>Checkout</button>
     </div>
   </aside>
-  <div class="toast" data-toast role="status" aria-live="polite"></div>`;
+`;
+
+/**
+ * The toast, on its own.
+ *
+ * It lives apart from the drawer because the admin page has no cart and no
+ * drawer but does have things to confirm. toast() returns silently when
+ * [data-toast] is missing, so shipping the admin without this would have
+ * swallowed every "Saved", "Recorded" and "10 orders downloaded" with no
+ * error anywhere.
+ */
+const toastEl = `<div class="toast" data-toast role="status" aria-live="polite"></div>`;
+
+/**
+ * The admin's own chrome.
+ *
+ * The admin used to render the shop's announce bar, header and footer — the
+ * free-shipping banner, the Shop/Collections nav, and fifty product links
+ * underneath. It read as a page of the shop with a tool inside it rather
+ * than as a tool.
+ *
+ * Deliberately dark and deliberately plain: nothing here should compete with
+ * the data, and it should be obvious at a glance which side of the shop you
+ * are looking at.
+ */
+const adminBar = () => `
+  <header class="abar">
+    <div class="abar__inner">
+      <a class="abar__brand" href="/admin/">${site.name} <span>Admin</span></a>
+      <nav class="abar__nav" aria-label="Admin sections">
+        <button class="abar__tab is-on" role="tab" data-tab="orders">Orders</button>
+        <button class="abar__tab" role="tab" data-tab="messages">Messages</button>
+        <button class="abar__tab" role="tab" data-tab="stock">Stock</button>
+      </nav>
+      <div class="abar__side">
+        <a class="abar__link" href="/" target="_blank" rel="noopener">View shop</a>
+        <span class="abar__who" data-admin-who></span>
+        <button class="abar__out" data-logout>Log out</button>
+      </div>
+    </div>
+  </header>`;
 
 /* ---------------------------------------------------------------- layout */
 
@@ -271,6 +311,11 @@ export const breadcrumbSchema = (trail) => ({
 export function layout({
   title, description, path, body, jsonLd, breadcrumb,
   ogImage, ogType = "website", noindex = false, bodyClass = "",
+  // "shop" wraps the page in the storefront's own furniture. "admin" gives
+  // it the tool's chrome instead: no announce bar, no shop nav, no footer
+  // full of product links, and no cart drawer — but still the toast, which
+  // the admin uses constantly.
+  chrome = "shop",
 }) {
   const fullTitle = path === "/" ? title : `${title} | ${site.name}`;
   const canonical = site.url + path;
@@ -338,11 +383,13 @@ export function layout({
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ""}>
   <a href="#main" class="skip-link">Skip to content</a>
+  ${chrome === "admin" ? adminBar() : `
   <div class="announce">Free shipping on orders over ${money(site.freeShippingAt)} · 100% pure, undiluted oils</div>
-  ${header(path)}
+  ${header(path)}`}
   <main id="main">${body}</main>
-  ${footer()}
-  ${drawerAndModal}
+  ${chrome === "admin" ? "" : `${footer()}
+  ${drawerAndModal}`}
+  ${toastEl}
   <script src="/catalog.js?v=${assetStamp}"></script>
   <script src="/app.js?v=${assetStamp}"></script>
 </body>

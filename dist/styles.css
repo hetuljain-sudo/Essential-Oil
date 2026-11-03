@@ -1226,3 +1226,109 @@ body.menu-open .header { z-index: 56; }
 }
 /* The email, which this form deliberately cannot change. */
 .account__fixed { margin: 0 0 1rem; font-size: .9rem; }
+
+/* ======================================================= admin chrome ====
+   The admin is a tool, not a page of the shop. It used to render the
+   announce bar, the shop nav and a footer of fifty product links, which made
+   it read as the storefront with a table inside it. */
+
+.admin-page { background: #eef0ec; }
+.admin-page .section { padding: 0; }
+
+.abar { background: #1f2a1d; color: #e7ece3; }
+.abar__inner {
+  display: flex; align-items: center; gap: 1.6rem;
+  padding: .7rem clamp(1rem, 3vw, 2rem); flex-wrap: wrap;
+}
+.abar__brand {
+  font-family: var(--serif); font-size: 1.15rem; font-weight: 600;
+  color: #fff; text-decoration: none; white-space: nowrap;
+}
+.abar__brand span { color: var(--terracotta); }
+.abar__nav { display: flex; gap: .3rem; margin-right: auto; }
+.abar__tab {
+  background: none; border: 0; color: #a9b8a0; cursor: pointer;
+  font: inherit; font-size: .88rem; padding: .45rem .8rem; border-radius: 8px;
+}
+.abar__tab:hover { color: #fff; background: rgba(255,255,255,.07); }
+.abar__tab.is-on { color: #fff; background: rgba(255,255,255,.14); }
+.abar__side { display: flex; align-items: center; gap: 1rem; font-size: .85rem; }
+.abar__link, .abar__who { color: #a9b8a0; text-decoration: none; }
+.abar__link:hover { color: #fff; }
+.abar__out {
+  background: none; border: 1px solid rgba(255,255,255,.25); color: #e7ece3;
+  font: inherit; font-size: .82rem; padding: .35rem .8rem; border-radius: 8px; cursor: pointer;
+}
+.abar__out:hover { background: rgba(255,255,255,.1); }
+.abar :focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
+
+/* Full width, because a table of orders has no business being as narrow as
+   a paragraph of prose. */
+.awrap { padding: clamp(1rem, 2.5vw, 1.8rem) clamp(1rem, 3vw, 2rem) 4rem; }
+
+.apanel {
+  background: #fff; border: 1px solid #dfe3db; border-radius: 12px;
+  overflow: auto; margin-bottom: 1.5rem;
+}
+.apanel--empty { padding: 2rem; }
+
+.atable { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.atable th {
+  text-align: left; font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .09em; color: var(--sage); font-weight: 700;
+  padding: .9rem 1rem; border-bottom: 1px solid #e6e9e3; white-space: nowrap;
+}
+.atable td { padding: .85rem 1rem; border-bottom: 1px solid #f0f2ee; vertical-align: top; }
+.atable tbody tr.arow:hover { background: #fafbf9; }
+.atable--num { text-align: right; white-space: nowrap; }
+.atable--act { text-align: right; white-space: nowrap; }
+.arow.is-warn { background: #fdf6ef; }
+.arow.is-warn:hover { background: #fbf0e4; }
+
+.amuted { color: var(--muted); font-size: .82rem; }
+.amono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .72rem; color: var(--muted); margin-top: .15rem;
+}
+
+.abadge {
+  display: inline-block; font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: .2rem .5rem; border-radius: 999px; background: #e6e9e3; color: #4a5544;
+}
+.abadge--paid { background: #dceadb; color: #2f5a2a; }
+.abadge--shipped { background: #dbe6ef; color: #27506f; }
+.abadge--oversold { background: #f6ded0; color: #8a3f14; }
+.abadge--failed, .abadge--created { background: #e9eaec; color: #5c6168; }
+.abadge--done { background: #dceadb; color: #2f5a2a; margin-left: .3rem; }
+
+.abtn {
+  background: #fff; border: 1px solid #d3d8ce; border-radius: 8px;
+  font: inherit; font-size: .8rem; padding: .3rem .7rem; cursor: pointer; color: inherit;
+}
+.abtn:hover { border-color: var(--sage); }
+
+.adetail > td { background: #fafbf9; }
+.adetail__grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.6rem; padding: .4rem 0 .8rem;
+}
+.adetail__grid h4 {
+  font-family: var(--sans); font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .09em; color: var(--sage); margin: 0 0 .5rem;
+}
+.adetail__grid p { margin: 0 0 .5rem; font-size: .86rem; }
+.adetail__items { list-style: none; padding: 0; margin: 0 0 .5rem; font-size: .86rem; }
+.adetail__items li { margin-bottom: .25rem; }
+
+@media (max-width: 720px) {
+  .abar__inner { gap: .8rem; }
+  .abar__nav { order: 3; width: 100%; margin-right: 0; }
+  .atable { font-size: .84rem; }
+  .atable th:nth-child(3), .atable td:nth-child(3) { display: none; }
+  /* Squeezed into 375px the first column wrapped one word per line. A data
+     table is one of the few things worth scrolling sideways for: the panel
+     already scrolls, so give the table a floor and let it. */
+  .atable { min-width: 34rem; }
+  .adetail__grid { padding-right: .5rem; }
+}
