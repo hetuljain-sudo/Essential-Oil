@@ -2065,25 +2065,66 @@ if (adminGate) {
 
   async function loadMessages() {
     const data = await apiGet("/api/admin/messages");
+    /*
+     * The same table as orders, with the message itself in the detail row.
+     *
+     * A contact message is mostly prose, and prose in a table cell makes
+     * every row a different height and the whole thing unreadable. The
+     * subject and who sent it are what you scan; the body is what you open.
+     */
     panel("messages").innerHTML = `
-      <p class="muted small">${data.counts.unhandled} unanswered ·
+      <p class="astat">${data.counts.unhandled} unanswered ·
          ${data.counts.subscribers} newsletter subscribers</p>
       ${data.messages.length
-        ? data.messages.map((m) => `
-          <article class="admin__row${m.handled_at ? " is-done" : ""}">
-            <div class="admin__rowhead">
-              <div>
-                <strong>${esc(m.name)}</strong>
-                <div class="muted small">${date(m.created_at)} · ${esc(m.email)}${
-                  m.subject ? ` · ${esc(m.subject)}` : ""}</div>
-              </div>
-              <button class="btn btn--ghost" data-handled="${esc(m.id)}" data-to="${m.handled_at ? "false" : "true"}">
-                ${m.handled_at ? "Reopen" : "Mark done"}
-              </button>
-            </div>
-            <p>${esc(m.body)}</p>
-          </article>`).join("")
-        : `<p class="muted">Nothing yet.</p>`}`;
+        ? `<div class="apanel">
+            <table class="atable">
+              <thead><tr>
+                <th>From</th><th>Subject</th><th>Received</th><th>Status</th><th></th>
+              </tr></thead>
+              <tbody>${data.messages.map((m) => `
+                <tr class="arow${m.handled_at ? " is-done" : ""}">
+                  <td>
+                    <strong>${esc(m.name)}</strong>
+                    <div class="amuted">${esc(m.email)}</div>
+                  </td>
+                  <td>${m.subject ? esc(m.subject) : `<span class="amuted">(no subject)</span>`}</td>
+                  <td class="amuted">${date(m.created_at)}</td>
+                  <td>${m.handled_at
+                    ? `<span class="abadge abadge--done">done</span>`
+                    : `<span class="abadge abadge--oversold">waiting</span>`}</td>
+                  <td class="atable--act">
+                    <button class="abtn" data-order-detail="msg-${esc(m.id)}"
+                      aria-expanded="false">Read</button>
+                  </td>
+                </tr>
+                <tr class="adetail" data-detail-for="msg-${esc(m.id)}" hidden>
+                  <td colspan="5">
+                    <div class="adetail__grid">
+                      <div class="adetail__body">
+                        <h4>Message</h4>
+                        <p>${esc(m.body)}</p>
+                      </div>
+                      <div>
+                        <h4>Actions</h4>
+                        <p><a class="btn btn--ghost" href="mailto:${esc(m.email)}${
+                          m.subject ? `?subject=${encodeURIComponent("Re: " + m.subject)}` : ""
+                        }">Reply by email</a></p>
+                        <p><button class="btn btn--ghost" data-handled="${esc(m.id)}"
+                          data-to="${m.handled_at ? "false" : "true"}">
+                          ${m.handled_at ? "Reopen" : "Mark done"}
+                        </button></p>
+                        ${m.handled_at
+                          ? `<p class="amuted">Marked done ${date(m.handled_at)}</p>` : ""}
+                        ${m.from_account
+                          ? `<p class="amuted">Sent while logged in.</p>`
+                          : `<p class="amuted">Sent by a visitor who was not logged in.</p>`}
+                      </div>
+                    </div>
+                  </td>
+                </tr>`).join("")}</tbody>
+            </table>
+          </div>`
+        : `<p class="muted apanel apanel--empty">Nothing yet.</p>`}`;
   }
 
   /* Opening an order's detail row. Delegated, because the table is redrawn
@@ -2096,7 +2137,10 @@ if (adminGate) {
     const open = row.hidden;
     row.hidden = !open;
     btn.setAttribute("aria-expanded", String(open));
-    btn.textContent = open ? "Close" : "Details";
+    // "Details" on an order, "Read" on a message: remember whichever the
+    // button started as rather than imposing one word on both.
+    if (!btn.dataset.closed) btn.dataset.closed = btn.textContent.trim();
+    btn.textContent = open ? "Close" : btn.dataset.closed;
   });
 
   /* Recording what was done about an oversold order. It does not refund
@@ -2167,22 +2211,45 @@ if (adminGate) {
 
   async function loadStock() {
     const data = await apiGet("/api/admin/stock");
+    /*
+     * Already a table; now the same table as the other two, with the sku
+     * shown because that is what the spreadsheet and the courier label
+     * carry, and a badge for the two states worth noticing from across the
+     * room.
+     */
     panel("stock").innerHTML = `
-      <p class="muted small">${data.counts.out_of_stock} sold out ·
+      <p class="astat">${data.counts.out_of_stock} sold out ·
          ${data.counts.low} low (5 or fewer)</p>
-      <table class="admin__stock">
-        <thead><tr><th>Oil</th><th>Size</th><th>In stock</th><th></th></tr></thead>
-        <tbody>${data.stock.map((s) => `
-          <tr${s.quantity === 0 ? ' class="is-warn"' : ""}>
-            <td>${esc(s.name)}${s.orphan ? ' <span class="muted small">(not in catalogue)</span>' : ""}</td>
-            <td>${esc(s.size)}</td>
-            <td><form class="admin__qty" data-stock="${esc(s.sku)}">
-              <input type="number" name="quantity" value="${s.quantity}" min="0" max="10000" />
-              <button class="btn btn--ghost" type="submit">Save</button>
-            </form></td>
-            <td class="muted small">${s.updated_at ? date(s.updated_at) : ""}</td>
-          </tr>`).join("")}</tbody>
-      </table>`;
+      <div class="apanel">
+        <table class="atable">
+          <thead><tr>
+            <th>Oil</th><th>Size</th><th>State</th>
+            <th class="atable--num">In stock</th><th>Updated</th>
+          </tr></thead>
+          <tbody>${data.stock.map((s) => `
+            <tr class="arow${s.quantity === 0 ? " is-warn" : ""}">
+              <td>
+                <strong>${esc(s.name)}</strong>${s.orphan
+                  ? ` <span class="amuted">(not in catalogue)</span>` : ""}
+                <div class="amono">${esc(s.sku)}</div>
+              </td>
+              <td class="amuted">${esc(s.size)}</td>
+              <td>${s.quantity === 0
+                ? `<span class="abadge abadge--oversold">sold out</span>`
+                : s.quantity <= 5
+                  ? `<span class="abadge abadge--created">low</span>`
+                  : `<span class="abadge abadge--paid">in stock</span>`}</td>
+              <td class="atable--num">
+                <form class="admin__qty" data-stock="${esc(s.sku)}">
+                  <input type="number" name="quantity" value="${s.quantity}"
+                    min="0" max="10000" aria-label="Quantity of ${esc(s.name)} ${esc(s.size)}" />
+                  <button class="abtn" type="submit">Save</button>
+                </form>
+              </td>
+              <td class="amuted">${s.updated_at ? date(s.updated_at) : ""}</td>
+            </tr>`).join("")}</tbody>
+        </table>
+      </div>`;
   }
 
   const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock };

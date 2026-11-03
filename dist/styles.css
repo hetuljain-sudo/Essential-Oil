@@ -1332,3 +1332,24 @@ body.menu-open .header { z-index: 56; }
   .atable { min-width: 34rem; }
   .adetail__grid { padding-right: .5rem; }
 }
+
+/* The line above each table: counts worth knowing before you read rows. */
+.astat { margin: 0 0 .8rem; font-size: .85rem; color: var(--muted); }
+
+/* A message body is prose and wants the room, unlike the three narrow
+   columns an order's detail splits into. */
+.adetail__body { grid-column: 1 / -1; max-width: 46rem; }
+.adetail__body p { white-space: pre-wrap; }
+
+/* A handled message recedes rather than disappearing — it is still a record
+   of somebody writing in. */
+.arow.is-done td { opacity: .62; }
+
+/* The quantity field sits in a right-aligned numeric column. */
+.admin__qty { display: flex; gap: .4rem; justify-content: flex-end; }
+.admin__qty input {
+  width: 4.5rem; padding: .3rem .5rem; font: inherit; font-size: .85rem;
+  text-align: right; border: 1.5px solid var(--line); border-radius: 8px;
+  background: var(--paper); color: inherit;
+}
+.admin__qty input:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 1px; }
