@@ -1189,14 +1189,20 @@ page("/contact/", layout({
 const authTrail = (label) => [HOME, { label }];
 
 /** The shared chrome for the three narrow account pages. */
-const accountPage = ({ path, title, description, label, body }) =>
+/*
+ * `wide` is for /account/ alone. The narrow container is right for a login
+ * form: one column of short fields, easy to aim at. The account page is four
+ * sections of different shapes, and squeezing them into 34rem gave one long
+ * ladder of giant headings with nothing grouped under any of them.
+ */
+const accountPage = ({ path, title, description, label, body, wide = false }) =>
   page(path, layout({
     path, title, description,
     noindex: true,
     breadcrumb: authTrail(label),
     body: `
     <section class="section section--first">
-      <div class="container container--narrow">
+      <div class="container${wide ? "" : " container--narrow"}">
         ${breadcrumbs(authTrail(label))}
         ${body}
       </div>
@@ -1326,17 +1332,14 @@ accountPage({
 
 accountPage({
   path: "/account/",
+  wide: true,
   title: "Your Account",
   description: "Your Sarvha account: past orders and saved details.",
   label: "Your account",
   body: `
-    <div class="page-head">
-      <p class="eyebrow">Accounts</p>
-      <h1>Your account</h1>
-    </div>
-
-    <!-- Filled by /api/auth/session. Rendered server-side it would be a page that
-         must never be cached, for one small panel of content. -->
+    <!-- Filled by /api/auth/session, title and all: the name in the header
+         comes from the session, so there is nothing to show until it answers.
+         Rendered server-side this would be a page that must never be cached. -->
     <div data-account-panel>
       <p class="muted">Loading your account…</p>
     </div>`,

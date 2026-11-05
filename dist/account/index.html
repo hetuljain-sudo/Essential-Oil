@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=91e64d79" />
+  <link rel="stylesheet" href="/styles.css?v=a583d9e7" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Your account"}]}]}</script>
 </head>
 <body>
@@ -90,18 +90,14 @@
   </header>
   <main id="main">
     <section class="section section--first">
-      <div class="container container--narrow">
+      <div class="container">
         <nav class="crumbs" aria-label="Breadcrumb"><ol>
     <li><a href="/">Home</a></li><li aria-current="page">Your account</li>
   </ol></nav>
         
-    <div class="page-head">
-      <p class="eyebrow">Accounts</p>
-      <h1>Your account</h1>
-    </div>
-
-    <!-- Filled by /api/auth/session. Rendered server-side it would be a page that
-         must never be cached, for one small panel of content. -->
+    <!-- Filled by /api/auth/session, title and all: the name in the header
+         comes from the session, so there is nothing to show until it answers.
+         Rendered server-side this would be a page that must never be cached. -->
     <div data-account-panel>
       <p class="muted">Loading your account…</p>
     </div>
@@ -180,7 +176,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=91e64d79"></script>
-  <script src="/app.js?v=91e64d79"></script>
+  <script src="/catalog.js?v=a583d9e7"></script>
+  <script src="/app.js?v=a583d9e7"></script>
 </body>
 </html>

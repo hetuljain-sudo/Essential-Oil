@@ -1451,84 +1451,120 @@ if (accountPanel) {
 
       if (!data.customer) {
         accountPanel.innerHTML = `
+          <header class="acct__head"><div>
+            <p class="eyebrow">Your account</p>
+            <h1>Your account</h1>
+          </div></header>
           <p>You're not logged in.</p>
           <p class="muted"><a class="btn btn--primary" href="/account/login/">Log in</a></p>`;
         return;
       }
 
       const orders = data.orders ?? [];
+      const addr = data.customer.address ?? {};
+
+      /*
+       * Panels, not a ladder of headings.
+       *
+       * This was four `<h2>`s at the page's full serif heading size stacked
+       * down a 34rem column — orders, details, address, password — each
+       * shouting as loudly as the page title, with nothing drawing a boundary
+       * around what belonged to which. Now each section is a bordered card
+       * with a small quiet label, and they sit two-up when there is room.
+       */
       accountPanel.innerHTML = `
-        <p>Signed in as <strong>${esc(data.customer.name)}</strong> — ${esc(data.customer.email)}</p>
-        <h2>Your orders</h2>
-        ${orders.length
-          ? `<ul class="account__orders">${orders.map((o) => `
-              <li class="account__order">
-                <div>
-                  <strong>${new Date(o.created_at).toLocaleDateString("en-IN",
-                    { day: "numeric", month: "long", year: "numeric" })}</strong>
-                  <ul>${o.items.map((i) =>
-                    `<li>${esc(i.name)} ${esc(i.size)} × ${i.qty}</li>`).join("")}</ul>
-                  ${orderStatus(o)}
-                </div>
-                <strong>${money(o.total_paise / 100)}</strong>
-              </li>`).join("")}</ul>`
-          : `<p class="muted">Nothing yet. <a href="/shop/">Have a look around</a>.</p>`}
-        <h2>Your details</h2>
-        <form class="account__form" data-account-form="profile">
-          <label>Name
-            <input name="name" type="text" required minlength="2"
-              value="${esc(data.customer.name)}" />
-          </label>
-          <label>Mobile
-            <input name="phone" type="tel" placeholder="Optional"
-              value="${esc(data.customer.phone ?? "")}" />
-          </label>
-          <p class="account__fixed">Email: ${esc(data.customer.email)}
-            <span class="muted">— get in touch if this needs changing.</span></p>
-          <button class="btn btn--ghost" type="submit">Save details</button>
-        </form>
+        <header class="acct__head">
+          <div>
+            <p class="eyebrow">Your account</p>
+            <h1>${esc(data.customer.name)}</h1>
+            <p class="acct__email">${esc(data.customer.email)}</p>
+          </div>
+          <button class="btn btn--ghost" data-logout>Log out</button>
+        </header>
 
-        <h2>Delivery address</h2>
-        <form class="account__form" data-account-form="address">
-          <label>Address
-            <input name="line1" type="text" required
-              value="${esc(data.customer.address?.line1 ?? "")}" />
-          </label>
-          <label>Address line 2
-            <input name="line2" type="text" placeholder="Optional"
-              value="${esc(data.customer.address?.line2 ?? "")}" />
-          </label>
-          <label>City
-            <input name="city" type="text" required
-              value="${esc(data.customer.address?.city ?? "")}" />
-          </label>
-          <label>State
-            <input name="state" type="text" required
-              value="${esc(data.customer.address?.state ?? "")}" />
-          </label>
-          <label>PIN code
-            <input name="postcode" type="text" inputmode="numeric" required
-              value="${esc(data.customer.address?.postcode ?? "")}" />
-          </label>
-          <button class="btn btn--ghost" type="submit">Save address</button>
-        </form>
+        <div class="acct__grid">
+          <section class="acct__card acct__card--wide">
+            <h2>Your orders</h2>
+            ${orders.length
+              ? `<ul class="account__orders">${orders.map((o) => `
+                  <li class="account__order">
+                    <div>
+                      <strong>${new Date(o.created_at).toLocaleDateString("en-IN",
+                        { day: "numeric", month: "long", year: "numeric" })}</strong>
+                      <ul>${o.items.map((i) =>
+                        `<li>${esc(i.name)} ${esc(i.size)} × ${i.qty}</li>`).join("")}</ul>
+                      ${orderStatus(o)}
+                    </div>
+                    <strong>${money(o.total_paise / 100)}</strong>
+                  </li>`).join("")}</ul>`
+              : `<p class="muted">Nothing yet. <a href="/shop/">Have a look around</a>.</p>`}
+          </section>
 
-        <h2>Password</h2>
-        <form class="account__form" data-account-form="password">
-          <label>Current password
-            <input name="current" type="password" required autocomplete="current-password" />
-          </label>
-          <label>New password
-            <input name="next" type="password" required minlength="10"
-              autocomplete="new-password" />
-          </label>
-          <p class="muted small">Changing it signs you out everywhere else, but not here.</p>
-          <button class="btn btn--ghost" type="submit">Change password</button>
-        </form>
+          <section class="acct__card">
+            <h2>Your details</h2>
+            <form class="account__form" data-account-form="profile">
+              <label>Name
+                <input name="name" type="text" required minlength="2"
+                  value="${esc(data.customer.name)}" />
+              </label>
+              <label>Mobile
+                <input name="phone" type="tel" placeholder="Optional"
+                  value="${esc(data.customer.phone ?? "")}" />
+              </label>
+              <p class="account__fixed">Email: ${esc(data.customer.email)}
+                <span class="muted">— get in touch if this needs changing.</span></p>
+              <button class="btn btn--ghost" type="submit">Save details</button>
+            </form>
+          </section>
 
-        <p class="muted"><button class="btn btn--ghost" data-logout>Log out</button></p>`;
+          <section class="acct__card">
+            <h2>Delivery address</h2>
+            <form class="account__form" data-account-form="address">
+              <label>Address
+                <input name="line1" type="text" required value="${esc(addr.line1 ?? "")}" />
+              </label>
+              <label>Address line 2
+                <input name="line2" type="text" placeholder="Optional"
+                  value="${esc(addr.line2 ?? "")}" />
+              </label>
+              <div class="acct__pair">
+                <label>City
+                  <input name="city" type="text" required value="${esc(addr.city ?? "")}" />
+                </label>
+                <label>PIN code
+                  <input name="postcode" type="text" inputmode="numeric" required
+                    value="${esc(addr.postcode ?? "")}" />
+                </label>
+              </div>
+              <label>State
+                <input name="state" type="text" required value="${esc(addr.state ?? "")}" />
+              </label>
+              <button class="btn btn--ghost" type="submit">Save address</button>
+            </form>
+          </section>
+
+          <section class="acct__card">
+            <h2>Password</h2>
+            <form class="account__form" data-account-form="password">
+              <label>Current password
+                <input name="current" type="password" required autocomplete="current-password" />
+              </label>
+              <label>New password
+                <input name="next" type="password" required minlength="10"
+                  autocomplete="new-password" />
+              </label>
+              <p class="muted small">At least ten characters. Changing it signs you
+                 out everywhere else, but not here.</p>
+              <button class="btn btn--ghost" type="submit">Change password</button>
+            </form>
+          </section>
+        </div>`;
     } catch (err) {
       accountPanel.innerHTML = `
+        <header class="acct__head"><div>
+          <p class="eyebrow">Your account</p>
+          <h1>Your account</h1>
+        </div></header>
         <p class="muted">${esc(apiMessage(err))}</p>
         <p><a class="btn btn--ghost" href="/shop/">Browse the oils</a></p>`;
     }

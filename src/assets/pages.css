@@ -695,6 +695,49 @@ body.menu-open .header { z-index: 56; }
 
 /* Account editing. Narrow on purpose: these are short fields, and a name
    box the full width of a desktop page reads as a mistake. */
+.acct__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.acct__head h1 { margin: 2px 0 0; font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.acct__email { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+
+/* Two columns once there is room for two forms side by side; orders span
+   both, because a line of items plus a total is a wide thing. */
+.acct__grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  align-items: start;
+}
+.acct__card {
+  padding: 20px 22px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.acct__card--wide { grid-column: 1 / -1; }
+/* Small and quiet: the card's border already says where the section starts,
+   so the label does not also have to be the size of the page title. */
+.acct__card h2 {
+  margin: 0 0 14px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.acct__card .account__form { max-width: none; margin: 0; }
+.acct__pair { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 420px) { .acct__pair { grid-template-columns: 1fr; } }
+
 .account__form { max-width: 26rem; margin: 0 0 2.5rem; }
 .account__form label {
   display: block; margin-bottom: .9rem;
