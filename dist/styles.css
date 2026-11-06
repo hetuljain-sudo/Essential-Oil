@@ -1360,6 +1360,17 @@ body.menu-open .header { z-index: 56; }
   font-size: .95em; color: var(--ink); overflow-wrap: anywhere;
 }
 
+/* What is in a set, on its product page. */
+.pdp__contains { list-style: none; margin: 1.2rem 0; padding: 0; border-top: 1px solid var(--line); }
+.pdp__contains li {
+  display: grid; grid-template-columns: 1fr auto; gap: .2rem 1rem;
+  align-items: baseline; padding: .7rem 0; border-bottom: 1px solid var(--line);
+}
+.pdp__contains a { font-weight: 600; text-decoration: none; }
+.pdp__contains a:hover { color: var(--terracotta-text); }
+.pdp__contains em { grid-column: 1; font-size: .85rem; color: var(--muted); }
+.pdp__contains span { grid-row: 1; grid-column: 2; font-size: .85rem; color: var(--muted); }
+
 .acct__head {
   display: flex;
   flex-wrap: wrap;

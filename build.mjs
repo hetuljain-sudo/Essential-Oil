@@ -149,10 +149,12 @@ const shippingDetails = [
 
 
 const isCarrier = (p) => !!p.carrier;
-const oilWord = (p) => (isCarrier(p) ? "Carrier Oil" : "Essential Oil");
+const isSet = (p) => p.kind === "set";
+const oilWord = (p) => (isSet(p) ? "Gift Set" : isCarrier(p) ? "Carrier Oil" : "Essential Oil");
 
 /** A product title people actually search: name, what it is, sizes, brand. */
 function productTitle(p) {
+  if (isSet(p)) return `${p.name} — ${p.contains.length} Oils`;
   const base = /oil$/i.test(p.name) ? p.name : `${p.name} ${oilWord(p)}`;
   const sizes = p.variants.map((v) => v.size).join(" & ");
   const withSizes = `${base} — ${sizes}`;
@@ -160,6 +162,13 @@ function productTitle(p) {
 }
 
 function productDescription(p) {
+  // A set has no botanical name and one notional size, so the oil sentence
+  // reads "(undefined) ... in Set" for it. It gets its own.
+  if (isSet(p)) {
+    const names = p.contains.map((c) => c.name).join(", ");
+    return `${p.name} from Sarvha: ${names}, boxed together and priced below buying them apart. ` +
+      `100% pure and undiluted. Free shipping over ${money(site.freeShippingAt)}.`;
+  }
   const sizes = p.variants.map((v) => v.size).join(" and ");
   return `Buy ${p.name} ${isCarrier(p) ? "carrier oil" : "essential oil"} (${p.botanical}) online in India. ` +
     `${p.tagline} 100% pure and undiluted, in ${sizes}. Free shipping over ${money(site.freeShippingAt)}.`;
@@ -459,14 +468,16 @@ for (const c of categories) {
   const catTrail = [HOME, { href: "/collections/", label: "Collections" }, { label: c.label }];
   page(categoryUrl(c), layout({
     path: categoryUrl(c),
-    title: `${c.label} Essential Oils — Buy Online`,
+    title: c.id === "sets"
+      ? "Essential Oil Gift Sets — Buy Online"
+      : `${c.label} Essential Oils — Buy Online`,
     description: `${c.blurb} ${items.length} oils for ${c.label.toLowerCase()} from ${site.name}, 100% pure and shipped across India. ${c.intro}`,
     breadcrumb: catTrail,
-    ogImage: items.find((x) => x.image) ? { src: items.find((x) => x.image).image.src, alt: `${c.label} essential oils` } : defaultOg,
+    ogImage: items.find((x) => x.image) ? { src: items.find((x) => x.image).image.src, alt: c.id === "sets" ? "Essential oil sets" : `${c.label} essential oils` } : defaultOg,
     jsonLd: [
       {
         "@type": "CollectionPage",
-        name: `${c.label} essential oils`,
+        name: c.id === "sets" ? "Essential oil sets" : `${c.label} essential oils`,
         description: c.intro,
         url: site.url + categoryUrl(c),
         isPartOf: { "@id": site.url + "/#website" },
@@ -492,7 +503,7 @@ for (const c of categories) {
           <div class="page-head page-head--coll" style="--tint:${c.color}">
             <span class="coll__icon coll__icon--lg" aria-hidden="true">${c.icon}</span>
             <p class="eyebrow">Collection</p>
-            <h1>${c.label} essential oils</h1>
+            <h1>${c.id === "sets" ? "Essential oil sets" : `${c.label} essential oils`}</h1>
             <p class="lead">${esc(hub.lede || c.intro)}</p>
             <dl class="coll-facts">
               <div><dt>Oils</dt><dd>${items.length}</dd></div>
@@ -547,7 +558,7 @@ for (const c of categories) {
                 <tbody>
                   ${items.map((p) => `<tr>
                     <td><a href="${productUrl(p)}">${esc(p.name)}</a></td>
-                    <td><em>${esc(p.botanical)}</em></td>
+                    <td><em>${p.botanical ? esc(p.botanical) : `${p.contains.length} oils`}</em></td>
                     <td>${esc(p.notes.join(", "))}</td>
                     <td>${p.variants.map((v) => v.size).join(", ")}</td>
                     <td>${money(fromPrice(p))}</td>
@@ -693,11 +704,20 @@ ${breadcrumbs(trail)}
             <div class="pdp__info">
               <p class="eyebrow"><a href="${categoryUrl(cat)}">${cat.label}</a></p>
               <h1>${esc(p.name)}</h1>
-              <p class="latin">${esc(p.botanical)}</p>
+              ${p.botanical ? `<p class="latin">${esc(p.botanical)}</p>` : ""}
               <p class="pdp__tagline">${esc(p.tagline)}</p>
               <p class="pdp__desc">${esc(p.desc)}</p>
 
-              <div class="tags">${p.notes.map((n) => `<span class="tag">${esc(n)}</span>`).join("")}</div>
+              ${isSet(p) ? `
+              <ul class="pdp__contains">
+                ${p.contains.map((c) => `
+                  <li>
+                    <a href="${c.url}">${esc(c.name)}</a>
+                    <em>${esc(c.botanical)}</em>
+                    <span>${esc(c.size)}</span>
+                  </li>`).join("")}
+              </ul>`
+              : `<div class="tags">${p.notes.map((n) => `<span class="tag">${esc(n)}</span>`).join("")}</div>`}
 
               ${multi ? `
               <fieldset class="sizes">
@@ -711,7 +731,9 @@ ${breadcrumbs(trail)}
                       ? money(x.price) + (saleOn(x) ? ` <s class="price__was">${money(saleOn(x).was)}</s>` : "")
                       : "Sold out"}</span>
                   </label>`).join("")}
-              </fieldset>` : `<p class="pdp__single">${v.size} bottle</p>`}
+              </fieldset>` : `<p class="pdp__single">${isSet(p)
+                ? `One box · ${p.contains.length} bottles`
+                : `${esc(v.size)} bottle`}</p>`}
 
               <div class="pdp__buy">
                 <div class="qty qty--lg">
@@ -858,7 +880,7 @@ function derivedTable(kind) {
       .sort((a, b) => a.safety.phototoxic - b.safety.phototoxic)
       .map((p) => `<tr>
         <td>${oilLink(p)}</td>
-        <td><em>${esc(p.botanical)}</em></td>
+        <td><em>${p.botanical ? esc(p.botanical) : `${p.contains.length} oils`}</em></td>
         <td>${esc(p.method)}</td>
         <td><strong>${p.safety.phototoxic}%</strong></td>
       </tr>`);
@@ -891,7 +913,7 @@ function derivedTable(kind) {
   // pregnancy | children | pets | nutAllergy
   const rows = flagged(kind).map((p) => `<tr>
     <td>${oilLink(p)}</td>
-    <td><em>${esc(p.botanical)}</em></td>
+    <td><em>${p.botanical ? esc(p.botanical) : `${p.contains.length} oils`}</em></td>
     <td>${esc(categoryOf(p.category).label)}</td>
     ${kind === "pregnancy" && p.safety.conditions
       ? `<td>Also avoid with ${esc(p.safety.conditions.join(", "))}</td>`
@@ -1593,7 +1615,10 @@ const catalog = {
     };
   }),
   products: products.map((p) => ({
-    id: p.id, name: p.name, short: p.short || null, botanical: p.botanical, category: p.category,
+    id: p.id, name: p.name, short: p.short || null, botanical: p.botanical || null, category: p.category,
+    // The grid re-renders client-side on every filter and sort, so a set's
+    // card needs the one fact that stands in for a species: how many bottles.
+    contains: p.contains ? p.contains.map((c) => ({ name: c.name, size: c.size })) : null,
     tagline: p.tagline, notes: p.notes, featured: !!p.featured, badge: p.badge || null,
     bg: p.bg, swatch: p.swatch, url: productUrl(p),
     image: p.image || null,

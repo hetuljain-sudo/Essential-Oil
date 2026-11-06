@@ -88,7 +88,7 @@ These are in order. Nothing below this section matters until these are done.
 | **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
 | **No discount codes** | Nothing in the backend can issue, store or redeem one. The newsletter band used to offer 10% off a first order and the copy was already changed to what the list actually is, so nothing unhonourable is being advertised — but a shop with no mechanism for a code has no lever for a festival sale either. |
 | **No "notify me when back in stock"** | Sold-out variants are a dead end. |
-| **No gift options, sets or bundles** | Essential oils sell heavily as gift sets, especially around festivals. |
+| **Gift sets** | Four added 6 November: Sleep & Unwind, Bright Mornings, Seasonal Care and the Carrier Oil Duo, each priced 9–11% under its parts. Each is a product with its own SKU and stock, so it is a box you assemble and count. No photographs of the boxes yet. |
 | **Cart does not survive a device change** | `localStorage` only, not tied to the account. |
 | **Colour contrast** | Fixed 6 November: sage and terracotta as small text measured 3.1:1 and 4.2:1 against WCAG AA's 4.5:1, and white on the terracotta newsletter band measured 4.3:1. Darker text variants of both hues now carry the words; the brand colours still carry the decoration. |
 | **No analytics at all** | You cannot see what sells, where people drop out, or whether anyone arrives. |

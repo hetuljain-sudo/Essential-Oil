@@ -266,7 +266,11 @@ const state = { filter: "all", sort: "featured", query: "" };
 
 function matchesQuery(p, q) {
   if (!q) return true;
-  const hay = [p.name, p.botanical, p.tagline, p.notes.join(" "), catLabel(p.category)].join(" ").toLowerCase();
+  // ?? "" because a set has no botanical name, and [a, undefined].join(" ")
+  // puts the literal word "undefined" in the haystack — which then matches a
+  // search for it.
+  const hay = [p.name, p.botanical ?? "", p.tagline, p.notes.join(" "), catLabel(p.category)]
+    .join(" ").toLowerCase();
   return q.toLowerCase().split(/\s+/).filter(Boolean).every((t) => hay.includes(t));
 }
 
@@ -304,7 +308,9 @@ function productCard(p, i = 99) {
     <div class="card__body">
       <span class="card__meta">${catLabel(p.category)} · ${p.variants.map((x) => x.size).join(" / ")}</span>
       <h3 class="card__title"><a href="${p.url}">${esc(p.name)}</a></h3>
-      <p class="card__latin">${esc(p.botanical)}</p>
+      <p class="card__latin">${p.botanical
+        ? esc(p.botanical)
+        : (p.contains ? `${p.contains.length} oils` : "")}</p>
       <p class="card__desc">${esc(p.tagline)}</p>
       ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">
