@@ -83,10 +83,10 @@ These are in order. Nothing below this section matters until these are done.
 | Gap | Why it matters |
 | --- | --- |
 | **Real product photography** | All 50 images are Unsplash stock. Generic photos are the clearest signal to a shopper that a shop is not real. The single highest-value thing you can do that needs no code. |
-| **Guides are empty** | 6 guide pages exist, all `draft: true`, 0 live. `/guides/` tells visitors "we're writing them now". Either write 2–3 or stop advertising the section. |
+| **Guides are written but shelved** | All 6 are finished drafts (240–540 words each, with safety tables generated from the catalogue), every one `draft: true`, 0 live. `/guides/` tells visitors "we're writing them now" while the writing is done. Publishing is deleting one line per guide — what it needs is a read-through, not an author. |
 | **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
 | **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
-| **No discount codes** | The homepage offers 10% off a first order. Nothing in the backend can issue, store or redeem a code. The site is currently advertising something it cannot honour. |
+| **No discount codes** | Nothing in the backend can issue, store or redeem one. The newsletter band used to offer 10% off a first order and the copy was already changed to what the list actually is, so nothing unhonourable is being advertised — but a shop with no mechanism for a code has no lever for a festival sale either. |
 | **No "notify me when back in stock"** | Sold-out variants are a dead end. |
 | **No gift options, sets or bundles** | Essential oils sell heavily as gift sets, especially around festivals. |
 | **Cart does not survive a device change** | `localStorage` only, not tied to the account. |
@@ -131,13 +131,19 @@ These are in order. Nothing below this section matters until these are done.
 
 **Then, to be a complete shop:**
 
-10. Discount codes (or withdraw the 10% offer).
+10. Discount codes — the offer is already withdrawn, so this is about having
+    the lever, not repairing a promise.
 11. Unsubscribe endpoint, before any marketing email.
 12. GST invoices.
 13. Analytics.
 14. Back-in-stock notifications, gift sets, wishlist.
 
 ---
+
+**Two claims in the first version of this file were wrong**, found by
+checking rather than remembering: the policy TODOs number 23, not 18, and
+the 10% newsletter offer had already been withdrawn. Both are corrected
+above.
 
 *Written against commit `b32eaf0`. 93 tests passing, SEO audit clean,
 `dist/` builds deterministically.*
