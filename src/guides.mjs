@@ -3,10 +3,9 @@
  *
  * `draft: true` keeps a guide in this file and out of the site: it is not
  * built, not linked and not in the sitemap, but nothing about it is lost.
- * Four are published. The phototoxicity and pregnancy pages are shelved at
- * the owner's request, pending their own read: they are the two where being
- * wrong costs a reader something real, and that call is not ours. Nothing
- * about them is lost, and publishing is deleting one line.
+ * All six are shelved at the owner's request, so /guides/ falls back to its
+ * empty state. Nothing is lost: the prose, the tables and the metadata all
+ * stay here, and publishing any of them is deleting one line.
  *
  * The index page, the nav item and the footer links all follow from
  * `liveGuides` below rather than being written out by hand.
@@ -31,6 +30,7 @@
 
 export const guidePages = [
   {
+    draft: true,
     slug: "dilution-chart",
     title: "Essential Oil Dilution Chart",
     nav: "Dilution chart",
@@ -127,6 +127,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "how-to-use-a-diffuser",
     title: "How to Use an Essential Oil Diffuser",
     nav: "Using a diffuser",
@@ -165,6 +166,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "why-we-dont-say-therapeutic-grade",
     title: "Why we won't say \"therapeutic grade\"",
     nav: "Therapeutic grade",
@@ -191,6 +193,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "how-to-read-an-essential-oil-label",
     title: "How to read an essential oil label",
     nav: "Reading a label",
