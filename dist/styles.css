@@ -16,6 +16,23 @@
  * latin-ext is not optional despite the name: the rupee sign lives at U+20B9,
  * inside its U+20AD-20C4 range. Dropping it would leave every price on the
  * site rendering ₹ in a fallback face.
+ *
+ * So it is kept, but cut down. Google's latin-ext files carry some 1,200
+ * glyphs for European languages this site does not print, and the browser was
+ * fetching 83 KB of Inter three times over — 166 KB on a typical page — to
+ * draw one currency symbol. Every HTML file in dist/ was scanned for
+ * characters in the latin-ext ranges: there is exactly one, U+20B9, on 77 of
+ * 78 pages.
+ *
+ * These six files are therefore subsetted to U+20A0-20C4, the currency block,
+ * which keeps every currency symbol in case one is ever shown and costs about
+ * 8 KB instead of 83. Regenerate with: pip install fonttools brotli, then
+ * pyftsubset <file> --unicodes=U+20A0-20C4 --flavor=woff2.
+ *
+ * The trade: a stray accented character outside this block — in a customer's
+ * name on the account page, say — now renders in the browser's fallback face
+ * rather than in Inter. At one character inside a line of text that is close
+ * to invisible, and it buys back 166 KB on every page on a mobile connection.
  */
 @font-face {
   font-family: 'Cormorant Garamond';
@@ -23,7 +40,7 @@
   font-weight: 500;
   font-display: swap;
   src: url(/fonts/cormorant-garamond-500-italic-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+20A0-20C4;
 }
 @font-face {
   font-family: 'Cormorant Garamond';
@@ -39,7 +56,7 @@
   font-weight: 500;
   font-display: swap;
   src: url(/fonts/cormorant-garamond-500-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+20A0-20C4;
 }
 @font-face {
   font-family: 'Cormorant Garamond';
@@ -55,7 +72,7 @@
   font-weight: 600;
   font-display: swap;
   src: url(/fonts/cormorant-garamond-600-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+20A0-20C4;
 }
 @font-face {
   font-family: 'Cormorant Garamond';
@@ -71,7 +88,7 @@
   font-weight: 400;
   font-display: swap;
   src: url(/fonts/inter-400-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+20A0-20C4;
 }
 @font-face {
   font-family: 'Inter';
@@ -87,7 +104,7 @@
   font-weight: 500;
   font-display: swap;
   src: url(/fonts/inter-500-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+20A0-20C4;
 }
 @font-face {
   font-family: 'Inter';
@@ -103,7 +120,7 @@
   font-weight: 600;
   font-display: swap;
   src: url(/fonts/inter-600-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+20A0-20C4;
 }
 @font-face {
   font-family: 'Inter';
