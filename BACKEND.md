@@ -38,6 +38,7 @@ Other scripts, none of which deploy:
 npm run db:setup    apply db/schema.sql
 npm run db:check    what is configured, what is missing, what is owed
 npm run smoke       exercise the database paths against a real database
+npm run db:export   a copy of everything, into backups/<timestamp>/
 npm run demo        realistic test orders · --remove to clear them
 ```
 

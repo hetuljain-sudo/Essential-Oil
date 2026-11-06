@@ -104,7 +104,7 @@ These are in order. Nothing below this section matters until these are done.
 | **No shipping integration** | Flat ₹79 under ₹999, typed by hand. No courier, no label, no pincode serviceability check, no delivery estimate. |
 | **Stock is not reserved at checkout** | Deliberate and documented — the second buyer of the last bottle gets `oversold` and a human deals with it. Fine at low volume, a problem at higher. |
 | **One address per customer** | Overwritten each checkout. No chooser. |
-| **No backups** | Neon's free tier retention is what you have. No export runs anywhere. |
+| **Backups are manual** | `npm run db:export` writes a full copy to `backups/<timestamp>/` — added 6 November. Nothing runs it on a schedule, so it is only as good as the last time somebody typed it. |
 | **No error monitoring** | A function that starts throwing in production tells nobody. |
 
 ---
