@@ -83,7 +83,7 @@ These are in order. Nothing below this section matters until these are done.
 | Gap | Why it matters |
 | --- | --- |
 | **Real product photography** | All 50 images are Unsplash stock. Generic photos are the clearest signal to a shopper that a shop is not real. The single highest-value thing you can do that needs no code. |
-| **Guides are written but shelved** | All 6 are finished drafts (240–540 words each, with safety tables generated from the catalogue), every one `draft: true`, 0 live. `/guides/` tells visitors "we're writing them now" while the writing is done. Publishing is deleting one line per guide — what it needs is a read-through, not an author. |
+| **Guides** | Published 6 November: all six are live, linked and in the sitemap. |
 | **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
 | **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
 | **No discount codes** | Nothing in the backend can issue, store or redeem one. The newsletter band used to offer 10% off a first order and the copy was already changed to what the list actually is, so nothing unhonourable is being advertised — but a shop with no mechanism for a code has no lever for a festival sale either. |
@@ -116,7 +116,7 @@ These are in order. Nothing below this section matters until these are done.
 
 1. Real product photography (or at minimum, consistent, honest photos of the
    actual bottles).
-2. Write 2–3 guides, or remove the promise from `/guides/`.
+2. ~~Write 2–3 guides~~ — all six published 6 November.
 3. ~~Show the tracking reference to the customer~~ — done 6 November.
 4. ~~Fix `BACKEND.md`~~ — done 6 November.
 5. ~~Resolve the FAQ/code disagreement about shipping~~ — done 6 November.

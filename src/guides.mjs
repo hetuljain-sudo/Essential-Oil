@@ -3,10 +3,10 @@
  *
  * `draft: true` keeps a guide in this file and out of the site: it is not
  * built, not linked and not in the sitemap, but nothing about it is lost.
- * Every guide is currently shelved that way. Publishing one again is a
- * matter of deleting its `draft: true` — the index page, the nav item and
- * the footer links all come back on their own, because they are derived
- * from `liveGuides` below rather than written out by hand.
+ * All six are published as of 6 November 2026. Shelving one again is a
+ * matter of adding `draft: true` back — the index page, the nav item and
+ * the footer links all follow on their own, because they are derived from
+ * `liveGuides` below rather than written out by hand.
  */
 
 /**
@@ -28,7 +28,6 @@
 
 export const guidePages = [
   {
-    draft: true,
     slug: "dilution-chart",
     title: "Essential Oil Dilution Chart",
     nav: "Dilution chart",
@@ -62,7 +61,6 @@ export const guidePages = [
   },
 
   {
-    draft: true,
     slug: "phototoxic-oils",
     title: "Which Essential Oils Are Phototoxic",
     nav: "Phototoxic oils",
@@ -94,7 +92,6 @@ export const guidePages = [
   },
 
   {
-    draft: true,
     slug: "essential-oils-and-pregnancy",
     title: "Essential Oils to Avoid in Pregnancy",
     nav: "Pregnancy & children",
@@ -125,7 +122,6 @@ export const guidePages = [
   },
 
   {
-    draft: true,
     slug: "how-to-use-a-diffuser",
     title: "How to Use an Essential Oil Diffuser",
     nav: "Using a diffuser",
@@ -164,12 +160,11 @@ export const guidePages = [
   },
 
   {
-    draft: true,
     slug: "why-we-dont-say-therapeutic-grade",
     title: "Why we won't say \"therapeutic grade\"",
     nav: "Therapeutic grade",
     excerpt: "It appears on bottles everywhere and it means nothing. No body awards it, no standard defines it, and no test can confirm it. Here is what to look for instead.",
-    description: "It appears on bottles everywhere and it means nothing. No body awards it, no standard defines it, and no test can confirm it. Here is what to look for inst",
+    description: "Therapeutic grade is awarded by nobody, defined by no standard and confirmed by no test. What to look at on a label instead.",
     updated: "2026-10-26",
     body: [
       ["p","Walk down any aisle selling essential oils and you will see the same phrase on half the bottles: therapeutic grade. Sometimes certified therapeutic grade. Occasionally, with real confidence, clinical grade."],
@@ -191,7 +186,6 @@ export const guidePages = [
   },
 
   {
-    draft: true,
     slug: "how-to-read-an-essential-oil-label",
     title: "How to read an essential oil label",
     nav: "Reading a label",
