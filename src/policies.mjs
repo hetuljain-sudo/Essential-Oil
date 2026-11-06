@@ -417,13 +417,11 @@ export const policies = [
           ["p",
             `Free on orders of ₹${site.freeShippingAt} and over. Below that, a flat ` +
             `₹${site.shippingFlat} is added at checkout, wherever in India you are.`],
-          ["todo",
-            "CONFLICT — resolve before publishing. The FAQ says charges below " +
-            "₹999 are 'calculated at checkout based on your location'. The code " +
-            "charges a flat ₹79 regardless of location. This page states the flat " +
-            "fee, because that is what the checkout actually does. Either change " +
-            "the FAQ to match, or change the code to charge by location — but " +
-            "the two cannot keep disagreeing once customers can read both."],
+          // The FAQ used to say charges below ₹999 were "calculated at
+          // checkout based on your location" while the code charged a flat
+          // fee anywhere. The FAQ now states the flat fee, so all three —
+          // this page, the FAQ and priceCart() — say the same thing, and the
+          // notice that used to stand here has nothing left to warn about.
           ["todo",
             "Confirm ₹79 is the fee you want. It was chosen as a placeholder so " +
             "a total could be calculated; it has never been a decision."],

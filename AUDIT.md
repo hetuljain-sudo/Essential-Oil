@@ -51,8 +51,9 @@ every request and answers 404 rather than 403.
 
 These are in order. Nothing below this section matters until these are done.
 
-1. **18 unfinished policy TODOs** — 4 in privacy, 4 in terms, 6 in refunds,
-   4 in shipping. Legal entity, GST status, returns window, whether opened
+1. **23 unfinished policy TODOs** — 5 in privacy, 5 in terms, 8 in refunds,
+   5 in shipping. (An earlier draft of this file said 18; that count was
+   taken by lines rather than by boxes and was wrong.) Legal entity, GST status, returns window, whether opened
    bottles come back, refund timeline, courier, grievance officer. They
    render as yellow boxes on the live pages right now. Razorpay will not
    approve the account without them, and two are legal requirements in India.
@@ -117,9 +118,9 @@ These are in order. Nothing below this section matters until these are done.
 2. Write 2–3 guides, or remove the promise from `/guides/`.
 3. ~~Show the tracking reference to the customer~~ — done 6 November.
 4. ~~Fix `BACKEND.md`~~ — done 6 November.
-5. Resolve the FAQ/code disagreement about shipping — the FAQ says charges are
-   "calculated at checkout based on your location"; the code charges a flat
-   ₹79 anywhere.
+5. ~~Resolve the FAQ/code disagreement about shipping~~ — done 6 November.
+   The FAQ had in fact already been corrected; what was left was a stale
+   CONFLICT notice published on `/shipping/`.
 
 **Needs the business registration you're already doing:**
 

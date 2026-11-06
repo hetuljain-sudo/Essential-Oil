@@ -238,7 +238,7 @@ const drawerAndModal = `
     <div class="drawer__items" data-cart-items></div>
     <div class="drawer__foot">
       <div class="drawer__row"><span>Subtotal</span><strong data-subtotal></strong></div>
-      <p class="muted small">Taxes and shipping calculated at checkout.</p>
+      <p class="muted small">Shipping is free over ${money(site.freeShippingAt)}, otherwise ${money(site.shippingFlat)}. Calculated at checkout.</p>
       <button class="btn btn--primary btn--block" data-checkout>Checkout</button>
     </div>
   </aside>

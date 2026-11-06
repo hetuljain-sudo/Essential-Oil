@@ -261,10 +261,12 @@ abandoned carts hold inventory hostage, which at this volume is the more
 common and more costly failure. If orders start colliding, add a reservation
 with an expiry.
 
-**The FAQ and the code disagree about shipping.** The FAQ says charges below
-₹999 are "calculated at checkout based on your location"; `priceCart` charges
-a flat ₹79 anywhere in India. The new shipping policy states the flat fee,
-because that is what the checkout does. One of the two has to change.
+**The shipping fee is a placeholder, not a decision.** `site.shippingFlat`
+is ₹79 below the ₹999 free-shipping threshold. The FAQ, the shipping policy,
+the cart drawer and `priceCart()` all now say the same thing — they disagreed
+once, and the FAQ claimed charges were "calculated at checkout based on your
+location" while the code charged a flat fee anywhere — but what they agree on
+has still never been chosen by anyone.
 
 **"Sign out everywhere" is the password change.** Changing a password from
 `/account/` ends every other session and keeps the current browser's. There
@@ -304,7 +306,7 @@ These are not optional, and two of them are legal requirements in India:
 
 - **Policy pages — written, but not finished.** `/privacy/`, `/terms/`,
   `/refunds/` and `/shipping/` exist, are linked from the footer and from
-  checkout, and are in the sitemap. They carry **18 visible `TODO` blocks**
+  checkout, and are in the sitemap. They carry **23 visible `TODO` blocks**
   for facts nobody has stated yet: legal entity, GST status, returns window,
   whether opened bottles come back, refund timeline, courier, grievance
   officer. Each renders on the page in a yellow box, so publishing them
