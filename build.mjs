@@ -42,7 +42,7 @@ const dist = join(root, "dist");
 {
   const { createHash } = await import("node:crypto");
   const sources = [
-    "src/assets/styles.css", "src/assets/pages.css",
+    "src/assets/fonts.css", "src/assets/styles.css", "src/assets/pages.css",
     "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
@@ -1617,11 +1617,22 @@ for (const { path, html } of pages) {
 }
 
 await writeFile(join(dist, "catalog.js"), `window.CATALOG = ${JSON.stringify(catalog)};\n`, "utf8");
-// styles.css holds the base system; pages.css adds the multi-page layer.
+// fonts.css declares the faces, styles.css holds the base system, pages.css
+// adds the multi-page layer. Fonts first so the browser meets the @font-face
+// rules as it starts parsing rather than after everything that uses them.
 const css = await Promise.all(
-  ["src/assets/styles.css", "src/assets/pages.css"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/assets/fonts.css", "src/assets/styles.css", "src/assets/pages.css"]
+    .map((f) => readFile(join(root, f), "utf8"))
 );
 await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
+/* The font files themselves, copied verbatim into dist/fonts/. */
+{
+  const fontsIn = join(root, "src/assets/fonts");
+  const fontsOut = join(dist, "fonts");
+  await mkdir(fontsOut, { recursive: true });
+  for (const f of await readdir(fontsIn)) await copyFile(join(fontsIn, f), join(fontsOut, f));
+}
+
 // app.js is a plain script, not a module, so it cannot import. Rather than
 // keep a second copy of the redirect check in the browser — the kind of
 // duplicate that drifts and takes the security property with it — the tested

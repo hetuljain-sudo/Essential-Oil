@@ -374,10 +374,14 @@ export function layout({
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f3e2c'/%3E%3Cpath d='M16 6c4.5 5.4 7 9.4 7 13.3a7 7 0 0 1-14 0C9 15.4 11.5 11.4 16 6z' fill='%23b5653b'/%3E%3C/svg%3E" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- The fonts are ours now; src/assets/fonts.css says why. Preloaded
+       because a font named inside a stylesheet is not requested until that
+       stylesheet has been downloaded and parsed, and these two carry nearly
+       every word on the page. The other ten faces stay undiscovered until
+       something needs them, which is the point of the unicode-range split. -->
+  <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/styles.css?v=${assetStamp}" />
   ${graph ? `<script type="application/ld+json">${JSON.stringify(graph)}</script>` : ""}
 </head>

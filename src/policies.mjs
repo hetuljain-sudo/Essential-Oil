@@ -100,6 +100,18 @@ export const policies = [
             "or anything else we have no use for. There is no advertising or " +
             "analytics tracking on this site at all — no Google Analytics, no " +
             "advertising pixels, no third-party scripts watching what you look at."],
+          // The fonts used to load from Google on every page view, which sent
+          // Google every visitor's IP address whether or not we called it
+          // tracking. They are served from this site now. The photographs are
+          // still Unsplash's, and saying so is cheaper than being caught not
+          // having said it.
+          ["p",
+            "Two small things we would rather state than leave you to discover. " +
+            "Our product photographs are currently served by Unsplash, so your " +
+            "browser asks their servers for each image and they see your IP " +
+            "address in the process. Our fonts used to work the same way through " +
+            "Google and no longer do — they come from this site. When we have our " +
+            "own photographs, the images will too."],
         ],
       },
       {
