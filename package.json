@@ -16,6 +16,7 @@
     "db:setup": "node --env-file-if-exists=.env.local db/setup.mjs",
     "db:check": "node --env-file-if-exists=.env.local db/check.mjs",
     "smoke": "node --env-file-if-exists=.env.local db/smoke.mjs",
+    "admin": "node --env-file-if-exists=.env.local db/make-admin.mjs",
     "db:export": "node --env-file-if-exists=.env.local db/export.mjs",
     "demo": "node --env-file-if-exists=.env.local db/demo.mjs",
     "demo:clear": "node --env-file-if-exists=.env.local db/demo.mjs --remove"

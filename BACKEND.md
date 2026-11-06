@@ -227,9 +227,14 @@ ordinary account, so there is one identity, one login and one session
 mechanism to get right rather than two.
 
 ```bash
-node db/make-admin.mjs you@example.com     # after registering on the site
-node db/make-admin.mjs them@example.com --revoke
+npm run admin -- you@example.com            # after registering on the site
+npm run admin -- them@example.com --revoke
 ```
+
+The account has to exist first: the person registers at
+`/account/register/` themselves, and only then does this find them. There is
+no way to create someone else's account, which is deliberate — it would mean
+choosing their password for them.
 
 Granting admin is a command against the database, never a button. A "make
 this person an admin" control is the one whose compromise hands over
