@@ -1,0 +1,144 @@
+# Site audit — 6 November 2026
+
+Where Sarvha stands against what a working retail site needs. Everything
+below was checked against the code in this repo, not from memory.
+
+---
+
+## 1. What exists and works
+
+### The storefront
+
+| | |
+| --- | --- |
+| Pages built | 74, from `build.mjs` into `dist/` |
+| Products | 50 oils, 78 SKUs across sizes |
+| Collections | 7 (relaxation, energy, immunity, skincare, +3) |
+| Static pages | home, shop, collections, about, FAQ (55 Q&As), contact, guides, 4 policy pages, 404 |
+| Tests | 93, all passing, all database-free |
+
+Working on the front end: product listing with filter and sort, client-side
+search over the catalogue, product detail pages with size variants, a cart in
+`localStorage` with a drawer, a checkout that recomputes everything
+server-side, accounts (register, login, forgot, reset, account page), a
+contact form, a newsletter form, and an admin panel with its own chrome.
+
+Technically sound: structured data on every page type (Product, FAQPage,
+BreadcrumbList, Organization, Store), `srcset` on catalogue images, a real
+404 rather than a soft one, deterministic builds, a sitemap that excludes
+noindex pages automatically, skip links and `aria-live` toasts.
+
+### The backend
+
+12 serverless functions — **the Vercel Hobby ceiling, with nothing spare**:
+
+```
+checkout, razorpay-webhook, stock, contact, newsletter,
+auth/{register, session, account, recover},
+admin/{orders, messages, stock}
+```
+
+Nine Postgres tables on Neon. The parts that matter are right: the browser is
+never believed about money, orders become `paid` only in the signed webhook,
+the webhook is idempotent, stock cannot be decremented twice, passwords are
+scrypt hashes, session and reset tokens are stored only as SHA-256, cookies
+are HttpOnly + Secure + SameSite=Lax, admin is checked in the database on
+every request and answers 404 rather than 403.
+
+---
+
+## 2. Blocking — the site cannot legally or practically take money yet
+
+These are in order. Nothing below this section matters until these are done.
+
+1. **18 unfinished policy TODOs** — 4 in privacy, 4 in terms, 6 in refunds,
+   4 in shipping. Legal entity, GST status, returns window, whether opened
+   bottles come back, refund timeline, courier, grievance officer. They
+   render as yellow boxes on the live pages right now. Razorpay will not
+   approve the account without them, and two are legal requirements in India.
+2. **No business registration** — Razorpay needs PAN, a bank account, and GST
+   above the threshold.
+3. **Razorpay is in test mode.** `rzp_test_…` keys, no live keys, and the
+   end-to-end flow (real session → Razorpay order → their payment screen →
+   webhook settles it) **has never been run once**. This is the single
+   largest unverified path in the project.
+4. **No email provider.** Nothing has ever been delivered to an inbox. This
+   blocks: order confirmations, the admin thank-you button, password reset
+   links (the endpoint refuses with 503 without it), and contact
+   notifications. The code paths are written and smoke-tested with an
+   injected sender — which is not the same as an email arriving.
+5. **No domain.** Still on `oil-ten-omega.vercel.app`.
+6. **Hosting is wrong for a shop.** Vercel Hobby forbids commercial use.
+   Railway is ~$5/mo, Vercel Pro ~$20/mo. Pro also lifts the 12-function cap.
+7. **Reset the Neon password** before real orders — it was shared in a
+   screenshot during setup.
+
+---
+
+## 3. Missing for a complete retail site
+
+### Front end
+
+| Gap | Why it matters |
+| --- | --- |
+| **Real product photography** | All 50 images are Unsplash stock. Generic photos are the clearest signal to a shopper that a shop is not real. The single highest-value thing you can do that needs no code. |
+| **Guides are empty** | 6 guide pages exist, all `draft: true`, 0 live. `/guides/` tells visitors "we're writing them now". Either write 2–3 or stop advertising the section. |
+| **No order tracking for the customer** | The admin records a tracking reference; the customer's account page never shows it. They are told "shipped" and nothing more. |
+| **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
+| **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
+| **No discount codes** | The homepage offers 10% off a first order. Nothing in the backend can issue, store or redeem a code. The site is currently advertising something it cannot honour. |
+| **No "notify me when back in stock"** | Sold-out variants are a dead end. |
+| **No gift options, sets or bundles** | Essential oils sell heavily as gift sets, especially around festivals. |
+| **Cart does not survive a device change** | `localStorage` only, not tied to the account. |
+| **No analytics at all** | You cannot see what sells, where people drop out, or whether anyone arrives. |
+
+### Back end
+
+| Gap | Why it matters |
+| --- | --- |
+| **No unsubscribe endpoint** | Every signup mints an `unsubscribe_token` and nothing consumes it. Must exist **before** the first marketing email, not after. No function slot is free for it. |
+| **Email addresses are unverified** | Anyone can register as anyone. Matters much more once email is actually sent. |
+| **Rate limiting is per account, not per IP** | Ten failed logins locks an email for 15 minutes — which means anyone can deliberately lock out an address they know. The fix is edge rate limiting by IP. |
+| **No invoices** | Indian retail generally needs a GST invoice per order. Nothing generates one. |
+| **No refund or cancellation flow** | The refunds policy will promise something no code can carry out. Today a refund is a manual action in the Razorpay dashboard with nothing recorded against the order. |
+| **No shipping integration** | Flat ₹79 under ₹999, typed by hand. No courier, no label, no pincode serviceability check, no delivery estimate. |
+| **Stock is not reserved at checkout** | Deliberate and documented — the second buyer of the last bottle gets `oversold` and a human deals with it. Fine at low volume, a problem at higher. |
+| **One address per customer** | Overwritten each checkout. No chooser. |
+| **No backups** | Neon's free tier retention is what you have. No export runs anywhere. |
+| **No error monitoring** | A function that starts throwing in production tells nobody. |
+| **`BACKEND.md` is stale** | It still documents `api/auth/login.js`, `logout.js` and `me.js`, which were merged into `session.js`. |
+
+---
+
+## 4. What I would do next, in order
+
+**Needs nothing from anyone else — can start today:**
+
+1. Real product photography (or at minimum, consistent, honest photos of the
+   actual bottles).
+2. Write 2–3 guides, or remove the promise from `/guides/`.
+3. Show the tracking reference to the customer on `/account/`.
+4. Fix `BACKEND.md` so it describes the endpoints that exist.
+5. Resolve the FAQ/code disagreement about shipping — the FAQ says charges are
+   "calculated at checkout based on your location"; the code charges a flat
+   ₹79 anywhere.
+
+**Needs the business registration you're already doing:**
+
+6. Answer the 18 policy TODOs.
+7. Set up email (Brevo) — this alone unblocks four finished features.
+8. Razorpay live keys, then run the full payment path end to end once.
+9. Domain, then move off Hobby to Railway or Vercel Pro.
+
+**Then, to be a complete shop:**
+
+10. Discount codes (or withdraw the 10% offer).
+11. Unsubscribe endpoint, before any marketing email.
+12. GST invoices.
+13. Analytics.
+14. Back-in-stock notifications, gift sets, wishlist.
+
+---
+
+*Written against commit `b32eaf0`. 93 tests passing, SEO audit clean,
+`dist/` builds deterministically.*
