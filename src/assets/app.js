@@ -270,7 +270,19 @@ function matchesQuery(p, q) {
   return q.toLowerCase().split(/\s+/).filter(Boolean).every((t) => hay.includes(t));
 }
 
-function productCard(p) {
+/*
+ * `i` is the card's position in the grid, and all it decides is whether the
+ * image waits.
+ *
+ * Every card here was `loading="lazy"`, including the three or four on screen
+ * when the page opens. Lazy means "fetch this when it is nearly in view",
+ * which for a visible image is a round trip of delay bought for nothing — the
+ * browser finds the image, decides it is needed immediately, and starts the
+ * request it could have started while parsing. The first row loads eagerly
+ * and at high priority; everything below the fold keeps the behaviour that is
+ * right for it.
+ */
+function productCard(p, i = 99) {
   const v = firstAvailable(p);
   const multi = p.variants.length > 1;
   const sold = !inStock(p);
@@ -280,7 +292,7 @@ function productCard(p) {
     // uses. The grid re-renders here on filter, sort and live stock, so a
     // srcset only in the built HTML would vanish on the first interaction.
     ? `<img src="${p.image.src}"${srcsetFor(p.image.src)} alt="${esc(p.image.alt)}" width="900" height="1200"
-         loading="lazy" decoding="async"
+         ${i < 4 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"
          sizes="(max-width: 860px) 50vw, 25vw" data-pid="${p.id}" onerror="artFallback(this)" />`
     : bottleSVG(p.swatch, shortLabel(p), p.id);
   return `<article class="card${sold ? " is-sold" : ""}${bestSale(p) ? " is-sale" : ""}">
@@ -318,7 +330,7 @@ function renderGrid() {
   if (state.sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
 
   grid.innerHTML = list.length
-    ? `<div class="grid">${list.map(productCard).join("")}</div>`
+    ? `<div class="grid">${list.map((p, i) => productCard(p, i)).join("")}</div>`
     : `<div class="no-results">
          <p><strong>No oils match that.</strong></p>
          <p class="muted">Try a different word, or browse the whole collection.</p>

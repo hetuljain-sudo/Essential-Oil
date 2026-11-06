@@ -39,7 +39,7 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .prose { max-width: 42rem; }
 .prose p { margin-bottom: 1.1rem; }
 .prose h2 { margin-top: 2.2rem; font-size: 1.9rem; }
-.prose a { color: var(--terracotta); }
+.prose a { color: var(--terracotta-text); }
 
 /* On the shop page the chips stand alone rather than inside .section__head,
    so they carry their own spacing above the search row. */
@@ -387,12 +387,12 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .post-card a { text-decoration: none; display: block; }
 .post-card__meta {
   font-size: .74rem; text-transform: uppercase; letter-spacing: .12em;
-  font-weight: 600; color: var(--sage); margin: 0 0 .5rem;
+  font-weight: 600; color: var(--sage-text); margin: 0 0 .5rem;
 }
 .post-card h2 { font-size: 1.7rem; margin: 0 0 .5rem; }
 .post-card:hover h2 { color: var(--terracotta); }
 .post-card__excerpt { color: var(--muted); margin: 0 0 .9rem; font-size: .95rem; }
-.post-card__more { font-weight: 600; font-size: .88rem; color: var(--terracotta); }
+.post-card__more { font-weight: 600; font-size: .88rem; color: var(--terracotta-text); }
 .post-card__more::after { content: " →"; }
 .post-card time { font-size: .78rem; color: var(--muted); margin-top: auto; }
 
@@ -536,7 +536,7 @@ body.menu-open .header { z-index: 56; }
   display: flex; justify-content: space-between; gap: 1rem; align-items: baseline;
 }
 .account__order ul { list-style: none; padding: 0; margin: .35rem 0 0; color: var(--muted); font-size: .86rem; }
-.account__flag { color: var(--terracotta); font-size: .82rem; }
+.account__flag { color: var(--terracotta-text); font-size: .82rem; }
 
 /* ------------------------------------------------------------- checkout */
 
@@ -751,7 +751,7 @@ body.menu-open .header { z-index: 56; }
 .account__form { max-width: 26rem; margin: 0 0 2.5rem; }
 .account__form label {
   display: block; margin-bottom: .9rem;
-  font-size: .82rem; font-weight: 600; color: var(--sage);
+  font-size: .82rem; font-weight: 600; color: var(--sage-text);
   text-transform: uppercase; letter-spacing: .08em;
 }
 .account__form input {
@@ -814,7 +814,7 @@ body.menu-open .header { z-index: 56; }
 .atable { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .atable th {
   text-align: left; font-size: .7rem; text-transform: uppercase;
-  letter-spacing: .09em; color: var(--sage); font-weight: 700;
+  letter-spacing: .09em; color: var(--sage-text); font-weight: 700;
   padding: .9rem 1rem; border-bottom: 1px solid #e6e9e3; white-space: nowrap;
 }
 .atable td { padding: .85rem 1rem; border-bottom: 1px solid #f0f2ee; vertical-align: top; }
@@ -854,7 +854,7 @@ body.menu-open .header { z-index: 56; }
 }
 .adetail__grid h4 {
   font-family: var(--sans); font-size: .7rem; text-transform: uppercase;
-  letter-spacing: .09em; color: var(--sage); margin: 0 0 .5rem;
+  letter-spacing: .09em; color: var(--sage-text); margin: 0 0 .5rem;
 }
 .adetail__grid p { margin: 0 0 .5rem; font-size: .86rem; }
 .adetail__items { list-style: none; padding: 0; margin: 0 0 .5rem; font-size: .86rem; }
