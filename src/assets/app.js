@@ -1076,10 +1076,37 @@ if (resetForm) {
 const accountPanel = $("[data-account-panel]");
 
 if (accountPanel) {
-  const orderStatus = (o) =>
-    o.status === "oversold"
-      ? `<p class="account__flag">We're short on part of this order and will be in touch.</p>`
-      : "";
+  const day = (iso) => new Date(iso).toLocaleDateString("en-IN",
+    { day: "numeric", month: "long", year: "numeric" });
+
+  /*
+   * What the shop can honestly tell you about where your order is.
+   *
+   * Every one of these facts was already in the database and none of them
+   * reached the person who most wanted them: a dispatched order said
+   * "shipped" and stopped there, while the tracking reference the admin had
+   * typed sat in a column nobody outside the admin page could see.
+   *
+   * There is deliberately no link to a courier's tracking page. We do not
+   * record which courier carried which order, and guessing would send people
+   * to a site that has never heard of their reference.
+   */
+  const orderStatus = (o) => {
+    if (o.status === "oversold") {
+      return `<p class="account__flag">We're short on part of this order and will be in touch.</p>`;
+    }
+    if (o.status === "shipped") {
+      return `<p class="account__ship">Dispatched${
+        o.shipped_at ? ` on ${day(o.shipped_at)}` : ""}.${
+        o.tracking
+          ? ` Tracking reference <span class="account__track">${esc(o.tracking)}</span>.`
+          : ""}</p>`;
+    }
+    if (o.status === "paid") {
+      return `<p class="account__prep">Paid for — we're packing it now.</p>`;
+    }
+    return "";
+  };
 
   // Named rather than an IIFE so a save can redraw the panel with what the
   // server actually stored.
@@ -1129,8 +1156,7 @@ if (accountPanel) {
               ? `<ul class="account__orders">${orders.map((o) => `
                   <li class="account__order">
                     <div>
-                      <strong>${new Date(o.created_at).toLocaleDateString("en-IN",
-                        { day: "numeric", month: "long", year: "numeric" })}</strong>
+                      <strong>${day(o.created_at)}</strong>
                       <ul>${o.items.map((i) =>
                         `<li>${esc(i.name)} ${esc(i.size)} × ${i.qty}</li>`).join("")}</ul>
                       ${orderStatus(o)}

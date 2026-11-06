@@ -59,8 +59,12 @@ async function whoAmI(sql, req, res) {
 
   // Scoped to this customer in the query itself. An order id in the URL is
   // never what decides whose order gets returned.
+  // shipped_at and tracking are selected because the customer is the person
+  // who most needs them and was, until now, the only one who could not see
+  // them: the admin typed a tracking reference and the account page showed
+  // the order as "shipped" with nothing else to say.
   const orders = await sql`
-    select o.id, o.status, o.total_paise, o.created_at,
+    select o.id, o.status, o.total_paise, o.created_at, o.shipped_at, o.tracking,
            coalesce(
              json_agg(json_build_object('name', i.name, 'size', i.size, 'qty', i.qty)
                       order by i.id)

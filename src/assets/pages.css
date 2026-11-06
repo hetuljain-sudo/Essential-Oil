@@ -695,6 +695,16 @@ body.menu-open .header { z-index: 56; }
 
 /* Account editing. Narrow on purpose: these are short fields, and a name
    box the full width of a desktop page reads as a mistake. */
+/* Where an order has got to. The flag is a warning and stays warm-coloured;
+   the other two are information, so they stay quiet. */
+.account__ship, .account__prep {
+  margin: .4rem 0 0; font-size: .85rem; color: var(--muted);
+}
+.account__track {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .95em; color: var(--ink); overflow-wrap: anywhere;
+}
+
 .acct__head {
   display: flex;
   flex-wrap: wrap;

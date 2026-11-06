@@ -83,7 +83,6 @@ These are in order. Nothing below this section matters until these are done.
 | --- | --- |
 | **Real product photography** | All 50 images are Unsplash stock. Generic photos are the clearest signal to a shopper that a shop is not real. The single highest-value thing you can do that needs no code. |
 | **Guides are empty** | 6 guide pages exist, all `draft: true`, 0 live. `/guides/` tells visitors "we're writing them now". Either write 2–3 or stop advertising the section. |
-| **No order tracking for the customer** | The admin records a tracking reference; the customer's account page never shows it. They are told "shipped" and nothing more. |
 | **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
 | **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
 | **No discount codes** | The homepage offers 10% off a first order. Nothing in the backend can issue, store or redeem a code. The site is currently advertising something it cannot honour. |
@@ -116,7 +115,7 @@ These are in order. Nothing below this section matters until these are done.
 1. Real product photography (or at minimum, consistent, honest photos of the
    actual bottles).
 2. Write 2–3 guides, or remove the promise from `/guides/`.
-3. Show the tracking reference to the customer on `/account/`.
+3. ~~Show the tracking reference to the customer~~ — done 6 November.
 4. ~~Fix `BACKEND.md`~~ — done 6 November.
 5. Resolve the FAQ/code disagreement about shipping — the FAQ says charges are
    "calculated at checkout based on your location"; the code charges a flat
