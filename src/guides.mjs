@@ -3,10 +3,13 @@
  *
  * `draft: true` keeps a guide in this file and out of the site: it is not
  * built, not linked and not in the sitemap, but nothing about it is lost.
- * All six are published as of 6 November 2026. Shelving one again is a
- * matter of adding `draft: true` back — the index page, the nav item and
- * the footer links all follow on their own, because they are derived from
- * `liveGuides` below rather than written out by hand.
+ * Four are published. The phototoxicity and pregnancy pages are shelved at
+ * the owner's request, pending their own read: they are the two where being
+ * wrong costs a reader something real, and that call is not ours. Nothing
+ * about them is lost, and publishing is deleting one line.
+ *
+ * The index page, the nav item and the footer links all follow from
+ * `liveGuides` below rather than being written out by hand.
  */
 
 /**
@@ -61,6 +64,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "phototoxic-oils",
     title: "Which Essential Oils Are Phototoxic",
     nav: "Phototoxic oils",
@@ -92,6 +96,7 @@ export const guidePages = [
   },
 
   {
+    draft: true,
     slug: "essential-oils-and-pregnancy",
     title: "Essential Oils to Avoid in Pregnancy",
     nav: "Pregnancy & children",

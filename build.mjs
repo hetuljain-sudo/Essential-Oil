@@ -918,7 +918,12 @@ page("/guides/", layout({
   path: "/guides/",
   title: "Essential Oil Guides",
   description: liveGuides.length
-    ? `Plain reference guides from ${site.name} — dilution, phototoxicity, pregnancy and pet safety, and how to use a diffuser. Written from our own catalogue data.`
+    // Names the live guides rather than a fixed list of topics: the page
+    // described phototoxicity and pregnancy for a while after both were
+    // shelved, which is the drift this file exists to avoid everywhere else.
+    ? `Plain reference guides from ${site.name} — ${
+        liveGuides.map((g) => g.nav.toLowerCase()).join(", ")
+      }. Written from our own catalogue data.`
     : `Reference guides from ${site.name} on using essential oils safely. We're writing them now — in the meantime the FAQ covers dilution, safe use and storage.`,
   breadcrumb: guidesTrail,
   ogImage: defaultOg,
