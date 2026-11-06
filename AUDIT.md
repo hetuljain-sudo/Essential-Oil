@@ -106,7 +106,6 @@ These are in order. Nothing below this section matters until these are done.
 | **One address per customer** | Overwritten each checkout. No chooser. |
 | **No backups** | Neon's free tier retention is what you have. No export runs anywhere. |
 | **No error monitoring** | A function that starts throwing in production tells nobody. |
-| **`BACKEND.md` is stale** | It still documents `api/auth/login.js`, `logout.js` and `me.js`, which were merged into `session.js`. |
 
 ---
 
@@ -118,7 +117,7 @@ These are in order. Nothing below this section matters until these are done.
    actual bottles).
 2. Write 2–3 guides, or remove the promise from `/guides/`.
 3. Show the tracking reference to the customer on `/account/`.
-4. Fix `BACKEND.md` so it describes the endpoints that exist.
+4. ~~Fix `BACKEND.md`~~ — done 6 November.
 5. Resolve the FAQ/code disagreement about shipping — the FAQ says charges are
    "calculated at checkout based on your location"; the code charges a flat
    ₹79 anywhere.
