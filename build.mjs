@@ -21,7 +21,7 @@ import { skuFor } from "./src/sku.mjs";
 import {
   layout, esc, productGrid, productCard, productMedia, mediaClass, bottleSVG, breadcrumbs,
   newsletter, trustBar, categoryTiles, oilLibrary, safetyNote,
-  productUrl, categoryUrl, postDate, clamp,
+  productUrl, categoryUrl, postDate, clamp, heart,
   setAssetStamp,
 } from "./src/templates.mjs";
 
@@ -773,9 +773,12 @@ ${breadcrumbs(trail)}
               </div>
               <p class="stock-note" data-stock-note${v.stock > 8 ? " hidden" : ""}>${v.stock > 0 ? `Only ${v.stock} left` : ""}</p>
 
-              <button class="btn btn--primary btn--block" data-pdp-add${inStock(p) ? "" : " disabled"}>
-                ${inStock(p) ? "Add to cart" : "Sold out"}
-              </button>
+              <div class="pdp__cta">
+                <button class="btn btn--primary btn--block" data-pdp-add${inStock(p) ? "" : " disabled"}>
+                  ${inStock(p) ? "Add to cart" : "Sold out"}
+                </button>
+                ${heart(p, "pdp")}
+              </div>
               <p class="muted small pdp__ship">Free shipping over ${money(site.freeShippingAt)} · Dispatched within 48 hours</p>
 
               ${p.warning ? `
@@ -1478,6 +1481,51 @@ accountPage({
     <p data-order-ref class="muted"></p>
     <p><a class="btn btn--ghost" href="/shop/">Keep shopping</a></p>`,
 });
+
+/* ---------------------------------------------------------------- saved */
+
+/*
+ * The saved list, drawn client-side from localStorage.
+ *
+ * noindex, and for a different reason than /account/ or /admin/: there is
+ * nothing private here, but the page is empty for everyone who has not saved
+ * something. Indexed, Google would hold a Sarvha page whose entire content is
+ * "nothing saved yet" — and it would be the honest version of the page, since
+ * that is what the server sends.
+ *
+ * It is not in the main nav either. The heart in the header appears once the
+ * list has something in it, which is the only moment the page is worth a
+ * visit. The <noscript> says so plainly rather than leaving a blank panel.
+ */
+page("/saved/", layout({
+  path: "/saved/",
+  title: "Saved Oils",
+  description: "The oils you have saved to come back to.",
+  noindex: true,
+  breadcrumb: [HOME, { label: "Saved" }],
+  body: `
+    <section class="section section--first">
+      <div class="container">
+        ${breadcrumbs([HOME, { label: "Saved" }])}
+        <div class="page-head">
+          <p class="eyebrow">Saved</p>
+          <h1>Oils you've saved</h1>
+          <p class="lead">Kept in this browser, so the list is here next time you
+            visit on this device. Saving something does not hold stock or reserve
+            a price.</p>
+        </div>
+
+        <div data-saved-grid>
+          <p class="muted">Loading your saved oils…</p>
+        </div>
+
+        <noscript>
+          <p class="muted">The saved list is kept in your browser, so it needs
+            JavaScript to show. <a href="/shop/">Browse the shop</a> instead.</p>
+        </noscript>
+      </div>
+    </section>`,
+}));
 
 /* ---------------------------------------------------------------- admin */
 

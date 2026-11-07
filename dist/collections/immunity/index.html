@@ -51,7 +51,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=40daac43" />
+  <link rel="stylesheet" href="/styles.css?v=a67cae17" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":"Immunity essential oils","description":"Camphorous, green and medicinal in the best sense. These are the bottles that come out of the cupboard the moment the seasons change.","url":"https://sarvha.com/collections/immunity/","isPartOf":{"@id":"https://sarvha.com/#website"}},{"@type":"ItemList","name":"Immunity oils","numberOfItems":13,"itemListElement":[{"@type":"ListItem","position":1,"url":"https://sarvha.com/oils/eucalyptus-clearing/","name":"Eucalyptus Clearing"},{"@type":"ListItem","position":2,"url":"https://sarvha.com/oils/tea-tree-shield/","name":"Tea Tree Shield"},{"@type":"ListItem","position":3,"url":"https://sarvha.com/oils/ginger-warmth/","name":"Ginger Warmth"},{"@type":"ListItem","position":4,"url":"https://sarvha.com/oils/clove-bud/","name":"Clove Bud"},{"@type":"ListItem","position":5,"url":"https://sarvha.com/oils/cinnamon-leaf/","name":"Cinnamon Leaf"},{"@type":"ListItem","position":6,"url":"https://sarvha.com/oils/basil-holy/","name":"Holy Basil (Tulsi)"},{"@type":"ListItem","position":7,"url":"https://sarvha.com/oils/black-pepper/","name":"Black Pepper"},{"@type":"ListItem","position":8,"url":"https://sarvha.com/oils/juniper-berry/","name":"Juniper Berry"},{"@type":"ListItem","position":9,"url":"https://sarvha.com/oils/thyme/","name":"Thyme"},{"@type":"ListItem","position":10,"url":"https://sarvha.com/oils/niaouli/","name":"Niaouli"},{"@type":"ListItem","position":11,"url":"https://sarvha.com/oils/ravensara/","name":"Ravensara"},{"@type":"ListItem","position":12,"url":"https://sarvha.com/oils/fennel/","name":"Sweet Fennel"},{"@type":"ListItem","position":13,"url":"https://sarvha.com/oils/coriander-seed/","name":"Coriander Seed"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Do these oils treat colds or boost immunity?","acceptedAnswer":{"@type":"Answer","text":"No, and we are not going to suggest otherwise. They smell clearing, and many people find steam comforting when congested — but the steam is doing most of that work, and neither will shorten an illness. Essential oils are not medicine."}},{"@type":"Question","name":"Why do you call it the immunity collection then?","acceptedAnswer":{"@type":"Answer","text":"Because it is what people come looking for, and pretending otherwise would just make the range harder to navigate. The name describes the shelf, not a claim about the contents."}},{"@type":"Question","name":"Are these safe around children?","acceptedAnswer":{"@type":"Answer","text":"Largely not. Eucalyptus, niaouli and ravensara are high in 1,8-cineole, which can affect breathing in babies and young children. Clove, cinnamon and thyme should be kept away from children entirely. Ask a doctor before diffusing any of these in a house with a small child."}},{"@type":"Question","name":"Which are safe around cats and dogs?","acceptedAnswer":{"@type":"Answer","text":"Tea tree is genuinely toxic to cats and dogs, including as vapour in a closed room. As a general rule we would not diffuse anything from this collection around pets without veterinary advice."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Collections","item":"https://sarvha.com/collections/"},{"@type":"ListItem","position":3,"name":"Immunity"}]}]}</script>
 </head>
 <body>
@@ -85,6 +85,15 @@
       <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
+      <!-- Hidden until there is something in it. An empty counter in the
+           chrome of every page is a permanent invitation to a dead end, and
+           the saved list is a thing you come back to, not a thing you are
+           first sold. app.js unhides it when the list is not empty. -->
+      <a class="icon-btn saved-btn" href="/saved/" aria-label="Saved items" data-saved-link hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-saved-count>0</span>
       </a>
 
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
@@ -145,6 +154,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="ginger-warmth" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="ginger-warmth"
+  aria-pressed="false" aria-label="Save Ginger Warmth for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/ginger-warmth/">Ginger Warmth</a></h3>
@@ -164,6 +178,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="clove-bud" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="clove-bud"
+  aria-pressed="false" aria-label="Save Clove Bud for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/clove-bud/">Clove Bud</a></h3>
@@ -183,6 +202,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="cinnamon-leaf" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="cinnamon-leaf"
+  aria-pressed="false" aria-label="Save Cinnamon Leaf for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/cinnamon-leaf/">Cinnamon Leaf</a></h3>
@@ -202,6 +226,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="black-pepper" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="black-pepper"
+  aria-pressed="false" aria-label="Save Black Pepper for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/black-pepper/">Black Pepper</a></h3>
@@ -221,6 +250,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="fennel" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="fennel"
+  aria-pressed="false" aria-label="Save Sweet Fennel for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/fennel/">Sweet Fennel</a></h3>
@@ -240,6 +274,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="coriander-seed" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="coriander-seed"
+  aria-pressed="false" aria-label="Save Coriander Seed for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/coriander-seed/">Coriander Seed</a></h3>
@@ -266,6 +305,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="eucalyptus-clearing" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="eucalyptus-clearing"
+  aria-pressed="false" aria-label="Save Eucalyptus Clearing for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/eucalyptus-clearing/">Eucalyptus Clearing</a></h3>
@@ -285,6 +329,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="tea-tree-shield" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="tea-tree-shield"
+  aria-pressed="false" aria-label="Save Tea Tree Shield for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/tea-tree-shield/">Tea Tree Shield</a></h3>
@@ -304,6 +353,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="niaouli" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="niaouli"
+  aria-pressed="false" aria-label="Save Niaouli for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 15 ml</span>
       <h3 class="card__title"><a href="/oils/niaouli/">Niaouli</a></h3>
@@ -323,6 +377,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="ravensara" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="ravensara"
+  aria-pressed="false" aria-label="Save Ravensara for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 15 ml</span>
       <h3 class="card__title"><a href="/oils/ravensara/">Ravensara</a></h3>
@@ -349,6 +408,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="basil-holy" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="basil-holy"
+  aria-pressed="false" aria-label="Save Holy Basil (Tulsi) for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/basil-holy/">Holy Basil (Tulsi)</a></h3>
@@ -368,6 +432,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="juniper-berry" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="juniper-berry"
+  aria-pressed="false" aria-label="Save Juniper Berry for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 15 ml</span>
       <h3 class="card__title"><a href="/oils/juniper-berry/">Juniper Berry</a></h3>
@@ -387,6 +456,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="thyme" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="thyme"
+  aria-pressed="false" aria-label="Save Thyme for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 10 ml</span>
       <h3 class="card__title"><a href="/oils/thyme/">Thyme</a></h3>
@@ -670,7 +744,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=40daac43"></script>
-  <script src="/app.js?v=40daac43"></script>
+  <script src="/catalog.js?v=a67cae17"></script>
+  <script src="/app.js?v=a67cae17"></script>
 </body>
 </html>

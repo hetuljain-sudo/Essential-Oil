@@ -51,7 +51,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=40daac43" />
+  <link rel="stylesheet" href="/styles.css?v=a67cae17" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":"Essential oil sets","description":"The same bottles we sell singly, chosen to go together and priced below what they cost apart. A reasonable way to start if fifty oils is too many to choose from.","url":"https://sarvha.com/collections/sets/","isPartOf":{"@id":"https://sarvha.com/#website"}},{"@type":"ItemList","name":"Sets oils","numberOfItems":4,"itemListElement":[{"@type":"ListItem","position":1,"url":"https://sarvha.com/oils/set-sleep/","name":"Sleep & Unwind Set"},{"@type":"ListItem","position":2,"url":"https://sarvha.com/oils/set-mornings/","name":"Bright Mornings Set"},{"@type":"ListItem","position":3,"url":"https://sarvha.com/oils/set-seasonal/","name":"Seasonal Care Set"},{"@type":"ListItem","position":4,"url":"https://sarvha.com/oils/set-carriers/","name":"Carrier Oil Duo"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Collections","item":"https://sarvha.com/collections/"},{"@type":"ListItem","position":3,"name":"Sets"}]}]}</script>
 </head>
 <body>
@@ -85,6 +85,15 @@
       <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
+      <!-- Hidden until there is something in it. An empty counter in the
+           chrome of every page is a permanent invitation to a dead end, and
+           the saved list is a thing you come back to, not a thing you are
+           first sold. app.js unhides it when the list is not empty. -->
+      <a class="icon-btn saved-btn" href="/saved/" aria-label="Saved items" data-saved-link hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-saved-count>0</span>
       </a>
 
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
@@ -128,6 +137,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="set-sleep" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="set-sleep"
+  aria-pressed="false" aria-label="Save Sleep &amp; Unwind Set for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Sets · Box of 3</span>
       <h3 class="card__title"><a href="/oils/set-sleep/">Sleep &amp; Unwind Set</a></h3>
@@ -147,6 +161,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="set-mornings" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="set-mornings"
+  aria-pressed="false" aria-label="Save Bright Mornings Set for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Sets · Box of 3</span>
       <h3 class="card__title"><a href="/oils/set-mornings/">Bright Mornings Set</a></h3>
@@ -166,6 +185,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="set-seasonal" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="set-seasonal"
+  aria-pressed="false" aria-label="Save Seasonal Care Set for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Sets · Box of 3</span>
       <h3 class="card__title"><a href="/oils/set-seasonal/">Seasonal Care Set</a></h3>
@@ -185,6 +209,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="set-carriers" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="set-carriers"
+  aria-pressed="false" aria-label="Save Carrier Oil Duo for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Sets · Box of 2</span>
       <h3 class="card__title"><a href="/oils/set-carriers/">Carrier Oil Duo</a></h3>
@@ -374,7 +403,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=40daac43"></script>
-  <script src="/app.js?v=40daac43"></script>
+  <script src="/catalog.js?v=a67cae17"></script>
+  <script src="/app.js?v=a67cae17"></script>
 </body>
 </html>

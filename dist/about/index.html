@@ -51,7 +51,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=40daac43" />
+  <link rel="stylesheet" href="/styles.css?v=a67cae17" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"AboutPage","name":"About Sarvha","url":"https://sarvha.com/about/","isPartOf":{"@id":"https://sarvha.com/#website"},"about":{"@id":"https://sarvha.com/#organization"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Our story"}]}]}</script>
 </head>
 <body>
@@ -85,6 +85,15 @@
       <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
+      <!-- Hidden until there is something in it. An empty counter in the
+           chrome of every page is a permanent invitation to a dead end, and
+           the saved list is a thing you come back to, not a thing you are
+           first sold. app.js unhides it when the list is not empty. -->
+      <a class="icon-btn saved-btn" href="/saved/" aria-label="Saved items" data-saved-link hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-saved-count>0</span>
       </a>
 
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
@@ -226,7 +235,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=40daac43"></script>
-  <script src="/app.js?v=40daac43"></script>
+  <script src="/catalog.js?v=a67cae17"></script>
+  <script src="/app.js?v=a67cae17"></script>
 </body>
 </html>

@@ -46,6 +46,24 @@ export const mediaClass = (p) => (p.image ? "" : " has-art");
 export const productUrl = (p) => `/oils/${p.id}/`;
 export const categoryUrl = (c) => `/collections/${c.id}/`;
 
+/**
+ * The save-for-later toggle.
+ *
+ * Always ships `aria-pressed="false"`: the saved list lives in this browser's
+ * localStorage, and the HTML is one file served to everybody. app.js corrects
+ * every heart on the page as soon as it runs. A button that rendered as saved
+ * server-side would be lying to whoever else opened the same page.
+ *
+ * It is a sibling of the media link rather than a child of it, because a
+ * button inside an anchor is invalid and keyboard users land on whichever the
+ * browser guesses. `.card` is the positioning context.
+ */
+export const heart = (p, where = "card") => `<button class="heart heart--${where}" data-save="${p.id}"
+  aria-pressed="false" aria-label="Save ${esc(p.name)} for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>`;
+
 /** A card in any product grid. */
 export function productCard(p) {
   const v = firstAvailable(p);
@@ -58,6 +76,7 @@ export function productCard(p) {
       ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
       ${productMedia(p)}
     </a>
+    ${heart(p)}
     <div class="card__body">
       <span class="card__meta">${categoryOf(p.category).label} · ${p.variants.map((x) => x.size).join(" / ")}</span>
       <h3 class="card__title"><a href="${productUrl(p)}">${esc(p.name)}</a></h3>
@@ -124,6 +143,15 @@ function header(current) {
       <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
+      <!-- Hidden until there is something in it. An empty counter in the
+           chrome of every page is a permanent invitation to a dead end, and
+           the saved list is a thing you come back to, not a thing you are
+           first sold. app.js unhides it when the list is not empty. -->
+      <a class="icon-btn saved-btn" href="/saved/" aria-label="Saved items" data-saved-link hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-saved-count>0</span>
       </a>
 
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>

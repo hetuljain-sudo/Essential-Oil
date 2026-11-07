@@ -86,7 +86,7 @@ These are in order. Nothing below this section matters until these are done.
 | **Guides** | All six written, none published — shelved 6 November at the owner's request. `/guides/` shows its empty state, which tells visitors the guides are being written. Publishing any of them is deleting one line. |
 | **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
 | **Shop filters** | Scent family, price band and in-stock-only added 7 November, alongside the existing collection chips, search and sort. All of it is in the URL, so a filtered view can be shared. |
-| **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
+| **Wishlist** | Added 7 November. A heart on every card and product page, a `/saved/` page, and a counter in the header that appears once the list has something in it. Kept in `localStorage`, so it does not follow you to another device — tying it to the account needs a function slot and there are none. The page says so. |
 | **No discount codes** | Nothing in the backend can issue, store or redeem one. The newsletter band used to offer 10% off a first order and the copy was already changed to what the list actually is, so nothing unhonourable is being advertised — but a shop with no mechanism for a code has no lever for a festival sale either. |
 | **No "notify me when back in stock"** | Sold-out variants are a dead end. |
 | **Gift sets** | Four added 6 November: Sleep & Unwind, Bright Mornings, Seasonal Care and the Carrier Oil Duo, each priced 9–11% under its parts. Each is a product with its own SKU and stock, so it is a box you assemble and count. No photographs of the boxes yet. |
@@ -138,7 +138,7 @@ These are in order. Nothing below this section matters until these are done.
 11. Unsubscribe endpoint, before any marketing email.
 12. GST invoices.
 13. Analytics.
-14. Back-in-stock notifications, gift sets, wishlist.
+14. Back-in-stock notifications. (Gift sets and the wishlist are done.)
 
 ---
 

@@ -284,6 +284,65 @@ function matchesQuery(p, q) {
   return q.toLowerCase().split(/\s+/).filter(Boolean).every((t) => hay.includes(t));
 }
 
+/* -------------------------------------------------------- wishlist (store) */
+
+/*
+ * Saved oils, kept in this browser.
+ *
+ * An array rather than a Set or an object, because the order matters: the
+ * saved page lists what you saved most recently first, and that is the whole
+ * reason the page is useful after a fortnight of browsing. Newest goes on the
+ * front; nothing sorts it afterwards.
+ *
+ * Deliberately not tied to the account. Doing that needs a serverless
+ * function to read and write it, and the Hobby plan is at 12 of 12 with
+ * nothing spare — so a saved list would have cost the unsubscribe endpoint or
+ * back-in-stock. The honest consequence is that the list does not follow you
+ * to your phone, and the saved page says so rather than implying otherwise.
+ *
+ * The store sits above the card renderer, not beside the rest of the
+ * wishlist code further down: `renderGrid` runs while the filters are being
+ * wired up, which is before that point, and a `let saved` declared after it
+ * is still in its temporal dead zone — the first card drawn would throw.
+ */
+
+const SAVED_KEY = "sarvha-saved-v1";
+
+function loadSaved() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SAVED_KEY));
+    // Products get renamed and retired. An id that no longer exists would
+    // render an undefined card, so it is dropped on the way in — the same
+    // guard loadCart applies to its keys.
+    return Array.isArray(raw) ? raw.filter((id) => byId(id)) : [];
+  } catch {
+    return [];
+  }
+}
+
+let saved = loadSaved();
+const isSaved = (id) => saved.includes(id);
+
+function persistSaved() {
+  try { localStorage.setItem(SAVED_KEY, JSON.stringify(saved)); } catch {}
+}
+
+/*
+ * The same heart as templates.mjs renders, with one difference: this one
+ * knows whether the oil is saved, because it is drawn in the browser. The
+ * built HTML cannot know, so it ships hollow and syncSaved corrects it —
+ * these cards arrive already right, which is why renderGrid does not have to
+ * call syncSaved afterwards (and must not, since syncSaved redraws grids).
+ */
+const heartHTML = (p, where = "card") => {
+  const on = isSaved(p.id);
+  return `<button class="heart heart--${where}" data-save="${p.id}"
+    aria-pressed="${on}" aria-label="${on ? "Remove" : "Save"} ${esc(p.name)} ${on ? "from saved" : "for later"}">
+    <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+    <span class="heart__text">${on ? "Saved" : "Save"}</span>
+  </button>`;
+};
+
 /*
  * `i` is the card's position in the grid, and all it decides is whether the
  * image waits.
@@ -315,6 +374,7 @@ function productCard(p, i = 99) {
       ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
       ${media}
     </a>
+    ${heartHTML(p)}
     <div class="card__body">
       <span class="card__meta">${catLabel(p.category)} · ${p.variants.map((x) => x.size).join(" / ")}</span>
       <h3 class="card__title"><a href="${p.url}">${esc(p.name)}</a></h3>
@@ -693,6 +753,81 @@ function enhanceSelect(select) {
 
 $$("select").forEach(enhanceSelect);
 
+/* ------------------------------------------------------- wishlist (views) */
+
+/**
+ * Bring every heart, the header count and the saved grid into line with
+ * `saved`.
+ *
+ * One function for all three because they are three views of one list, and
+ * the first version updated only the heart that was clicked — which left the
+ * other copy of the same oil (a card in "You may also like", say) showing
+ * hollow while the list said otherwise.
+ */
+function syncSaved() {
+  for (const btn of $$("[data-save]")) {
+    const on = isSaved(btn.dataset.save);
+    const p = byId(btn.dataset.save);
+    btn.setAttribute("aria-pressed", String(on));
+    if (p) btn.setAttribute("aria-label", `${on ? "Remove" : "Save"} ${p.name} ${on ? "from" : "for"} ${on ? "saved" : "later"}`);
+    const text = $(".heart__text", btn);
+    if (text) text.textContent = on ? "Saved" : "Save";
+  }
+
+  const link = $("[data-saved-link]");
+  if (link) {
+    link.hidden = saved.length === 0;
+    link.setAttribute("aria-label", saved.length
+      ? `Saved items, ${saved.length} oil${saved.length === 1 ? "" : "s"}`
+      : "Saved items");
+    $("[data-saved-count]").textContent = saved.length;
+  }
+
+  renderSavedGrid();
+}
+
+function toggleSaved(id) {
+  const p = byId(id);
+  if (!p) return;
+  if (isSaved(id)) {
+    saved = saved.filter((x) => x !== id);
+    toast(`${p.name} removed from saved`);
+  } else {
+    saved = [id, ...saved];
+    toast(`${p.name} saved`);
+  }
+  persistSaved();
+  syncSaved();
+}
+
+const savedGrid = $("[data-saved-grid]");
+
+function renderSavedGrid() {
+  if (!savedGrid) return;
+  const list = saved.map(byId).filter(Boolean);
+  savedGrid.innerHTML = list.length
+    ? `<p class="saved__count">${list.length} oil${list.length === 1 ? "" : "s"} saved</p>
+       <div class="grid">${list.map((p, i) => productCard(p, i)).join("")}</div>`
+    : `<div class="no-results">
+         <p><strong>Nothing saved yet.</strong></p>
+         <p class="muted">Tap the heart on any oil to keep it here for later.</p>
+         <a class="btn btn--ghost" href="/shop/">Browse the shop</a>
+       </div>`;
+}
+
+/*
+ * Two tabs, one list. localStorage fires `storage` in the other tabs when a
+ * tab writes to it, so saving something in one tab no longer leaves the
+ * other showing a stale count and hollow hearts until it is reloaded.
+ */
+window.addEventListener("storage", (e) => {
+  if (e.key !== SAVED_KEY) return;
+  saved = loadSaved();
+  syncSaved();
+});
+
+syncSaved();
+
 /* ---------------------------------------------------------------- events */
 
 document.addEventListener("click", (e) => {
@@ -700,6 +835,9 @@ document.addEventListener("click", (e) => {
 
   const add = t.closest("[data-add]");
   if (add) { e.preventDefault(); return addToCart(add.dataset.add, add.dataset.size); }
+
+  const save = t.closest("[data-save]");
+  if (save) { e.preventDefault(); return toggleSaved(save.dataset.save); }
 
   const q = t.closest("[data-qty]");
   if (q) return setQty(q.dataset.qty, (cart[q.dataset.qty] || 0) + +q.dataset.delta);
@@ -1602,6 +1740,9 @@ const skuFor = (p, v) =>
 
   // Re-render whatever is showing. Each of these is a no-op off its own page.
   if (typeof renderGrid === "function" && $("[data-grid]")) renderGrid();
+  // The saved page is a grid of cards too, and a bottle that sold out while
+  // it sat on someone's list is exactly the case worth showing correctly.
+  renderSavedGrid();
   if (pdpRefresh) pdpRefresh();
   if ($("[data-cart-items]")) renderCart();
 })();

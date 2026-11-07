@@ -51,7 +51,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=40daac43" />
+  <link rel="stylesheet" href="/styles.css?v=a67cae17" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://sarvha.com/#organization","name":"Sarvha","url":"https://sarvha.com","email":"hello@sarvha.com","telephone":["+91 93154 13515","+91 98735 44554"],"description":"Single-origin essential oils and cold-pressed carriers, bottled in small batches and shipped across India.","address":{"@type":"PostalAddress","streetAddress":"B-13, Rana Pratap Bagh, Nr. GT Road Industrial Area","addressLocality":"New Delhi","postalCode":"110007","addressRegion":"Delhi","addressCountry":"IN"}},{"@type":"WebSite","@id":"https://sarvha.com/#website","url":"https://sarvha.com","name":"Sarvha","inLanguage":"en-IN","publisher":{"@id":"https://sarvha.com/#organization"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://sarvha.com/shop/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"Store","@id":"https://sarvha.com/#store","name":"Sarvha","description":"Single-origin essential oils and cold-pressed carriers, bottled in small batches and shipped across India.","url":"https://sarvha.com","image":"https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900","parentOrganization":{"@id":"https://sarvha.com/#organization"},"email":"hello@sarvha.com","telephone":["+91 93154 13515","+91 98735 44554"],"priceRange":"₹₹","currenciesAccepted":"INR","areaServed":{"@type":"Country","name":"India"},"address":{"@type":"PostalAddress","streetAddress":"B-13, Rana Pratap Bagh, Nr. GT Road Industrial Area","addressLocality":"New Delhi","postalCode":"110007","addressRegion":"Delhi","addressCountry":"IN"}}]}</script>
 </head>
 <body>
@@ -85,6 +85,15 @@
       <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
+      <!-- Hidden until there is something in it. An empty counter in the
+           chrome of every page is a permanent invitation to a dead end, and
+           the saved list is a thing you come back to, not a thing you are
+           first sold. app.js unhides it when the list is not empty. -->
+      <a class="icon-btn saved-btn" href="/saved/" aria-label="Saved items" data-saved-link hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-saved-count>0</span>
       </a>
 
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
@@ -199,6 +208,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="lavender-fields" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="lavender-fields"
+  aria-pressed="false" aria-label="Save Lavender Fields for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Relaxation · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/lavender-fields/">Lavender Fields</a></h3>
@@ -218,6 +232,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="sweet-orange-sunrise" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="sweet-orange-sunrise"
+  aria-pressed="false" aria-label="Save Sweet Orange Sunrise for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Energy · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/sweet-orange-sunrise/">Sweet Orange Sunrise</a></h3>
@@ -237,6 +256,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="peppermint-spark" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="peppermint-spark"
+  aria-pressed="false" aria-label="Save Peppermint Spark for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Energy · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/peppermint-spark/">Peppermint Spark</a></h3>
@@ -256,6 +280,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="eucalyptus-clearing" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="eucalyptus-clearing"
+  aria-pressed="false" aria-label="Save Eucalyptus Clearing for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Immunity · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/eucalyptus-clearing/">Eucalyptus Clearing</a></h3>
@@ -488,7 +517,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=40daac43"></script>
-  <script src="/app.js?v=40daac43"></script>
+  <script src="/catalog.js?v=a67cae17"></script>
+  <script src="/app.js?v=a67cae17"></script>
 </body>
 </html>

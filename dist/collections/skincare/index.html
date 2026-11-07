@@ -51,7 +51,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=40daac43" />
+  <link rel="stylesheet" href="/styles.css?v=a67cae17" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":"Skincare essential oils","description":"Cold-pressed carriers and the precious oils worth diluting into them. Everything here is meant to go on skin — safely, and in small amounts.","url":"https://sarvha.com/collections/skincare/","isPartOf":{"@id":"https://sarvha.com/#website"}},{"@type":"ItemList","name":"Skincare oils","numberOfItems":12,"itemListElement":[{"@type":"ListItem","position":1,"url":"https://sarvha.com/oils/rosehip-renewal/","name":"Rosehip Renewal"},{"@type":"ListItem","position":2,"url":"https://sarvha.com/oils/frankincense-quiet/","name":"Frankincense Quiet"},{"@type":"ListItem","position":3,"url":"https://sarvha.com/oils/geranium-balance/","name":"Geranium Balance"},{"@type":"ListItem","position":4,"url":"https://sarvha.com/oils/rosemary/","name":"Rosemary"},{"@type":"ListItem","position":5,"url":"https://sarvha.com/oils/jojoba/","name":"Jojoba Carrier Oil"},{"@type":"ListItem","position":6,"url":"https://sarvha.com/oils/sweet-almond/","name":"Sweet Almond Carrier Oil"},{"@type":"ListItem","position":7,"url":"https://sarvha.com/oils/palmarosa/","name":"Palmarosa"},{"@type":"ListItem","position":8,"url":"https://sarvha.com/oils/carrot-seed/","name":"Carrot Seed"},{"@type":"ListItem","position":9,"url":"https://sarvha.com/oils/argan/","name":"Argan Carrier Oil"},{"@type":"ListItem","position":10,"url":"https://sarvha.com/oils/coconut/","name":"Coconut Carrier Oil"},{"@type":"ListItem","position":11,"url":"https://sarvha.com/oils/grapeseed/","name":"Grapeseed Carrier Oil"},{"@type":"ListItem","position":12,"url":"https://sarvha.com/oils/neem/","name":"Neem Carrier Oil"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the difference between a carrier oil and an essential oil?","acceptedAnswer":{"@type":"Answer","text":"Carrier oils are pressed from seeds, nuts or kernels and are used neat, by the spoonful. Essential oils are distilled, extremely concentrated, and used by the drop — always diluted into a carrier before they touch skin."}},{"@type":"Question","name":"Which carrier should I buy first?","acceptedAnswer":{"@type":"Answer","text":"Jojoba, for most people. It suits the widest range of skin, it is light, and it keeps for years because it is technically a wax rather than a fat. Grapeseed if you find jojoba heavy; sweet almond if you want something richer for body use."}},{"@type":"Question","name":"How much essential oil do I add?","acceptedAnswer":{"@type":"Answer","text":"For the face, one per cent — about 6 drops per 30 ml of carrier. For the body, two per cent, around 12 drops per 30 ml. Lower for anything our product pages flag as a sensitiser."}},{"@type":"Question","name":"Will these help with acne or scarring?","acceptedAnswer":{"@type":"Answer","text":"We are not able to make claims of that kind and we will not. What we can tell you is what each oil is, where it came from, how it behaves on skin and how people use it. For a skin condition, see a dermatologist."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Collections","item":"https://sarvha.com/collections/"},{"@type":"ListItem","position":3,"name":"Skincare"}]}]}</script>
 </head>
 <body>
@@ -85,6 +85,15 @@
       <a class="icon-btn account-btn" href="/account/" aria-label="Log in or create an account" data-account-link>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         <span class="account-dot" data-account-dot hidden></span>
+      </a>
+
+      <!-- Hidden until there is something in it. An empty counter in the
+           chrome of every page is a permanent invitation to a dead end, and
+           the saved list is a thing you come back to, not a thing you are
+           first sold. app.js unhides it when the list is not empty. -->
+      <a class="icon-btn saved-btn" href="/saved/" aria-label="Saved items" data-saved-link hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-saved-count>0</span>
       </a>
 
       <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
@@ -145,6 +154,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="rosehip-renewal" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="rosehip-renewal"
+  aria-pressed="false" aria-label="Save Rosehip Renewal for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 30 ml / 100 ml</span>
       <h3 class="card__title"><a href="/oils/rosehip-renewal/">Rosehip Renewal</a></h3>
@@ -164,6 +178,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="jojoba" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="jojoba"
+  aria-pressed="false" aria-label="Save Jojoba Carrier Oil for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 100 ml / 250 ml</span>
       <h3 class="card__title"><a href="/oils/jojoba/">Jojoba Carrier Oil</a></h3>
@@ -183,6 +202,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="sweet-almond" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="sweet-almond"
+  aria-pressed="false" aria-label="Save Sweet Almond Carrier Oil for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 100 ml / 250 ml</span>
       <h3 class="card__title"><a href="/oils/sweet-almond/">Sweet Almond Carrier Oil</a></h3>
@@ -202,6 +226,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="argan" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="argan"
+  aria-pressed="false" aria-label="Save Argan Carrier Oil for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 50 ml / 100 ml</span>
       <h3 class="card__title"><a href="/oils/argan/">Argan Carrier Oil</a></h3>
@@ -221,6 +250,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="coconut" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="coconut"
+  aria-pressed="false" aria-label="Save Coconut Carrier Oil for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 100 ml / 250 ml</span>
       <h3 class="card__title"><a href="/oils/coconut/">Coconut Carrier Oil</a></h3>
@@ -240,6 +274,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="grapeseed" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="grapeseed"
+  aria-pressed="false" aria-label="Save Grapeseed Carrier Oil for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 100 ml / 250 ml</span>
       <h3 class="card__title"><a href="/oils/grapeseed/">Grapeseed Carrier Oil</a></h3>
@@ -259,6 +298,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="neem" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="neem"
+  aria-pressed="false" aria-label="Save Neem Carrier Oil for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 100 ml</span>
       <h3 class="card__title"><a href="/oils/neem/">Neem Carrier Oil</a></h3>
@@ -285,6 +329,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="frankincense-quiet" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="frankincense-quiet"
+  aria-pressed="false" aria-label="Save Frankincense Quiet for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 10 ml / 15 ml</span>
       <h3 class="card__title"><a href="/oils/frankincense-quiet/">Frankincense Quiet</a></h3>
@@ -304,6 +353,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="geranium-balance" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="geranium-balance"
+  aria-pressed="false" aria-label="Save Geranium Balance for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 15 ml</span>
       <h3 class="card__title"><a href="/oils/geranium-balance/">Geranium Balance</a></h3>
@@ -323,6 +377,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="rosemary" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="rosemary"
+  aria-pressed="false" aria-label="Save Rosemary for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/rosemary/">Rosemary</a></h3>
@@ -342,6 +401,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="palmarosa" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="palmarosa"
+  aria-pressed="false" aria-label="Save Palmarosa for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 15 ml / 30 ml</span>
       <h3 class="card__title"><a href="/oils/palmarosa/">Palmarosa</a></h3>
@@ -361,6 +425,11 @@
     loading="lazy" decoding="async"
     sizes="(max-width: 860px) 50vw, 25vw" data-pid="carrot-seed" onerror="artFallback(this)" />
     </a>
+    <button class="heart heart--card" data-save="carrot-seed"
+  aria-pressed="false" aria-label="Save Carrot Seed for later">
+  <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.3c-.9-.6-7-4.8-7-9.6a4.1 4.1 0 0 1 7-2.9 4.1 4.1 0 0 1 7 2.9c0 4.8-6.1 9-7 9.6z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+  <span class="heart__text">Save</span>
+</button>
     <div class="card__body">
       <span class="card__meta">Skincare · 10 ml</span>
       <h3 class="card__title"><a href="/oils/carrot-seed/">Carrot Seed</a></h3>
@@ -637,7 +706,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=40daac43"></script>
-  <script src="/app.js?v=40daac43"></script>
+  <script src="/catalog.js?v=a67cae17"></script>
+  <script src="/app.js?v=a67cae17"></script>
 </body>
 </html>

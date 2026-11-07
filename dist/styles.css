@@ -264,13 +264,65 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
 
 /* Product grid */
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
-.card { background: var(--paper); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform .25s, box-shadow .25s; border: 1px solid #efe7d7; }
+/* position: relative is for the heart, which sits over the media but cannot
+   live inside it — .card__media is an <a>, and a button inside an anchor is
+   invalid markup that behaves differently in every browser. */
+.card { position: relative; background: var(--paper); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform .25s, box-shadow .25s; border: 1px solid #efe7d7; }
 .card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
 .card__media { position: relative; aspect-ratio: 1 / 1.05; display: grid; place-items: center; cursor: pointer; border: 0; padding: 0; width: 100%; }
 .card__media .bottle { width: 42%; transition: transform .35s; }
 .card:hover .card__media .bottle { transform: translateY(-6px) rotate(-3deg); }
 .badge { position: absolute; top: 12px; left: 12px; background: var(--paper); color: var(--forest); font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: .3rem .6rem; border-radius: 999px; }
 .badge--sale { background: var(--terracotta-dark); color: #fff; }
+/* ---------------------------------------------------------------- hearts */
+
+/* On a card the heart is a chip over the top-right corner of the photograph.
+   44px square: the WCAG target size, which a 19px icon on its own is not. */
+.heart--card {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  width: 44px; height: 44px; display: grid; place-items: center;
+  padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  /* Over photography of any colour, so it carries its own background. */
+  background: rgba(246, 241, 231, .88);
+  backdrop-filter: blur(4px);
+  color: var(--ink);
+  transition: background .2s, color .2s, transform .2s;
+}
+.heart--card:hover { background: var(--paper); transform: scale(1.06); }
+/* The global focus ring sets border-radius: 4px, which turns the round chip
+   into a rounded square the moment a keyboard reaches it. */
+.heart--card:focus-visible { border-radius: 50%; outline-offset: 2px; }
+/* The word is for the PDP button; on a card the icon and the label carry it. */
+.heart--card .heart__text {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* Saved is a filled heart in terracotta. Shape as well as colour, so it does
+   not depend on telling two hues apart. */
+.heart[aria-pressed="true"] { color: var(--terracotta-dark); }
+.heart[aria-pressed="true"] svg path { fill: currentColor; }
+
+/* Beside Add to cart: a bordered secondary button, with its word showing. */
+.pdp__cta { display: flex; gap: .6rem; align-items: stretch; }
+.pdp__cta .btn { flex: 1; }
+.heart--pdp {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .75rem 1rem; background: none; cursor: pointer;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  color: var(--ink); font: inherit; font-size: .88rem; font-weight: 500;
+  transition: border-color .2s, color .2s, background .2s;
+}
+.heart--pdp:hover { border-color: var(--terracotta-dark); color: var(--terracotta-dark); }
+@media (max-width: 420px) {
+  /* Two buttons on one row at 375px leaves "Add to cart" too narrow to read
+     as the primary action. Stacked, it keeps the full width. */
+  .pdp__cta { flex-direction: column; }
+  .heart--pdp { justify-content: center; }
+}
+
+.saved__count { color: var(--muted); font-size: .9rem; margin: 0 0 1.2rem; }
+
 .card__body { padding: 1rem 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }
 .card__meta { font-size: .74rem; color: var(--sage-text); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 .card__title { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; margin: 0; cursor: pointer; }
