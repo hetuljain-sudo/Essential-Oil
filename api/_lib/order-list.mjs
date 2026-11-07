@@ -24,6 +24,7 @@
 export async function listOrders(sql, { limit = 100 } = {}) {
   const rows = await sql`
     select o.id, o.status, o.subtotal_paise, o.shipping_paise, o.total_paise,
+           o.discount_code, o.discount_paise,
            o.created_at, o.paid_at, o.shipped_at, o.tracking, o.thanked_at, o.notes,
            o.resolved_at, o.resolution,
            o.customer_name, o.customer_email, o.customer_phone,

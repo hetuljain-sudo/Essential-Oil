@@ -554,6 +554,41 @@ body.menu-open .header { z-index: 56; }
   margin-top: .4rem; padding-top: .7rem !important;
   border-top: 1px solid var(--line); color: var(--ink); font-weight: 600; font-size: 1rem;
 }
+/* The one line in the summary that is money coming back. Terracotta, and the
+   only green here would read as a validation tick rather than a saving. */
+.checkout__discount { color: var(--terracotta-dark) !important; font-weight: 500; }
+.checkout__discount code {
+  font-size: .78rem; letter-spacing: .04em; background: var(--sand);
+  padding: .1rem .35rem; border-radius: 4px; margin-left: .3rem;
+}
+
+/* ---------------------------------------------------------- promo code */
+
+.promo {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: .6rem;
+  margin: 1rem 0 1.6rem;
+}
+.promo__row { flex: 1 1 12rem; display: block; }
+.promo__label {
+  display: block; font-size: .78rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: .3rem;
+}
+.promo input {
+  width: 100%; padding: .7rem .8rem; font: inherit; letter-spacing: .06em;
+  text-transform: uppercase;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper);
+}
+/* The field upper-cases what is typed, which turned the hint into a shouted
+   "E.G. DIWALI10". The example still shows in capitals; the "e.g." does not. */
+.promo input::placeholder { text-transform: none; }
+/* An applied code is read-only until it is removed, and should look it
+   rather than looking broken. */
+.promo input:disabled { background: var(--sand); color: var(--ink); opacity: 1; }
+.promo .btn { flex: 0 0 auto; }
+/* Full width, below both, so a message never squeezes the field. */
+.promo__note { flex: 1 0 100%; margin: 0; font-size: .85rem; }
+.promo__note.is-ok { color: var(--sage-text); }
+.promo__note.is-bad { color: var(--terracotta-dark); }
 
 /* Account icon in the header. The dot is the whole signed-in indicator —
    a name up there would push the nav around on narrow screens. */
@@ -877,6 +912,26 @@ body.menu-open .header { z-index: 56; }
 .adetail__grid p { margin: 0 0 .5rem; font-size: .86rem; }
 .adetail__items { list-style: none; padding: 0; margin: 0 0 .5rem; font-size: .86rem; }
 .adetail__items li { margin-bottom: .25rem; }
+
+/* The new-code form. A row of small fields on a wide screen, stacking on a
+   narrow one, with the help text spanning whatever the row turned out to be. */
+.admin__code {
+  display: grid; gap: .7rem 1rem; padding: 1rem 1.1rem;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  align-items: end;
+}
+.admin__code label {
+  display: flex; flex-direction: column; gap: .3rem;
+  font-size: .72rem; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--muted);
+}
+.admin__code input, .admin__code select {
+  font: inherit; font-size: .9rem; text-transform: none; letter-spacing: 0;
+  padding: .45rem .55rem; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--paper); color: var(--ink); width: 100%;
+}
+.admin__code .abtn { align-self: end; }
+.admin__code .amuted { grid-column: 1 / -1; margin: 0; font-size: .8rem; }
 
 @media (max-width: 720px) {
   .abar__inner { gap: .8rem; }

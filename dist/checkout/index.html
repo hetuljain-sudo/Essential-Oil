@@ -50,7 +50,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=a67cae17" />
+  <link rel="stylesheet" href="/styles.css?v=f0a223db" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Checkout"}]}]}</script>
 </head>
 <body>
@@ -119,6 +119,20 @@
 
     <div data-checkout-body hidden>
       <div class="checkout__summary" data-checkout-summary></div>
+
+      <!-- Not a <form>: it sits inside the checkout form, and a nested form
+           is invalid markup whose submit button submits the outer one — in
+           this case paying for the order. The button is type="button" for
+           the same reason. -->
+      <div class="promo" data-promo>
+        <label class="promo__row">
+          <span class="promo__label">Discount code</span>
+          <input type="text" name="code" autocomplete="off" autocapitalize="characters"
+                 spellcheck="false" placeholder="e.g. DIWALI10" data-code-input />
+        </label>
+        <button class="btn btn--ghost" type="button" data-code-apply>Apply</button>
+        <p class="promo__note" data-code-note role="status" hidden></p>
+      </div>
 
       <form class="auth-form" data-checkout-form novalidate>
         <div class="auth-form__error" data-checkout-error hidden role="alert"></div>
@@ -234,7 +248,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=a67cae17"></script>
-  <script src="/app.js?v=a67cae17"></script>
+  <script src="/catalog.js?v=f0a223db"></script>
+  <script src="/app.js?v=f0a223db"></script>
 </body>
 </html>

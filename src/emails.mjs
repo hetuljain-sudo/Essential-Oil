@@ -92,6 +92,9 @@ export function confirmationEmail(order) {
   const subject = `Order confirmed — ${site.name} (${reference(order.id)})`;
 
   const shipping = Number(order.shipping_paise ?? 0);
+  /* Without this line the email shows ₹699 plus ₹79 coming to ₹628 and
+     invites a "you've charged me wrong" reply to an inbox nobody staffs. */
+  const discount = Number(order.discount_paise ?? 0);
 
   const text = `Hi ${firstName(order.customer_name)},
 
@@ -104,7 +107,10 @@ What you bought
 ${pricedLines(order.items)}
 
 Subtotal${" ".repeat(Math.max(2, 46 - 8))}${rupees(order.subtotal_paise)}
-Shipping${" ".repeat(Math.max(2, 46 - 8))}${shipping === 0 ? "Free" : rupees(shipping)}
+Shipping${" ".repeat(Math.max(2, 46 - 8))}${shipping === 0 ? "Free" : rupees(shipping)}${
+discount > 0 ? `
+Discount (${order.discount_code})${
+  " ".repeat(Math.max(2, 46 - 11 - String(order.discount_code).length))}-${rupees(discount)}` : ""}
 Total${" ".repeat(Math.max(2, 46 - 5))}${rupees(order.total_paise)}
 
 Going to

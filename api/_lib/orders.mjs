@@ -42,9 +42,28 @@ export async function markPaid(sql, payment, { sendMail = sendEmail } = {}) {
        set status = 'paid', razorpay_payment_id = ${paymentId}, paid_at = now()
      where razorpay_order_id = ${razorpayOrderId}
        and status = 'created'
-     returning id, total_paise`;
+     returning id, total_paise, discount_code`;
 
   if (!order) return { settled: false }; // already settled, or never ours
+
+  /*
+   * A code counts as used when money arrives, not when a checkout starts.
+   *
+   * Counting at checkout would let abandoned carts burn through a hundred
+   * Diwali codes without a rupee taken. The cost of counting here is a
+   * window: between a shopper being quoted the last code and paying for it,
+   * someone else can be quoted it too, and both get the discount. That
+   * overspends the limit by the number of checkouts open at once, which at
+   * this shop's volume is a rounding error against the alternative.
+   *
+   * Inside the 'created' guard above, so a redelivered webhook cannot count
+   * the same order twice.
+   */
+  if (order.discount_code) {
+    await sql`
+      update discount_codes set times_redeemed = times_redeemed + 1
+       where code = ${order.discount_code}`;
+  }
 
   // What Razorpay captured should be what we asked for. If it is not,
   // something is wrong upstream and a human needs to look before we ship.

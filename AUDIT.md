@@ -38,7 +38,7 @@ auth/{register, session, account, recover},
 admin/{orders, messages, stock}
 ```
 
-Nine Postgres tables on Neon. The parts that matter are right: the browser is
+Ten Postgres tables on Neon. The parts that matter are right: the browser is
 never believed about money, orders become `paid` only in the signed webhook,
 the webhook is idempotent, stock cannot be decremented twice, passwords are
 scrypt hashes, session and reset tokens are stored only as SHA-256, cookies
@@ -87,7 +87,7 @@ These are in order. Nothing below this section matters until these are done.
 | **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
 | **Shop filters** | Scent family, price band and in-stock-only added 7 November, alongside the existing collection chips, search and sort. All of it is in the URL, so a filtered view can be shared. |
 | **Wishlist** | Added 7 November. A heart on every card and product page, a `/saved/` page, and a counter in the header that appears once the list has something in it. Kept in `localStorage`, so it does not follow you to another device — tying it to the account needs a function slot and there are none. The page says so. |
-| **No discount codes** | Nothing in the backend can issue, store or redeem one. The newsletter band used to offer 10% off a first order and the copy was already changed to what the list actually is, so nothing unhonourable is being advertised — but a shop with no mechanism for a code has no lever for a festival sale either. |
+| **Discount codes** | Added 7 November. Percentage or fixed amount, with an optional minimum spend, usage limit and expiry; made and retired from a Codes tab in the admin. The server prices every code, shipping is never discounted, and a code counts as used when payment settles rather than when a checkout starts. |
 | **No "notify me when back in stock"** | Sold-out variants are a dead end. |
 | **Gift sets** | Four added 6 November: Sleep & Unwind, Bright Mornings, Seasonal Care and the Carrier Oil Duo, each priced 9–11% under its parts. Each is a product with its own SKU and stock, so it is a box you assemble and count. No photographs of the boxes yet. |
 | **Cart does not survive a device change** | `localStorage` only, not tied to the account. |
@@ -133,8 +133,7 @@ These are in order. Nothing below this section matters until these are done.
 
 **Then, to be a complete shop:**
 
-10. Discount codes — the offer is already withdrawn, so this is about having
-    the lever, not repairing a promise.
+10. ~~Discount codes~~ — done 7 November.
 11. Unsubscribe endpoint, before any marketing email.
 12. GST invoices.
 13. Analytics.

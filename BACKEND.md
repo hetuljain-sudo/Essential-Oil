@@ -23,7 +23,7 @@ api/admin/messages.js        list · mark handled
 api/admin/stock.js           list · set a quantity
 
 api/_lib/                    pricing, database, email, Razorpay, plumbing
-db/schema.sql                nine tables
+db/schema.sql                ten tables
 db/seed-stock.mjs            fill the stock table from the catalogue
 ```
 
@@ -195,10 +195,36 @@ telling a bot it failed only invites a better-dressed attempt.
 Neither sends email, so nobody is notified that a message arrived. Until
 that exists, check the table.
 
-**There is still no discount-code system.** The homepage offers 10% off a
-first order and nothing in the backend can issue, store or redeem a code.
-The confirmation now says only "You're on the list", which is true, but the
-offer above it is not yet something the site can honour.
+## Discount codes
+
+`discount_codes` holds them; `src/discount.mjs` holds the rules and is tested
+without a database. A code is either a whole percentage or a fixed number of
+paise, with an optional minimum spend, usage limit and expiry.
+
+Four decisions worth knowing before changing any of it:
+
+- **Shipping is never discounted**, and the free-shipping threshold is judged
+  on the subtotal *before* the code. A ₹1,050 cart with a 20% code keeps its
+  free shipping rather than dropping under the line and gaining a ₹79 charge.
+- **Percentages round to the nearest whole rupee.** Every price in the shop
+  is a whole number of rupees; 10% of ₹699 is ₹69.90, which renders as
+  "₹69.9" and looks like a bug to the person about to pay.
+- **A code can never take the payable total below ₹1** — Razorpay's floor and
+  the schema's `total_paise > 0`. It is capped, not refused.
+- **A code counts as used when the webhook settles the payment**, not when a
+  checkout starts, so abandoned carts do not burn a limited run. The cost is
+  a window in which concurrent checkouts can overspend the limit by the
+  number of them open at once.
+
+`POST /api/checkout` with `{ preview: true }` prices a cart and stops —
+no order row, no Razorpay call. That is how the checkout page shows what a
+code is worth, and it means the quote and the charge come from one path.
+
+Codes are made and retired from the Codes tab in `/admin/`, through actions
+on `/api/admin/orders` rather than a file of their own — see the note at the
+top of that handler about the twelve-function cap. A code cannot be edited
+once it exists; retire it and issue another, because editing one silently
+changes what it is worth to everyone already holding it.
 
 ## Saved addresses
 
@@ -208,7 +234,7 @@ overwritten each time: a chooser is worth building when someone asks for one.
 
 ## Admin
 
-`/admin/` — orders, messages and stock. Noindex and out of the sitemap.
+`/admin/` — orders, messages, stock and discount codes. Noindex and out of the sitemap.
 
 ```
 api/admin/orders.js     list; mark dispatched; record what was done about an

@@ -305,6 +305,7 @@ const adminBar = () => `
         <button class="abar__tab is-on" role="tab" data-tab="orders">Orders</button>
         <button class="abar__tab" role="tab" data-tab="messages">Messages</button>
         <button class="abar__tab" role="tab" data-tab="stock">Stock</button>
+        <button class="abar__tab" role="tab" data-tab="codes">Codes</button>
       </nav>
       <div class="abar__side">
         <a class="abar__link" href="/" target="_blank" rel="noopener">View shop</a>

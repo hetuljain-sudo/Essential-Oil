@@ -10,7 +10,17 @@ const C = window.CATALOG || { products: [], categories: [], currency: "₹", loc
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-const money = (n) => C.currency + n.toLocaleString(C.locale);
+/*
+ * Whole rupees show bare; anything with paise in it shows both digits.
+ *
+ * Without the second case a fractional amount renders as "₹708.1", which
+ * reads as a broken price rather than as seven hundred and eight rupees ten
+ * paise. Nothing in the catalogue is fractional, so this never came up until
+ * discount codes could produce one.
+ */
+const money = (n) => C.currency + n.toLocaleString(C.locale, Number.isInteger(n)
+  ? undefined
+  : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const byId = (id) => C.products.find((p) => p.id === id);
 const catLabel = (id) => (C.categories.find((c) => c.id === id) || { label: id }).label;
 const fromPrice = (p) => Math.min(...p.variants.map((v) => v.price));
@@ -92,6 +102,14 @@ function saveCart() {
 }
 
 let cart = loadCart();
+
+/*
+ * Set by the checkout page, which is the one place that has to react to the
+ * cart changing underneath it: it holds a quote from the server, and a quote
+ * for a cart that no longer exists is a wrong number on a payment screen.
+ * Null everywhere else, hence the optional call in renderCart.
+ */
+let cartChanged = null;
 
 function addToCart(id, size, qty = 1) {
   const p = byId(id);
@@ -198,6 +216,8 @@ function renderCart() {
          <p class="muted small">Add a few oils and they'll show up here.</p>
          <a class="btn btn--ghost" href="/shop/">Start shopping</a>
        </div>`;
+
+  cartChanged?.();
 }
 
 /* ------------------------------------------------------ focus management */
@@ -1533,13 +1553,28 @@ if (checkoutGate) {
     errorBox.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
 
+  /*
+   * A code the server has confirmed, and the quote it gave for it.
+   *
+   * The browser never works out what a code is worth. It asks, and shows the
+   * answer. That is not caution for its own sake: the discount table lives in
+   * the database, so the only honest way to display a saving is to have been
+   * told it, and doing it this way means the number on the summary and the
+   * number charged came out of the same function on the same request.
+   */
+  let appliedCode = null;
+  let quoted = null;
+
   const renderSummary = () => {
     const lines = Object.entries(cart).filter(([k]) => lineProduct(k) && lineVariant(k));
     const subtotal = lines.reduce((s, [k, q]) => s + lineVariant(k).price * q, 0);
     const ship = subtotal >= C.freeShippingAt ? 0 : C.shippingFlat;
+    // The local sums are shown for reassurance only. Once a code has been
+    // applied the server's quote replaces them, because it is the one with
+    // the discount in it.
+    const discount = quoted ? quoted.discountPaise / 100 : 0;
+    const total = quoted ? quoted.totalPaise / 100 : subtotal + ship;
 
-    // Shown for reassurance only. The server prices the order again and its
-    // answer is the one that gets charged.
     $("[data-checkout-summary]").innerHTML = `
       <h2>Your order</h2>
       <ul class="checkout__lines">
@@ -1548,10 +1583,105 @@ if (checkoutGate) {
           return `<li><span>${esc(p.name)} ${esc(v.size)} × ${q}</span>
                       <span>${money(v.price * q)}</span></li>`;
         }).join("")}
+        ${discount > 0
+          ? `<li class="checkout__discount"><span>Discount
+               <code>${esc(appliedCode)}</code></span><span>−${money(discount)}</span></li>`
+          : ""}
         <li><span>Shipping</span><span>${ship === 0 ? "Free" : money(ship)}</span></li>
-        <li class="checkout__total"><span>Total</span><span>${money(subtotal + ship)}</span></li>
+        <li class="checkout__total"><span>Total</span><span>${money(total)}</span></li>
       </ul>`;
   };
+
+  /* -------------------------------------------------------- discount code */
+
+  const codeInput = $("[data-code-input]");
+  const codeBtn = $("[data-code-apply]");
+  const codeNote = $("[data-code-note]");
+
+  const sayAboutCode = (message, ok) => {
+    codeNote.textContent = message;
+    codeNote.hidden = !message;
+    codeNote.classList.toggle("is-ok", !!ok);
+    codeNote.classList.toggle("is-bad", message && !ok);
+  };
+
+  const clearCode = () => {
+    appliedCode = null;
+    quoted = null;
+    codeInput.value = "";
+    codeInput.disabled = false;
+    codeBtn.textContent = "Apply";
+    sayAboutCode("", false);
+    renderSummary();
+  };
+
+  async function applyCode() {
+    // The same button removes it again. Two buttons for one slot, one of
+    // them always doing nothing, is more chrome than this deserves.
+    if (appliedCode) return clearCode();
+
+    const typed = codeInput.value.trim();
+    if (!typed) return sayAboutCode("Enter a code first.", false);
+
+    codeBtn.disabled = true;
+    codeBtn.textContent = "Checking…";
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        // preview: price it, tell us, create nothing.
+        body: JSON.stringify({ preview: true, items: cartItems(), code: typed }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 401) {
+        location.href = "/account/login/?next=%2Fcheckout%2F";
+        return;
+      }
+      if (!res.ok) {
+        codeBtn.textContent = "Apply";
+        return sayAboutCode(data.error || "That code could not be applied.", false);
+      }
+
+      quoted = data.summary;
+      appliedCode = data.summary.code;
+      codeInput.value = appliedCode;
+      codeInput.disabled = true;
+      codeBtn.textContent = "Remove";
+      sayAboutCode(`${money(quoted.discountPaise / 100)} off applied.`, true);
+      renderSummary();
+    } catch {
+      codeBtn.textContent = "Apply";
+      sayAboutCode("We couldn't check that code. Please try again.", false);
+    } finally {
+      codeBtn.disabled = false;
+    }
+  }
+
+  /*
+   * The cart drawer is on this page too, so the order can be edited while a
+   * quote is on screen. A discount worked out for a cart that no longer
+   * exists is a wrong number sitting above a Pay button, so the code comes
+   * off and the shopper is told why rather than silently re-quoted.
+   */
+  cartChanged = () => {
+    if (!appliedCode) return renderSummary();
+    clearCode();
+    sayAboutCode("Your cart changed, so the code came off. Apply it again.", false);
+  };
+
+  if (codeBtn) {
+    codeBtn.addEventListener("click", applyCode);
+    // Enter in the code field applies the code. Without this it submits the
+    // checkout form, which is a keystroke away from paying the undiscounted
+    // total — the worst possible outcome of pressing Enter on a promo field.
+    codeInput.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      applyCode();
+    });
+  }
 
   const loadRazorpay = () =>
     new Promise((resolve, reject) => {
@@ -1619,6 +1749,11 @@ if (checkoutGate) {
     const f = Object.fromEntries(new FormData(form));
     const payload = {
       items: cartItems(),
+      // Sent as the shopper's request, not as a settled fact. The server
+      // looks the code up again and decides for itself; if the cart has
+      // changed since the quote and the code no longer qualifies, it says so
+      // and nothing is charged.
+      code: appliedCode,
       name: f.name, phone: f.phone, notes: f.notes,
       address: {
         line1: f.line1, line2: f.line2, city: f.city,
@@ -1940,6 +2075,9 @@ if (adminGate) {
                         `<li>${i.qty} × ${esc(i.name)} ${esc(i.size)}</li>`).join("")}</ul>
                       <p class="amuted">Shipping ${
                         o.shipping_paise ? rupees(o.shipping_paise) : "free"}</p>
+                      ${Number(o.discount_paise) > 0
+                        ? `<p class="amuted">Discount ${esc(o.discount_code ?? "")}
+                             −${rupees(o.discount_paise)}</p>` : ""}
                       ${o.shipped_at ? `<p class="amuted">Dispatched ${date(o.shipped_at)}${
                         o.tracking ? ` · ${esc(o.tracking)}` : ""}</p>` : ""}
                     </div>
@@ -2171,7 +2309,107 @@ if (adminGate) {
       </div>`;
   }
 
-  const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock };
+  /**
+   * Discount codes: the list, and the form that makes one.
+   *
+   * The form asks for rupees and the handler converts to paise before
+   * sending, because nobody types a minimum spend in paise and a field that
+   * wanted 99900 would eventually be given 999.
+   */
+  async function loadCodes() {
+    const { codes } = await apiGet("/api/admin/orders?codes=1");
+
+    /*
+     * The badge answers "would this work if someone typed it", not "is the
+     * active flag true".
+     *
+     * Those are different, and the first draft showed the flag: a code at
+     * 5 of 5 uses and one that expired in January both sat there in green
+     * saying ACTIVE, which is how you end up printing a dead code on a
+     * flyer. refusalFor is the same function the checkout refuses with, so
+     * this label cannot drift away from the behaviour. Infinity stands in
+     * for the basket, because the minimum spend is the shopper's problem,
+     * not a fact about the code.
+     */
+    const stateOf = (c) => {
+      const refusal = refusalFor(c, Infinity);
+      if (!refusal) return { label: "active", tone: "paid" };
+      if (refusal.code === "inactive_code") return { label: "retired", tone: "oversold" };
+      if (refusal.code === "expired_code") return { label: "expired", tone: "oversold" };
+      return { label: "used up", tone: "oversold" };
+    };
+
+    const live = codes.filter((c) => !refusalFor(c, Infinity)).length;
+
+    panel("codes").innerHTML = `
+      <p class="astat">${live} usable · ${codes.length} in all</p>
+
+      <div class="apanel">
+        <form class="admin__code" data-code-new>
+          <label>Code
+            <input name="code" required placeholder="DIWALI10" autocapitalize="characters"
+              autocomplete="off" spellcheck="false" />
+          </label>
+          <label>Type
+            <select name="kind">
+              <option value="percent">% off</option>
+              <option value="fixed">₹ off</option>
+            </select>
+          </label>
+          <label>Value
+            <input name="value" type="number" min="1" required
+              aria-describedby="code-help" />
+          </label>
+          <label>Min spend ₹
+            <input name="minSubtotal" type="number" min="0" value="0" />
+          </label>
+          <label>Max uses
+            <input name="maxRedemptions" type="number" min="1" placeholder="∞" />
+          </label>
+          <label>Expires
+            <input name="expiresAt" type="date" />
+          </label>
+          <button class="abtn abtn--go" type="submit">Create</button>
+          <p class="amuted" id="code-help">A percentage is whole percent, up to
+            ${MAX_PERCENT}. An amount is in rupees, and needs a minimum spend above
+            it so the code cannot empty a cart. A code cannot be edited once it
+            exists — retire it and make another.</p>
+        </form>
+      </div>
+
+      <div class="apanel">
+        <table class="atable">
+          <thead><tr>
+            <th>Code</th><th>Worth</th><th>Conditions</th>
+            <th class="atable--num">Used</th><th></th>
+          </tr></thead>
+          <tbody>${codes.length ? codes.map((c) => {
+            const state = stateOf(c);
+            return `
+            <tr class="arow${state.label === "active" ? "" : " is-warn"}">
+              <td><strong class="amono">${esc(c.code)}</strong>
+                <span class="abadge abadge--${state.tone}">${state.label}</span></td>
+              <td>${esc(describeDiscount(c))}</td>
+              <td class="amuted">
+                ${Number(c.min_subtotal_paise) > 0
+                  ? `over ${money(Number(c.min_subtotal_paise) / 100)}` : "any basket"}${
+                  c.expires_at ? ` · until ${date(c.expires_at)}` : ""}
+              </td>
+              <td class="atable--num">${c.times_redeemed}${
+                c.max_redemptions != null ? ` / ${c.max_redemptions}` : ""}</td>
+              <td>
+                <button class="abtn" data-code-toggle="${esc(c.code)}"
+                  data-to="${c.active ? "retire" : "revive"}">${
+                  c.active ? "Retire" : "Revive"}</button>
+              </td>
+            </tr>`;
+          }).join("")
+            : `<tr><td colspan="5" class="amuted">No codes yet.</td></tr>`}</tbody>
+        </table>
+      </div>`;
+  }
+
+  const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock, codes: loadCodes };
 
   /* ---------------------------------------------------------- search */
   /* Filters the rows already drawn, rather than asking the server on every
@@ -2260,6 +2498,20 @@ if (adminGate) {
 
   root.addEventListener("click", async (e) => {
 
+    const codeToggle = e.target.closest("[data-code-toggle]");
+    if (codeToggle) {
+      const retiring = codeToggle.dataset.to === "retire";
+      const result = await post("/api/admin/orders", {
+        action: retiring ? "code-retire" : "code-revive",
+        code: codeToggle.dataset.codeToggle,
+      });
+      if (result) {
+        say(retiring ? "Code retired." : "Code is live again.");
+        await loadCodes();
+      }
+      return;
+    }
+
     const done = e.target.closest("[data-handled]");
     if (done) {
       const result = await post("/api/admin/messages", {
@@ -2293,6 +2545,29 @@ if (adminGate) {
         sku: stock.dataset.stock, quantity: Number(stock.quantity.value),
       });
       if (result) say("Stock updated.");
+      return;
+    }
+
+    const newCode = e.target.closest("[data-code-new]");
+    if (newCode) {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(newCode));
+      const result = await post("/api/admin/orders", {
+        action: "code-create",
+        code: f.code,
+        kind: f.kind,
+        // Rupees on screen, paise on the wire — for a fixed amount. A
+        // percentage is a percentage and is sent as typed.
+        value: f.kind === "fixed" ? Math.round(Number(f.value) * 100) : Number(f.value),
+        minSubtotalPaise: Math.round(Number(f.minSubtotal || 0) * 100),
+        maxRedemptions: f.maxRedemptions === "" ? null : Number(f.maxRedemptions),
+        // A date input gives a day; a code is live to the end of it.
+        expiresAt: f.expiresAt ? `${f.expiresAt}T23:59:59` : null,
+      });
+      if (result) {
+        say(`${result.code} is live.`);
+        await loadCodes();
+      }
     }
   });
 

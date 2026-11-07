@@ -102,7 +102,11 @@ const isoDate = (value) => {
 const ORDER_COLUMNS = [
   "Order ID", "Date", "Status", "Customer", "Phone", "Email",
   "Address", "City", "State", "PIN",
-  "Items", "Subtotal", "Shipping", "Total", "Tracking", "Dispatched", "Notes",
+  // Discount sits between Shipping and Total because without it the three
+  // money columns do not add up on a discounted order, and a spreadsheet
+  // that does not add up is one somebody reconciles by hand forever.
+  "Items", "Subtotal", "Shipping", "Discount", "Code", "Total",
+  "Tracking", "Dispatched", "Notes",
 ];
 
 /**
@@ -132,6 +136,10 @@ function ordersToRows(orders) {
       items,
       rupees(o.subtotal_paise),
       rupees(o.shipping_paise),
+      // Orders placed before codes existed have no column value at all,
+      // hence the fallback; they are genuinely zero, not unknown.
+      rupees(o.discount_paise ?? 0),
+      o.discount_code ?? "",
       rupees(o.total_paise),
       o.tracking ?? "",
       isoDate(o.shipped_at),
@@ -359,6 +367,214 @@ function limitReason(variant, name = "", size = "") {
 }
 
 /**
+ * What a discount code is worth, and whether it may be used.
+ *
+ * Pure arithmetic and rules. No database, no request, no clock of its own —
+ * the caller passes `now`, so a test can sit on either side of an expiry
+ * without waiting. The server imports this to decide what to charge; the
+ * admin page imports the same limits to refuse a code it would never accept.
+ *
+ * Money is integer paise throughout, like the rest of the shop.
+ *
+ * Two rules worth stating before the code, because both are decisions rather
+ * than arithmetic:
+ *
+ *   Shipping is never discounted, and the free-shipping threshold is judged
+ *   on the subtotal BEFORE the discount. A ₹1,050 cart with a 20% code keeps
+ *   its free shipping. The alternative — discount first, then decide — hands
+ *   someone a ₹210 saving and a ₹79 charge they did not have a moment ago,
+ *   which reads as a trick even when the maths is honest.
+ *
+ *   A discount may never take the payable total below ₹1. Razorpay will not
+ *   accept an order under a rupee, and `orders.total_paise` is checked > 0 in
+ *   the schema, so a code that would zero a cart is capped rather than
+ *   refused. The shopper is told what came off, which is the true number.
+ */
+
+/** Razorpay's floor, and the schema's. */
+const MIN_PAYABLE_PAISE = 100;
+
+/**
+ * Half off is the most any code may be worth.
+ *
+ * Not a technical limit. It is the number that makes a mistyped "90" at the
+ * admin screen a refusal rather than a weekend of selling at a tenth of
+ * cost, and the shop has no margin data in it to check against anything
+ * cleverer.
+ */
+const MAX_PERCENT = 50;
+
+/** Letters, digits and hyphens. Long enough to not be guessed in a loop. */
+const CODE_PATTERN = /^[A-Z0-9][A-Z0-9-]{2,23}$/;
+
+const DISCOUNT_KINDS = ["percent", "fixed"];
+
+/** A refusal the shopper can act on — safe to show them verbatim. */
+class DiscountError extends Error {
+  constructor(message, code = "invalid_code") {
+    super(message);
+    this.name = "DiscountError";
+    this.code = code;
+  }
+}
+
+/**
+ * The canonical form of whatever was typed.
+ *
+ * Codes are printed on cards and read aloud, so they arrive with stray
+ * spaces and in whatever case the keyboard was in. One spelling is stored
+ * and compared; `diwali25`, ` Diwali25 ` and `DIWALI 25` are one code.
+ */
+const normalizeCode = (raw) =>
+  String(raw ?? "").trim().toUpperCase().replace(/\s+/g, "");
+
+/** `{ code }` or `{ error }` — the shape check, before any lookup. */
+function readCode(raw) {
+  const code = normalizeCode(raw);
+  if (!code) return { error: "Enter a code." };
+  if (!CODE_PATTERN.test(code)) {
+    return { error: "That doesn't look like one of our codes." };
+  }
+  return { code };
+}
+
+/**
+ * Check what an admin typed, before it reaches the database.
+ *
+ * Returns `{ definition }` or `{ errors }` with every problem, not the first:
+ * a form that reveals its objections one at a time is a form people fill in
+ * four times.
+ */
+function parseDefinition(input = {}) {
+  const errors = [];
+
+  const { code, error: codeError } = readCode(input.code);
+  if (codeError) errors.push(codeError);
+
+  const kind = String(input.kind ?? "").trim();
+  if (!DISCOUNT_KINDS.includes(kind)) errors.push("Choose a percentage or an amount off.");
+
+  const value = Number(input.value);
+  if (!Number.isInteger(value) || value < 1) {
+    errors.push("The value has to be a whole number of at least one.");
+  } else if (kind === "percent" && value > MAX_PERCENT) {
+    errors.push(`${MAX_PERCENT}% is the most a code may take off.`);
+  }
+
+  const minSubtotal = Number(input.minSubtotalPaise ?? 0);
+  if (!Number.isInteger(minSubtotal) || minSubtotal < 0) {
+    errors.push("The minimum spend has to be a whole number of paise, or nothing.");
+  }
+
+  /*
+   * A fixed code worth more than its own minimum spend is the mistake that
+   * costs money: ₹500 off with no minimum is a free ₹499 bottle. The rule is
+   * that the minimum must leave at least a rupee payable, which is the same
+   * floor the applied discount is capped at.
+   */
+  if (kind === "fixed" && Number.isInteger(value) && Number.isInteger(minSubtotal)) {
+    if (minSubtotal < value + MIN_PAYABLE_PAISE) {
+      errors.push("Set a minimum spend at least ₹1 above the amount off, or the code can empty a cart.");
+    }
+  }
+
+  const maxRedemptions = input.maxRedemptions == null || input.maxRedemptions === ""
+    ? null
+    : Number(input.maxRedemptions);
+  if (maxRedemptions !== null && (!Number.isInteger(maxRedemptions) || maxRedemptions < 1)) {
+    errors.push("A usage limit has to be a whole number of at least one, or left empty.");
+  }
+
+  let expiresAt = null;
+  if (input.expiresAt) {
+    expiresAt = new Date(input.expiresAt);
+    if (Number.isNaN(expiresAt.getTime())) errors.push("That expiry date could not be read.");
+  }
+
+  if (errors.length) return { errors };
+  return { definition: { code, kind, value, minSubtotalPaise: minSubtotal, maxRedemptions, expiresAt } };
+}
+
+/**
+ * Why this code cannot be used on this cart, or null.
+ *
+ * `def` is a row as the database stores it, in snake_case, because that is
+ * what the driver hands back and translating it twice is a place for a typo
+ * to hide. Nothing here is worth a thrown error: the caller wants the reason.
+ */
+function refusalFor(def, subtotalPaise, now = new Date()) {
+  if (!def) return new DiscountError("We don't recognise that code.", "unknown_code");
+
+  if (def.active === false) {
+    return new DiscountError("That code is no longer active.", "inactive_code");
+  }
+  if (def.expires_at && new Date(def.expires_at) <= now) {
+    return new DiscountError("That code has expired.", "expired_code");
+  }
+  if (def.max_redemptions != null && Number(def.times_redeemed ?? 0) >= Number(def.max_redemptions)) {
+    return new DiscountError("That code has been fully used.", "code_used_up");
+  }
+  if (subtotalPaise < Number(def.min_subtotal_paise ?? 0)) {
+    const short = Number(def.min_subtotal_paise) / 100;
+    return new DiscountError(
+      `That code needs a basket of ₹${short.toLocaleString("en-IN")} or more.`,
+      "below_minimum",
+    );
+  }
+  return null;
+}
+
+/**
+ * What comes off, in paise.
+ *
+ * A percentage is rounded to the nearest whole rupee, not to the paisa.
+ *
+ * That is a display decision as much as an arithmetic one. Every price in
+ * this shop is a whole number of rupees, so until codes existed no total
+ * ever had paise in it — and 10% of ₹699 is ₹69.90, which renders as
+ * "₹69.9" and a total of "₹708.1". Both look like a bug to the person about
+ * to pay. Rounding to the nearest rupee keeps the shop in whole rupees
+ * everywhere, and rounding to the NEAREST rather than down means the
+ * rounding falls the customer's way as often as not.
+ */
+function rawDiscountPaise(def, subtotalPaise) {
+  if (def.kind === "percent") {
+    const exact = (subtotalPaise * Number(def.value)) / 100;
+    return Math.min(Math.round(exact / 100) * 100, subtotalPaise);
+  }
+  return Math.min(Number(def.value), subtotalPaise);
+}
+
+/**
+ * Apply a code to a priced cart.
+ *
+ * Returns the discount and the new total, with the cap already applied.
+ * Throws DiscountError if the code may not be used at all — the caller
+ * answers 400 with the message.
+ */
+function applyDiscount({ subtotalPaise, shippingPaise }, def, now = new Date()) {
+  const refusal = refusalFor(def, subtotalPaise, now);
+  if (refusal) throw refusal;
+
+  const gross = subtotalPaise + shippingPaise;
+  const wanted = rawDiscountPaise(def, subtotalPaise);
+  // Never below a rupee payable. See the header: capped, not refused.
+  const discountPaise = Math.max(0, Math.min(wanted, gross - MIN_PAYABLE_PAISE));
+
+  return {
+    code: def.code,
+    discountPaise,
+    totalPaise: gross - discountPaise,
+  };
+}
+
+/** "10% off" / "₹200 off" — one phrasing, used by the page and the admin list. */
+const describeDiscount = (def) =>
+  def.kind === "percent"
+    ? `${def.value}% off`
+    : `₹${(Number(def.value) / 100).toLocaleString("en-IN")} off`;
+
+/**
  * Shared behaviour for every page: cart drawer, mobile menu, shop filtering,
  * and the product page's size/quantity picker.
  *
@@ -370,7 +586,17 @@ const C = window.CATALOG || { products: [], categories: [], currency: "₹", loc
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-const money = (n) => C.currency + n.toLocaleString(C.locale);
+/*
+ * Whole rupees show bare; anything with paise in it shows both digits.
+ *
+ * Without the second case a fractional amount renders as "₹708.1", which
+ * reads as a broken price rather than as seven hundred and eight rupees ten
+ * paise. Nothing in the catalogue is fractional, so this never came up until
+ * discount codes could produce one.
+ */
+const money = (n) => C.currency + n.toLocaleString(C.locale, Number.isInteger(n)
+  ? undefined
+  : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const byId = (id) => C.products.find((p) => p.id === id);
 const catLabel = (id) => (C.categories.find((c) => c.id === id) || { label: id }).label;
 const fromPrice = (p) => Math.min(...p.variants.map((v) => v.price));
@@ -452,6 +678,14 @@ function saveCart() {
 }
 
 let cart = loadCart();
+
+/*
+ * Set by the checkout page, which is the one place that has to react to the
+ * cart changing underneath it: it holds a quote from the server, and a quote
+ * for a cart that no longer exists is a wrong number on a payment screen.
+ * Null everywhere else, hence the optional call in renderCart.
+ */
+let cartChanged = null;
 
 function addToCart(id, size, qty = 1) {
   const p = byId(id);
@@ -558,6 +792,8 @@ function renderCart() {
          <p class="muted small">Add a few oils and they'll show up here.</p>
          <a class="btn btn--ghost" href="/shop/">Start shopping</a>
        </div>`;
+
+  cartChanged?.();
 }
 
 /* ------------------------------------------------------ focus management */
@@ -1893,13 +2129,28 @@ if (checkoutGate) {
     errorBox.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
 
+  /*
+   * A code the server has confirmed, and the quote it gave for it.
+   *
+   * The browser never works out what a code is worth. It asks, and shows the
+   * answer. That is not caution for its own sake: the discount table lives in
+   * the database, so the only honest way to display a saving is to have been
+   * told it, and doing it this way means the number on the summary and the
+   * number charged came out of the same function on the same request.
+   */
+  let appliedCode = null;
+  let quoted = null;
+
   const renderSummary = () => {
     const lines = Object.entries(cart).filter(([k]) => lineProduct(k) && lineVariant(k));
     const subtotal = lines.reduce((s, [k, q]) => s + lineVariant(k).price * q, 0);
     const ship = subtotal >= C.freeShippingAt ? 0 : C.shippingFlat;
+    // The local sums are shown for reassurance only. Once a code has been
+    // applied the server's quote replaces them, because it is the one with
+    // the discount in it.
+    const discount = quoted ? quoted.discountPaise / 100 : 0;
+    const total = quoted ? quoted.totalPaise / 100 : subtotal + ship;
 
-    // Shown for reassurance only. The server prices the order again and its
-    // answer is the one that gets charged.
     $("[data-checkout-summary]").innerHTML = `
       <h2>Your order</h2>
       <ul class="checkout__lines">
@@ -1908,10 +2159,105 @@ if (checkoutGate) {
           return `<li><span>${esc(p.name)} ${esc(v.size)} × ${q}</span>
                       <span>${money(v.price * q)}</span></li>`;
         }).join("")}
+        ${discount > 0
+          ? `<li class="checkout__discount"><span>Discount
+               <code>${esc(appliedCode)}</code></span><span>−${money(discount)}</span></li>`
+          : ""}
         <li><span>Shipping</span><span>${ship === 0 ? "Free" : money(ship)}</span></li>
-        <li class="checkout__total"><span>Total</span><span>${money(subtotal + ship)}</span></li>
+        <li class="checkout__total"><span>Total</span><span>${money(total)}</span></li>
       </ul>`;
   };
+
+  /* -------------------------------------------------------- discount code */
+
+  const codeInput = $("[data-code-input]");
+  const codeBtn = $("[data-code-apply]");
+  const codeNote = $("[data-code-note]");
+
+  const sayAboutCode = (message, ok) => {
+    codeNote.textContent = message;
+    codeNote.hidden = !message;
+    codeNote.classList.toggle("is-ok", !!ok);
+    codeNote.classList.toggle("is-bad", message && !ok);
+  };
+
+  const clearCode = () => {
+    appliedCode = null;
+    quoted = null;
+    codeInput.value = "";
+    codeInput.disabled = false;
+    codeBtn.textContent = "Apply";
+    sayAboutCode("", false);
+    renderSummary();
+  };
+
+  async function applyCode() {
+    // The same button removes it again. Two buttons for one slot, one of
+    // them always doing nothing, is more chrome than this deserves.
+    if (appliedCode) return clearCode();
+
+    const typed = codeInput.value.trim();
+    if (!typed) return sayAboutCode("Enter a code first.", false);
+
+    codeBtn.disabled = true;
+    codeBtn.textContent = "Checking…";
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        // preview: price it, tell us, create nothing.
+        body: JSON.stringify({ preview: true, items: cartItems(), code: typed }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 401) {
+        location.href = "/account/login/?next=%2Fcheckout%2F";
+        return;
+      }
+      if (!res.ok) {
+        codeBtn.textContent = "Apply";
+        return sayAboutCode(data.error || "That code could not be applied.", false);
+      }
+
+      quoted = data.summary;
+      appliedCode = data.summary.code;
+      codeInput.value = appliedCode;
+      codeInput.disabled = true;
+      codeBtn.textContent = "Remove";
+      sayAboutCode(`${money(quoted.discountPaise / 100)} off applied.`, true);
+      renderSummary();
+    } catch {
+      codeBtn.textContent = "Apply";
+      sayAboutCode("We couldn't check that code. Please try again.", false);
+    } finally {
+      codeBtn.disabled = false;
+    }
+  }
+
+  /*
+   * The cart drawer is on this page too, so the order can be edited while a
+   * quote is on screen. A discount worked out for a cart that no longer
+   * exists is a wrong number sitting above a Pay button, so the code comes
+   * off and the shopper is told why rather than silently re-quoted.
+   */
+  cartChanged = () => {
+    if (!appliedCode) return renderSummary();
+    clearCode();
+    sayAboutCode("Your cart changed, so the code came off. Apply it again.", false);
+  };
+
+  if (codeBtn) {
+    codeBtn.addEventListener("click", applyCode);
+    // Enter in the code field applies the code. Without this it submits the
+    // checkout form, which is a keystroke away from paying the undiscounted
+    // total — the worst possible outcome of pressing Enter on a promo field.
+    codeInput.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      applyCode();
+    });
+  }
 
   const loadRazorpay = () =>
     new Promise((resolve, reject) => {
@@ -1979,6 +2325,11 @@ if (checkoutGate) {
     const f = Object.fromEntries(new FormData(form));
     const payload = {
       items: cartItems(),
+      // Sent as the shopper's request, not as a settled fact. The server
+      // looks the code up again and decides for itself; if the cart has
+      // changed since the quote and the code no longer qualifies, it says so
+      // and nothing is charged.
+      code: appliedCode,
       name: f.name, phone: f.phone, notes: f.notes,
       address: {
         line1: f.line1, line2: f.line2, city: f.city,
@@ -2300,6 +2651,9 @@ if (adminGate) {
                         `<li>${i.qty} × ${esc(i.name)} ${esc(i.size)}</li>`).join("")}</ul>
                       <p class="amuted">Shipping ${
                         o.shipping_paise ? rupees(o.shipping_paise) : "free"}</p>
+                      ${Number(o.discount_paise) > 0
+                        ? `<p class="amuted">Discount ${esc(o.discount_code ?? "")}
+                             −${rupees(o.discount_paise)}</p>` : ""}
                       ${o.shipped_at ? `<p class="amuted">Dispatched ${date(o.shipped_at)}${
                         o.tracking ? ` · ${esc(o.tracking)}` : ""}</p>` : ""}
                     </div>
@@ -2531,7 +2885,107 @@ if (adminGate) {
       </div>`;
   }
 
-  const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock };
+  /**
+   * Discount codes: the list, and the form that makes one.
+   *
+   * The form asks for rupees and the handler converts to paise before
+   * sending, because nobody types a minimum spend in paise and a field that
+   * wanted 99900 would eventually be given 999.
+   */
+  async function loadCodes() {
+    const { codes } = await apiGet("/api/admin/orders?codes=1");
+
+    /*
+     * The badge answers "would this work if someone typed it", not "is the
+     * active flag true".
+     *
+     * Those are different, and the first draft showed the flag: a code at
+     * 5 of 5 uses and one that expired in January both sat there in green
+     * saying ACTIVE, which is how you end up printing a dead code on a
+     * flyer. refusalFor is the same function the checkout refuses with, so
+     * this label cannot drift away from the behaviour. Infinity stands in
+     * for the basket, because the minimum spend is the shopper's problem,
+     * not a fact about the code.
+     */
+    const stateOf = (c) => {
+      const refusal = refusalFor(c, Infinity);
+      if (!refusal) return { label: "active", tone: "paid" };
+      if (refusal.code === "inactive_code") return { label: "retired", tone: "oversold" };
+      if (refusal.code === "expired_code") return { label: "expired", tone: "oversold" };
+      return { label: "used up", tone: "oversold" };
+    };
+
+    const live = codes.filter((c) => !refusalFor(c, Infinity)).length;
+
+    panel("codes").innerHTML = `
+      <p class="astat">${live} usable · ${codes.length} in all</p>
+
+      <div class="apanel">
+        <form class="admin__code" data-code-new>
+          <label>Code
+            <input name="code" required placeholder="DIWALI10" autocapitalize="characters"
+              autocomplete="off" spellcheck="false" />
+          </label>
+          <label>Type
+            <select name="kind">
+              <option value="percent">% off</option>
+              <option value="fixed">₹ off</option>
+            </select>
+          </label>
+          <label>Value
+            <input name="value" type="number" min="1" required
+              aria-describedby="code-help" />
+          </label>
+          <label>Min spend ₹
+            <input name="minSubtotal" type="number" min="0" value="0" />
+          </label>
+          <label>Max uses
+            <input name="maxRedemptions" type="number" min="1" placeholder="∞" />
+          </label>
+          <label>Expires
+            <input name="expiresAt" type="date" />
+          </label>
+          <button class="abtn abtn--go" type="submit">Create</button>
+          <p class="amuted" id="code-help">A percentage is whole percent, up to
+            ${MAX_PERCENT}. An amount is in rupees, and needs a minimum spend above
+            it so the code cannot empty a cart. A code cannot be edited once it
+            exists — retire it and make another.</p>
+        </form>
+      </div>
+
+      <div class="apanel">
+        <table class="atable">
+          <thead><tr>
+            <th>Code</th><th>Worth</th><th>Conditions</th>
+            <th class="atable--num">Used</th><th></th>
+          </tr></thead>
+          <tbody>${codes.length ? codes.map((c) => {
+            const state = stateOf(c);
+            return `
+            <tr class="arow${state.label === "active" ? "" : " is-warn"}">
+              <td><strong class="amono">${esc(c.code)}</strong>
+                <span class="abadge abadge--${state.tone}">${state.label}</span></td>
+              <td>${esc(describeDiscount(c))}</td>
+              <td class="amuted">
+                ${Number(c.min_subtotal_paise) > 0
+                  ? `over ${money(Number(c.min_subtotal_paise) / 100)}` : "any basket"}${
+                  c.expires_at ? ` · until ${date(c.expires_at)}` : ""}
+              </td>
+              <td class="atable--num">${c.times_redeemed}${
+                c.max_redemptions != null ? ` / ${c.max_redemptions}` : ""}</td>
+              <td>
+                <button class="abtn" data-code-toggle="${esc(c.code)}"
+                  data-to="${c.active ? "retire" : "revive"}">${
+                  c.active ? "Retire" : "Revive"}</button>
+              </td>
+            </tr>`;
+          }).join("")
+            : `<tr><td colspan="5" class="amuted">No codes yet.</td></tr>`}</tbody>
+        </table>
+      </div>`;
+  }
+
+  const loaders = { orders: loadOrders, messages: loadMessages, stock: loadStock, codes: loadCodes };
 
   /* ---------------------------------------------------------- search */
   /* Filters the rows already drawn, rather than asking the server on every
@@ -2620,6 +3074,20 @@ if (adminGate) {
 
   root.addEventListener("click", async (e) => {
 
+    const codeToggle = e.target.closest("[data-code-toggle]");
+    if (codeToggle) {
+      const retiring = codeToggle.dataset.to === "retire";
+      const result = await post("/api/admin/orders", {
+        action: retiring ? "code-retire" : "code-revive",
+        code: codeToggle.dataset.codeToggle,
+      });
+      if (result) {
+        say(retiring ? "Code retired." : "Code is live again.");
+        await loadCodes();
+      }
+      return;
+    }
+
     const done = e.target.closest("[data-handled]");
     if (done) {
       const result = await post("/api/admin/messages", {
@@ -2653,6 +3121,29 @@ if (adminGate) {
         sku: stock.dataset.stock, quantity: Number(stock.quantity.value),
       });
       if (result) say("Stock updated.");
+      return;
+    }
+
+    const newCode = e.target.closest("[data-code-new]");
+    if (newCode) {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(newCode));
+      const result = await post("/api/admin/orders", {
+        action: "code-create",
+        code: f.code,
+        kind: f.kind,
+        // Rupees on screen, paise on the wire — for a fixed amount. A
+        // percentage is a percentage and is sent as typed.
+        value: f.kind === "fixed" ? Math.round(Number(f.value) * 100) : Number(f.value),
+        minSubtotalPaise: Math.round(Number(f.minSubtotal || 0) * 100),
+        maxRedemptions: f.maxRedemptions === "" ? null : Number(f.maxRedemptions),
+        // A date input gives a day; a code is live to the end of it.
+        expiresAt: f.expiresAt ? `${f.expiresAt}T23:59:59` : null,
+      });
+      if (result) {
+        say(`${result.code} is live.`);
+        await loadCodes();
+      }
     }
   });
 

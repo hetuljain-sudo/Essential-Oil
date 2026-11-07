@@ -252,3 +252,57 @@ create table if not exists password_resets (
 create index if not exists password_resets_customer_idx on password_resets (customer_id);
 -- Sweeping expired rows needs no index scan of the whole table.
 create index if not exists password_resets_expiry_idx on password_resets (expires_at);
+
+-- ------------------------------------------------------------- discounts
+--
+-- Festival codes. The shop had no way to issue one at all, which meant no
+-- lever for Diwali and no way to make good on a late delivery beyond typing
+-- an apology.
+--
+-- The rules themselves live in src/discount.mjs, tested without a database.
+-- This table only stores them. Two things it deliberately does NOT do:
+--
+--   It does not store what a code is worth in rupees. Percent and fixed are
+--   one `value` column read against `kind`, in paise for a fixed amount and
+--   in whole percent otherwise, so there is no second column to fall out of
+--   step with the first.
+--
+--   It does not track who used a code. Doing that properly is a second table
+--   and a per-customer limit nobody has asked for; `times_redeemed` answers
+--   the question the owner actually has, which is whether the hundred codes
+--   printed on the Diwali flyers have run out.
+
+create table if not exists discount_codes (
+  -- Stored already upper-cased by the application, which is also how it is
+  -- compared. Two rows differing only in case would be one code to a shopper.
+  code                text primary key,
+
+  kind                text not null check (kind in ('percent', 'fixed')),
+  -- Whole percent, or paise. Which, depends on kind.
+  value               integer not null check (value > 0),
+
+  min_subtotal_paise  bigint not null default 0 check (min_subtotal_paise >= 0),
+  -- Null is unlimited. Zero would mean a code that can never be used, so the
+  -- check refuses it rather than leaving a silent dud.
+  max_redemptions     integer check (max_redemptions > 0),
+  times_redeemed      integer not null default 0 check (times_redeemed >= 0),
+
+  expires_at          timestamptz,
+  -- Retiring a code sets this false rather than deleting the row: orders
+  -- reference the code by name, and a deleted row makes last month's orders
+  -- unexplainable.
+  active              boolean not null default true,
+
+  note                text,
+  created_at          timestamptz not null default now(),
+  created_by          uuid references customers (id) on delete set null
+);
+
+create index if not exists discount_codes_live_idx on discount_codes (created_at desc)
+  where active;
+
+-- What the order was actually given. The code is copied, not referenced, for
+-- the same reason order_items copies the product name: an order is a record
+-- of what happened, and retiring a code next month must not rewrite it.
+alter table orders add column if not exists discount_code text;
+alter table orders add column if not exists discount_paise bigint not null default 0;

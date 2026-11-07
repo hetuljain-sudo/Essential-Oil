@@ -43,7 +43,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/fonts.css", "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -1426,6 +1426,20 @@ accountPage({
     <div data-checkout-body hidden>
       <div class="checkout__summary" data-checkout-summary></div>
 
+      <!-- Not a <form>: it sits inside the checkout form, and a nested form
+           is invalid markup whose submit button submits the outer one — in
+           this case paying for the order. The button is type="button" for
+           the same reason. -->
+      <div class="promo" data-promo>
+        <label class="promo__row">
+          <span class="promo__label">Discount code</span>
+          <input type="text" name="code" autocomplete="off" autocapitalize="characters"
+                 spellcheck="false" placeholder="e.g. DIWALI10" data-code-input />
+        </label>
+        <button class="btn btn--ghost" type="button" data-code-apply>Apply</button>
+        <p class="promo__note" data-code-note role="status" hidden></p>
+      </div>
+
       <form class="auth-form" data-checkout-form novalidate>
         <div class="auth-form__error" data-checkout-error hidden role="alert"></div>
 
@@ -1562,6 +1576,7 @@ page("/admin/", layout({
         <div data-panel="orders"></div>
         <div data-panel="messages" hidden></div>
         <div data-panel="stock" hidden></div>
+        <div data-panel="codes" hidden></div>
       </div>
     </div>`,
 }));
@@ -1739,7 +1754,7 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
 const sharedForBrowser = (await Promise.all(
-  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs"].map((f) => readFile(join(root, f), "utf8"))
 )).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),

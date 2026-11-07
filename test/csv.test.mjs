@@ -108,6 +108,25 @@ test("money is a number in rupees, so a column can be summed", () => {
   assert.equal(row[ORDER_COLUMNS.indexOf("Shipping")], 79);
 });
 
+test("the money columns add up on a discounted order", () => {
+  // The reason Discount is in the file at all: without it this row reads as
+  // ₹699 of oil plus ₹79 of post coming to ₹628, which is nonsense to
+  // anyone reconciling the month.
+  const [row] = ordersToRows([{
+    ...order, discount_code: "DIWALI10", discount_paise: 6990, total_paise: 70810,
+  }]);
+  const at = (c) => row[ORDER_COLUMNS.indexOf(c)];
+  assert.equal(at("Discount"), 69.9);
+  assert.equal(at("Code"), "DIWALI10");
+  assert.equal(at("Subtotal") + at("Shipping") - at("Discount"), at("Total"));
+});
+
+test("an order from before codes existed shows no discount, not a blank", () => {
+  const [row] = ordersToRows([order]);
+  assert.equal(row[ORDER_COLUMNS.indexOf("Discount")], 0);
+  assert.equal(row[ORDER_COLUMNS.indexOf("Code")], "");
+});
+
 test("dates are ISO, so the column sorts", () => {
   const [row] = ordersToRows([order]);
   assert.equal(row[ORDER_COLUMNS.indexOf("Date")], "2026-10-27");
