@@ -85,6 +85,7 @@ These are in order. Nothing below this section matters until these are done.
 | **Real product photography** | All 50 images are Unsplash stock. Generic photos are the clearest signal to a shopper that a shop is not real. The single highest-value thing you can do that needs no code. |
 | **Guides** | All six written, none published — shelved 6 November at the owner's request. `/guides/` shows its empty state, which tells visitors the guides are being written. Publishing any of them is deleting one line. |
 | **No reviews or ratings** | Deliberate so far — you won't invent them. But there is no mechanism to collect real ones after delivery either. |
+| **Shop filters** | Scent family, price band and in-stock-only added 7 November, alongside the existing collection chips, search and sort. All of it is in the URL, so a filtered view can be shared. |
 | **No wishlist / save for later** | Common in this category, where people browse scents over weeks. |
 | **No discount codes** | Nothing in the backend can issue, store or redeem one. The newsletter band used to offer 10% off a first order and the copy was already changed to what the list actually is, so nothing unhonourable is being advertised — but a shop with no mechanism for a code has no lever for a festival sale either. |
 | **No "notify me when back in stock"** | Sold-out variants are a dead end. |

@@ -376,6 +376,11 @@ page("/shop/", layout({
           ${categories.map((c) => `<button class="chip" data-filter="${c.id}" aria-pressed="false">${c.label}</button>`).join("")}
         </div>
 
+        <!-- Scent family and price sit beside Sort rather than becoming more
+             chips: the collection chips are the primary axis and a second row
+             of them would read as equally important, which these are not.
+             Options are rendered here, from the catalogue, so the control is
+             right in the HTML before any script runs. -->
         <div class="toolbar">
           <div class="search" id="search">
             <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
@@ -383,6 +388,28 @@ page("/shop/", layout({
           </div>
           <div class="toolbar__right">
             <span class="toolbar__count" data-result-count aria-live="polite"></span>
+            <span class="sort">
+              <span class="sort__label">Scent</span>
+              <select data-family aria-label="Filter by scent family">
+                <option value="all">Any family</option>
+                ${[...new Set(products.map((p) => p.family))]
+                  .map((f) => [f, products.filter((p) => p.family === f).length])
+                  .map(([f, n]) => `<option value="${esc(f)}">${esc(f)} (${n})</option>`).join("")}
+              </select>
+            </span>
+            <span class="sort">
+              <span class="sort__label">Price</span>
+              <select data-price aria-label="Filter by price">
+                <option value="all">Any price</option>
+                <option value="0-499">Under ${money(500)}</option>
+                <option value="500-999">${money(500)} – ${money(999)}</option>
+                <option value="1000-1999">${money(1000)} – ${money(1999)}</option>
+                <option value="2000-">${money(2000)} and over</option>
+              </select>
+            </span>
+            <label class="toolbar__stock">
+              <input type="checkbox" data-instock /> In stock only
+            </label>
             <span class="sort">
               <span class="sort__label">Sort</span>
               <select data-sort aria-label="Sort oils">
@@ -1619,6 +1646,7 @@ const catalog = {
     // The grid re-renders client-side on every filter and sort, so a set's
     // card needs the one fact that stands in for a species: how many bottles.
     contains: p.contains ? p.contains.map((c) => ({ name: c.name, size: c.size })) : null,
+    family: p.family,
     tagline: p.tagline, notes: p.notes, featured: !!p.featured, badge: p.badge || null,
     bg: p.bg, swatch: p.swatch, url: productUrl(p),
     image: p.image || null,

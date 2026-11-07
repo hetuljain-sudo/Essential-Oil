@@ -705,6 +705,13 @@ body.menu-open .header { z-index: 56; }
   font-size: .95em; color: var(--ink); overflow-wrap: anywhere;
 }
 
+/* "In stock only" sits with the selects rather than among the chips. */
+.toolbar__stock {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-size: .82rem; color: var(--muted); white-space: nowrap; cursor: pointer;
+}
+.toolbar__stock input { accent-color: var(--forest); width: 15px; height: 15px; }
+
 /* What is in a set, on its product page. */
 .pdp__contains { list-style: none; margin: 1.2rem 0; padding: 0; border-top: 1px solid var(--line); }
 .pdp__contains li {

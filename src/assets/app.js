@@ -262,7 +262,17 @@ function closeMenu() {
 
 const grid = $("[data-grid]");
 const searchInput = $("[data-search-input]");
-const state = { filter: "all", sort: "featured", query: "" };
+const state = { filter: "all", sort: "featured", query: "", family: "all", price: "all", inStock: false };
+
+/* "0-499", "500-999", "2000-" → a test on a product's lowest price.
+   Open-ended at the top because the range above ₹2,000 has no useful
+   ceiling: rose absolute is ₹9,499 and would need its own band. */
+function inPriceBand(p, band) {
+  if (band === "all") return true;
+  const [lo, hi] = band.split("-");
+  const from = fromPrice(p);
+  return from >= Number(lo) && (hi === "" || from <= Number(hi));
+}
 
 function matchesQuery(p, q) {
   if (!q) return true;
@@ -330,6 +340,11 @@ function renderGrid() {
   if (!grid) return;
   let list = C.products.filter((p) => state.filter === "all" || p.category === state.filter);
   list = list.filter((p) => matchesQuery(p, state.query));
+  list = list.filter((p) => state.family === "all" || p.family === state.family);
+  list = list.filter((p) => inPriceBand(p, state.price));
+  // Stock is live from /api/stock, so this hides what is genuinely gone
+  // rather than what the catalogue thought was gone at build time.
+  if (state.inStock) list = list.filter((p) => inStock(p));
   if (state.sort === "featured") list = [...list].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
   if (state.sort === "price-asc") list = [...list].sort((a, b) => fromPrice(a) - fromPrice(b));
   if (state.sort === "price-desc") list = [...list].sort((a, b) => fromPrice(b) - fromPrice(a));
@@ -347,6 +362,9 @@ function renderGrid() {
   if (counter) {
     const bits = [];
     if (state.filter !== "all") bits.push(`in <strong>${catLabel(state.filter)}</strong>`);
+    if (state.family !== "all") bits.push(`in <strong>${esc(state.family)}</strong>`);
+    if (state.price !== "all") bits.push(`at that price`);
+    if (state.inStock) bits.push(`in stock`);
     if (state.query) bits.push(`matching “${esc(state.query)}”`);
     counter.innerHTML = `${list.length} oil${list.length === 1 ? "" : "s"}` +
       (bits.length ? ` ${bits.join(" ")} · <button class="linkish" data-reset-filters>clear</button>` : "");
@@ -354,8 +372,14 @@ function renderGrid() {
 
   // Keep the URL shareable: /shop/?collection=energy
   const url = new URL(location.href);
-  if (state.filter === "all") url.searchParams.delete("collection");
-  else url.searchParams.set("collection", state.filter);
+  const put = (key, value, off) => {
+    if (value === off) url.searchParams.delete(key);
+    else url.searchParams.set(key, String(value));
+  };
+  put("collection", state.filter, "all");
+  put("family", state.family, "all");
+  put("price", state.price, "all");
+  put("instock", state.inStock, false);
   history.replaceState(null, "", url);
 }
 
@@ -369,6 +393,30 @@ function setFilter(id) {
   renderGrid();
 }
 
+const familySelect = $("[data-family]");
+const priceSelect = $("[data-price]");
+const stockToggle = $("[data-instock]");
+
+/* A shared /shop/ link should show what the sender was looking at. Values are
+   checked against the control's own options rather than trusted, so a hand-
+   edited URL cannot put the grid in a state the controls cannot undo. */
+if (grid) {
+  const params = new URL(location.href).searchParams;
+  const pick = (el, value) => {
+    if (!el || value == null) return null;
+    const ok = [...el.options].some((o) => o.value === value);
+    if (!ok) return null;
+    el.value = value;
+    return value;
+  };
+  state.family = pick(familySelect, params.get("family")) ?? "all";
+  state.price = pick(priceSelect, params.get("price")) ?? "all";
+  if (params.get("instock") === "true" && stockToggle) {
+    stockToggle.checked = true;
+    state.inStock = true;
+  }
+}
+
 const filters = $("[data-filters]");
 if (filters) {
   filters.addEventListener("click", (e) => {
@@ -379,6 +427,10 @@ if (filters) {
   if (preset && C.categories.some((c) => c.id === preset)) setFilter(preset);
   else renderGrid();
 }
+
+if (familySelect) familySelect.addEventListener("change", (e) => { state.family = e.target.value; renderGrid(); });
+if (priceSelect) priceSelect.addEventListener("change", (e) => { state.price = e.target.value; renderGrid(); });
+if (stockToggle) stockToggle.addEventListener("change", (e) => { state.inStock = e.target.checked; renderGrid(); });
 
 const sortSelect = $("[data-sort]");
 if (sortSelect) sortSelect.addEventListener("change", (e) => { state.sort = e.target.value; renderGrid(); });
@@ -659,6 +711,12 @@ document.addEventListener("click", (e) => {
     e.preventDefault();
     state.query = "";
     if (searchInput) searchInput.value = "";
+    state.family = "all";
+    state.price = "all";
+    state.inStock = false;
+    if (familySelect) familySelect.value = "all";
+    if (priceSelect) priceSelect.value = "all";
+    if (stockToggle) stockToggle.checked = false;
     return setFilter("all");
   }
 
