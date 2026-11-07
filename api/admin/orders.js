@@ -26,7 +26,7 @@
  */
 
 import { json } from "../_lib/http.mjs";
-import { requireAdmin, parseTracking, parseResolution } from "../_lib/admin.mjs";
+import { requireAdmin, parseTracking, parseResolution, adminFailed } from "../_lib/admin.mjs";
 import { sendEmail, emailStatus } from "../_lib/email.mjs";
 import { listOrders, countOrders } from "../_lib/order-list.mjs";
 import { sheetStatus, syncSheet } from "../_lib/sheets.mjs";
@@ -285,24 +285,6 @@ export default async function handler(req, res) {
     res.setHeader("allow", "GET, POST");
     return json(res, 405, { error: "Use GET or POST." });
   } catch (err) {
-    console.error("admin orders failed:", err);
-
-    /*
-     * 42P01 is Postgres for "that table does not exist", which here means
-     * db/schema.sql has not been applied since a table was added to it.
-     *
-     * Worth its own message because the generic one sends you looking for a
-     * bug: the Codes tab answered "Couldn't load that" the first time it
-     * was opened against a database that predated discount_codes, and
-     * nothing on the page said the fix was one command. This is the only
-     * failure here that the person reading it can resolve themselves, so
-     * it is the only one that gets told apart from the rest.
-     */
-    if (err?.code === "42P01") {
-      return json(res, 503, {
-        error: "The database is missing a table this page needs. Run `npm run db:setup`.",
-      });
-    }
-    return json(res, 500, { error: "Something went wrong." });
+    return adminFailed(res, err, "admin orders");
   }
 }

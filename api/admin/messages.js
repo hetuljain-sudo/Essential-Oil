@@ -7,7 +7,7 @@
  */
 
 import { json } from "../_lib/http.mjs";
-import { requireAdmin } from "../_lib/admin.mjs";
+import { requireAdmin, adminFailed } from "../_lib/admin.mjs";
 
 export default async function handler(req, res) {
   const gate = await requireAdmin(req, res);
@@ -58,7 +58,6 @@ export default async function handler(req, res) {
     res.setHeader("allow", "GET, POST");
     return json(res, 405, { error: "Use GET or POST." });
   } catch (err) {
-    console.error("admin messages failed:", err);
-    return json(res, 500, { error: "Something went wrong." });
+    return adminFailed(res, err, "admin messages");
   }
 }

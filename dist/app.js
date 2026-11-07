@@ -3177,10 +3177,21 @@ if (adminGate) {
     try {
       await apiGet("/api/admin/orders");
     } catch (err) {
-      // 404 is both "no backend" and "not an admin" — deliberately the same
-      // answer, so this page cannot be used to discover that admin exists.
+      /*
+       * Only a 404 means "nothing here".
+       *
+       * 404 is deliberately both "no backend" and "not an admin", so this
+       * page cannot be used to discover that admin exists — that part is
+       * the point and stays. What was wrong is that every other failure got
+       * the same answer: a database missing a column locked the entire
+       * admin behind "Nothing to see here", which reads as "your account
+       * lost its privileges" and sends you looking in the wrong place
+       * entirely. A server fault is not a permissions answer, and the
+       * endpoint's own message is the useful thing in the response.
+       */
+      const hidden = err?.message === API_MISSING;
       adminGate.innerHTML = `
-        <p class="muted">${esc(err?.message === "offline" ? apiMessage(err) : "Nothing to see here.")}</p>
+        <p class="muted">${esc(hidden ? "Nothing to see here." : errorText(err))}</p>
         <p><a class="btn btn--ghost" href="/">Back to the shop</a></p>`;
       return;
     }

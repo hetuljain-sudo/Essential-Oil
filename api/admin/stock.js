@@ -8,7 +8,7 @@
  */
 
 import { json } from "../_lib/http.mjs";
-import { requireAdmin, parseQuantity } from "../_lib/admin.mjs";
+import { requireAdmin, parseQuantity, adminFailed } from "../_lib/admin.mjs";
 import { products } from "../../src/data.mjs";
 import { skuFor } from "../../src/sku.mjs";
 
@@ -64,7 +64,6 @@ export default async function handler(req, res) {
     res.setHeader("allow", "GET, POST");
     return json(res, 405, { error: "Use GET or POST." });
   } catch (err) {
-    console.error("admin stock failed:", err);
-    return json(res, 500, { error: "Something went wrong." });
+    return adminFailed(res, err, "admin stock");
   }
 }

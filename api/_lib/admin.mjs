@@ -55,3 +55,31 @@ export async function requireAdmin(req, res) {
   }
   return { sql, admin };
 }
+
+/**
+ * The end of every admin handler's catch.
+ *
+ * One failure here is the reader's to fix and the rest are ours, and the
+ * difference is worth drawing. Postgres answers 42P01 for a table that does
+ * not exist and 42703 for a column that does not — both mean db/schema.sql
+ * has gained something since it was last applied, which is one command away
+ * from fixed.
+ *
+ * This existed as a generic "Something went wrong", and the cost was real:
+ * adding discount_codes put two columns in the orders query, and an admin
+ * opening the page against the old database was told nothing at all — the
+ * whole panel sat behind a message that read as "you are not an admin".
+ *
+ * Everything else stays deliberately vague. An admin is still a visitor,
+ * and a stack trace in a response body is a gift to whoever finds it.
+ */
+export function adminFailed(res, err, label) {
+  console.error(`${label} failed:`, err);
+
+  if (err?.code === "42P01" || err?.code === "42703") {
+    return json(res, 503, {
+      error: "The database is behind this version of the site. Run `npm run db:setup`.",
+    });
+  }
+  return json(res, 500, { error: "Something went wrong." });
+}
