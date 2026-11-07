@@ -913,6 +913,13 @@ body.menu-open .header { z-index: 56; }
 .adetail__items { list-style: none; padding: 0; margin: 0 0 .5rem; font-size: .86rem; }
 .adetail__items li { margin-bottom: .25rem; }
 
+/* A panel that holds a message instead of a table. */
+.apanel--note { padding: 1.2rem 1.3rem; }
+.apanel--note p { margin: 0; font-size: .92rem; }
+.apanel--note code {
+  background: var(--sand); padding: .1rem .35rem; border-radius: 4px; font-size: .85rem;
+}
+
 /* The new-code form. A row of small fields on a wide screen, stacking on a
    narrow one, with the help text spanning whatever the row turned out to be. */
 .admin__code {

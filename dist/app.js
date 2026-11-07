@@ -1697,11 +1697,22 @@ async function apiGet(path) {
   // an HTML body where JSON was expected: that is the host's own 404 page.
   if (res.status === 404) throw new Error(API_MISSING);
 
+  let data;
   try {
-    return await res.json();
+    data = await res.json();
   } catch {
     throw new Error(res.ok ? API_MISSING : API_DOWN);
   }
+
+  /*
+   * A failed request that happens to return readable JSON was being handed
+   * back as if it had worked. The caller then read a field that was not
+   * there, threw a TypeError, and the page said "Couldn't load that" — with
+   * the server's own explanation sitting unread in the body. Throw it
+   * instead, so whatever the endpoint took the trouble to say gets shown.
+   */
+  if (!res.ok) throw new Error(data?.error || API_DOWN);
+  return data;
 }
 
 const apiMessage = (err) => ({
@@ -2893,7 +2904,22 @@ if (adminGate) {
    * wanted 99900 would eventually be given 999.
    */
   async function loadCodes() {
-    const { codes } = await apiGet("/api/admin/orders?codes=1");
+    /*
+     * The panel reports its own failure rather than letting it reach the
+     * tab handler's "Couldn't load that" toast, which floats over a blank
+     * page for two seconds and then leaves nothing behind. A message in the
+     * panel stays put long enough to act on.
+     */
+    let codes;
+    try {
+      ({ codes } = await apiGet("/api/admin/orders?codes=1"));
+    } catch (err) {
+      panel("codes").innerHTML = `
+        <div class="apanel apanel--note">
+          <p>${esc(err?.message || "Couldn't load the codes.")}</p>
+        </div>`;
+      return;
+    }
 
     /*
      * The badge answers "would this work if someone typed it", not "is the
