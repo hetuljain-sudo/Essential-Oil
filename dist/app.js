@@ -1939,10 +1939,6 @@ if (accountPanel) {
 
       if (!data.customer) {
         accountPanel.innerHTML = `
-          <header class="acct__head"><div>
-            <p class="eyebrow">Your account</p>
-            <h1>Your account</h1>
-          </div></header>
           <p>You're not logged in.</p>
           <p class="muted"><a class="btn btn--primary" href="/account/login/">Log in</a></p>`;
         return;
@@ -1960,16 +1956,17 @@ if (accountPanel) {
        * around what belonged to which. Now each section is a bordered card
        * with a small quiet label, and they sit two-up when there is room.
        */
-      accountPanel.innerHTML = `
-        <header class="acct__head">
-          <div>
-            <p class="eyebrow">Your account</p>
-            <h1>${esc(data.customer.name)}</h1>
-            <p class="acct__email">${esc(data.customer.email)}</p>
-          </div>
-          <button class="btn btn--ghost" data-logout>Log out</button>
-        </header>
+      /*
+       * The header is served with the page and filled in here, rather than
+       * replaced. Replacing it meant the document had no <h1> at all until
+       * this ran, which a screen reader notices and a search engine would
+       * have, were the page not noindex.
+       */
+      $("[data-account-title]").textContent = data.customer.name;
+      $("[data-account-email]").textContent = data.customer.email;
+      $("[data-logout]").hidden = false;
 
+      accountPanel.innerHTML = `
         <div class="acct__grid">
           <section class="acct__card acct__card--wide">
             <h2>Your orders</h2>

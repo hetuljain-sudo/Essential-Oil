@@ -50,7 +50,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=ae3b0a68" />
+  <link rel="stylesheet" href="/styles.css?v=64f8b29d" />
   
 </head>
 <body class="admin-page">
@@ -74,6 +74,10 @@
   </header>
   <main id="main">
     <div class="awrap">
+      <!-- The admin bar is the page's visible title, but a bar is not a
+           heading. Served rather than drawn, so the document has one before
+           anything is fetched. -->
+      <h1 class="sr-only">Sarvha admin</h1>
       <div data-admin-gate><p class="muted">Checking…</p></div>
 
       <div data-admin hidden>
@@ -98,7 +102,7 @@
     </div></main>
   
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=ae3b0a68"></script>
-  <script src="/app.js?v=ae3b0a68"></script>
+  <script src="/catalog.js?v=64f8b29d"></script>
+  <script src="/app.js?v=64f8b29d"></script>
 </body>
 </html>

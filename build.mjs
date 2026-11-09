@@ -60,8 +60,51 @@ const addressLines = () => [
   site.address.country,
 ];
 
-// Counts in page copy come from the data, so they can't drift out of date.
+/*
+ * Counts in page copy come from the data, so they can't drift out of date.
+ *
+ * That comment was true and then stopped being true, which is worth leaving
+ * a note about. `count` is every product, and for a while every product was
+ * an oil. Adding four gift sets made the homepage say "54 oils" and "54 —
+ * oils in the range" when 50 of them are oils and four are boxes. Deriving a
+ * number from the data is not the same as deriving the RIGHT number: the
+ * copy says "oils", so the count has to be of oils.
+ */
 const count = products.length;
+const oilCount = products.filter((p) => p.kind !== "set").length;
+
+/* Small numbers read better as words in a heading. Beyond twelve, digits. */
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six",
+  "seven", "eight", "nine", "ten", "eleven", "twelve"];
+const numberWord = (n) => NUMBER_WORDS[n] ?? String(n);
+const titleCase = (s) => s[0].toUpperCase() + s.slice(1);
+
+
+/*
+ * Four questions on the homepage, taken from the FAQ by their exact text.
+ *
+ * Picked rather than written: an answer written fresh for the homepage is an
+ * answer that can disagree with the FAQ, and these are claims about purity,
+ * postage and safety. Looked up by question, so editing one in data.mjs
+ * edits it here, and a question renamed there fails the build instead of
+ * silently dropping off the homepage.
+ *
+ * The schema matters as much as the accordion: FAQPage is what makes these
+ * eligible to appear under the site in search, and the homepage was the one
+ * page type carrying none.
+ */
+const HOME_FAQ_QUESTIONS = [
+  "Are your essential oils 100% pure?",
+  "How do I use essential oils safely?",
+  "What are the shipping charges?",
+  "How long does delivery take?",
+];
+
+const homeFaqs = HOME_FAQ_QUESTIONS.map((q) => {
+  const found = faqs.find((f) => f.q === q);
+  if (!found) throw new Error(`Homepage FAQ: no question in data.mjs reads "${q}"`);
+  return found;
+});
 
 /* ------------------------------------------------------------------- SEO */
 
@@ -240,7 +283,7 @@ page("/", layout({
   path: "/",
   title: `${site.name} — Pure Essential Oils Online in India`,
   ogImage: defaultOg,
-  description: `Buy 100% pure essential oils and cold-pressed carrier oils online in India. ${count} single-origin oils, bottled in small batches and shipped from Delhi. Free shipping over ${money(site.freeShippingAt)}.`,
+  description: `Buy 100% pure essential oils and cold-pressed carrier oils online in India. ${oilCount} single-origin oils, bottled in small batches and shipped from Delhi. Free shipping over ${money(site.freeShippingAt)}.`,
   jsonLd: [
     organization,
     website,
@@ -266,6 +309,15 @@ page("/", layout({
         addressCountry: "IN",
       },
     },
+    // The homepage was the one page type carrying no FAQPage, so the
+    // questions a first-time buyer actually asks were invisible to search.
+    {
+      "@type": "FAQPage",
+      mainEntity: homeFaqs.map((f) => ({
+        "@type": "Question", name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
   ],
   body: `
     <section class="hero">
@@ -273,13 +325,13 @@ page("/", layout({
         <div class="hero__copy">
           <p class="eyebrow">Small batch · Single origin · Shipped across India</p>
           <h1>Nature, bottled<br /><em>at its purest.</em></h1>
-          <p class="lead">${count} oils, bought from growers and distillers we can name, decanted into amber glass and sent straight to you.</p>
+          <p class="lead">${oilCount} oils, bought from growers and distillers we can name, decanted into amber glass and sent straight to you.</p>
           <div class="hero__ctas">
             <a href="/shop/" class="btn btn--primary">Shop all oils</a>
             <a href="/collections/" class="btn btn--ghost">Browse collections</a>
           </div>
           <ul class="hero__stats">
-            <li><strong>${products.length}</strong><span>Oils in the range</span></li>
+            <li><strong>${oilCount}</strong><span>Oils in the range</span></li>
             <li><strong>100%</strong><span>Pure &amp; undiluted</span></li>
             <li><strong>48h</strong><span>Dispatch from Delhi</span></li>
           </ul>
@@ -328,8 +380,22 @@ page("/", layout({
           <h2>From grower to your shelf</h2>
         </div>
         <div class="steps steps--light">
-          ${steps.map((s) => `<div><span>${s.n}</span><h4>${s.h}</h4><p>${esc(s.p)}</p></div>`).join("")}
+          ${steps.map((s) => `<div><span>${s.n}</span><h3>${s.h}</h3><p>${esc(s.p)}</p></div>`).join("")}
         </div>
+      </div>
+    </section>
+
+    <section class="section" data-reveal>
+      <div class="container container--narrow">
+        <div class="section__head section__head--center">
+          <p class="eyebrow">Before you buy</p>
+          <h2>Common questions</h2>
+        </div>
+        <div class="faq__list faq__list--pdp">
+          ${homeFaqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}
+        </div>
+        <p class="muted small" style="text-align:center">
+          ${faqs.length - homeFaqs.length} more in the <a href="/faq/">full FAQ</a>.</p>
       </div>
     </section>
 
@@ -341,14 +407,14 @@ page("/", layout({
 page("/shop/", layout({
   path: "/shop/",
   title: "Buy Essential Oils Online in India",
-  description: `Shop all ${count} Sarvha oils — single-origin essential oils and cold-pressed carrier oils, 100% pure and undiluted. Sizes, prices and usage notes for every bottle.`,
+  description: `Shop all ${count} Sarvha products — single-origin essential oils and cold-pressed carrier oils, 100% pure and undiluted. Sizes, prices and usage notes for every bottle.`,
   breadcrumb: shopTrail,
   ogImage: defaultOg,
   jsonLd: [
     {
       "@type": "CollectionPage",
       name: "Shop all essential oils",
-      description: `All ${count} essential and carrier oils sold by ${site.name}.`,
+      description: `All ${oilCount} essential and carrier oils, plus ${products.length - oilCount} gift sets, sold by ${site.name}.`,
       url: site.url + "/shop/",
       isPartOf: { "@id": site.url + "/#website" },
       about: { "@id": site.url + "/#organization" },
@@ -422,6 +488,7 @@ page("/shop/", layout({
           </div>
         </div>
 
+        <h2 class="sr-only">All products</h2>
         <div data-grid>${productGrid(products)}</div>
       </div>
     </section>
@@ -434,7 +501,7 @@ page("/shop/", layout({
 page("/collections/", layout({
   path: "/collections/",
   title: "Essential Oil Collections",
-  description: `Browse ${site.name} oils by what you need — relaxation, energy, immunity and skincare. ${count} single-origin essential and carrier oils, grouped to help you find the right bottle.`,
+  description: `Browse ${site.name} oils by what you need — ${categories.map((c) => c.label.toLowerCase()).join(", ")}. ${oilCount} single-origin essential and carrier oils, grouped to help you find the right bottle.`,
   breadcrumb: collectionsTrail,
   ogImage: defaultOg,
   jsonLd: {
@@ -452,7 +519,7 @@ page("/collections/", layout({
         ${breadcrumbs(collectionsTrail)}
         <div class="page-head">
           <p class="eyebrow">Browse</p>
-          <h1>Four collections</h1>
+          <h1>${titleCase(numberWord(categories.length))} collections</h1>
           <p class="lead">We group the range by what people actually come looking for, rather than by botanical family.</p>
         </div>
         <div class="coll-list">
@@ -1123,7 +1190,7 @@ page("/about/", layout({
           <p>We describe how our oils smell and how people like to use them. We don't make medical claims, because essential oils aren't medicine. If you're pregnant, nursing, on medication, or buying for a child, talk to a doctor first — and <a href="/faq/#usage-safety">read our safety notes</a>.</p>
         </div>
         <div class="steps steps--light">
-          ${steps.map((s) => `<div><span>${s.n}</span><h4>${s.h}</h4><p>${esc(s.p)}</p></div>`).join("")}
+          ${steps.map((s) => `<div><span>${s.n}</span><h3>${s.h}</h3><p>${esc(s.p)}</p></div>`).join("")}
         </div>
       </div>
     </section>
@@ -1394,9 +1461,25 @@ accountPage({
   description: "Your Sarvha account: past orders and saved details.",
   label: "Your account",
   body: `
-    <!-- Filled by /api/auth/session, title and all: the name in the header
-         comes from the session, so there is nothing to show until it answers.
-         Rendered server-side this would be a page that must never be cached. -->
+    <!--
+      The h1 is served, the name is filled in.
+
+      Moving the whole header into the panel left this page with no <h1> at
+      all until JavaScript had run — invisible in search terms, since the
+      page is noindex, but a screen reader landing here was handed a
+      document with no heading to orient by. The customer's name still comes
+      from /api/auth/session, so it stays client-side; the page's own title
+      does not depend on knowing who you are, so it does not.
+    -->
+    <header class="acct__head">
+      <div>
+        <p class="eyebrow">Your account</p>
+        <h1 data-account-title>Your account</h1>
+        <p class="acct__email" data-account-email></p>
+      </div>
+      <button class="btn btn--ghost" data-logout hidden>Log out</button>
+    </header>
+
     <div data-account-panel>
       <p class="muted">Loading your account…</p>
     </div>`,
@@ -1557,6 +1640,10 @@ page("/admin/", layout({
   chrome: "admin",
   body: `
     <div class="awrap">
+      <!-- The admin bar is the page's visible title, but a bar is not a
+           heading. Served rather than drawn, so the document has one before
+           anything is fetched. -->
+      <h1 class="sr-only">Sarvha admin</h1>
       <div data-admin-gate><p class="muted">Checking…</p></div>
 
       <div data-admin hidden>

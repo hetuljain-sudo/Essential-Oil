@@ -194,7 +194,12 @@ function footer() {
 
   const column = (heading, links) => `
     <details class="footer__col" open>
-      <summary><h4>${heading}</h4></summary>
+      <!-- h2, not h4. These are top-level sections of the footer landmark,
+           and every page carried a jump from its last h1 or h2 straight to
+           h4 here — 80 pages of broken outline for a heading level chosen
+           to look small. The size comes from CSS; the level says what the
+           thing is. -->
+      <summary><h2>${heading}</h2></summary>
       <nav aria-label="${heading}">
         ${links.map((l) => `<a href="${l.href}">${esc(l.label)}${
           l.n ? `<small>${l.n}</small>` : ""}</a>`).join("")}

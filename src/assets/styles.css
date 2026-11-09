@@ -225,7 +225,7 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 .story__body p { color: #cfd8c3; font-size: 1.04rem; }
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; margin-top: 2.4rem; border-top: 1px solid rgba(255,255,255,.15); padding-top: 2rem; }
 .steps span { font-family: var(--serif); font-size: 1.5rem; color: #e0a57f; }
-.steps h4 { color: #fff; font-size: 1.3rem; margin: .3rem 0; }
+.steps h3 { color: #fff; font-size: 1.3rem; margin: .3rem 0; }
 .steps p { font-size: .84rem !important; margin: 0; }
 
 /* Uses */
@@ -263,7 +263,7 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 /* Footer */
 .footer { background: var(--ink); color: #b7bfae; padding: 4rem 0 2rem; font-size: .9rem; }
 .footer__inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2rem; }
-.footer h4 { color: #fff; font-family: var(--sans); font-size: .82rem; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 1rem; }
+.footer h2 { color: #fff; font-family: var(--sans); font-size: .82rem; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 1rem; }
 /* Not `> div > a` — the link columns are <nav> landmarks, not divs. */
 .footer__inner a:not(.logo) { display: block; text-decoration: none; margin-bottom: .5rem; width: fit-content; }
 .footer__inner a:hover { color: #fff; }
