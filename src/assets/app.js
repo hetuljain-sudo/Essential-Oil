@@ -396,7 +396,7 @@ function productCard(p, i = 99) {
     </a>
     ${heartHTML(p)}
     <div class="card__body">
-      <span class="card__meta">${catLabel(p.category)} · ${p.variants.map((x) => x.size).join(" / ")}</span>
+      <span class="card__meta">${catLabel(p.category)}<span class="card__sizes"> · ${p.variants.map((x) => x.size).join(" / ")}</span></span>
       <h3 class="card__title"><a href="${p.url}">${esc(p.name)}</a></h3>
       <p class="card__latin">${p.botanical
         ? esc(p.botanical)

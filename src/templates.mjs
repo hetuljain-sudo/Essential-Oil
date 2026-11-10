@@ -78,7 +78,7 @@ export function productCard(p) {
     </a>
     ${heart(p)}
     <div class="card__body">
-      <span class="card__meta">${categoryOf(p.category).label} · ${p.variants.map((x) => x.size).join(" / ")}</span>
+      <span class="card__meta">${categoryOf(p.category).label}<span class="card__sizes"> · ${p.variants.map((x) => x.size).join(" / ")}</span></span>
       <h3 class="card__title"><a href="${productUrl(p)}">${esc(p.name)}</a></h3>
       ${p.botanical
         ? `<p class="card__latin">${esc(p.botanical)}</p>`

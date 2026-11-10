@@ -95,8 +95,9 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   .select__menu { animation: none; }
 }
 
-/* Collection tiles are links now, and there are four of them */
-.moods { grid-template-columns: repeat(4, 1fr); }
+/* Collection tiles are links now. How many columns they take is left to
+   the auto-fit rule in styles.css, so adding a collection cannot strand one
+   on a row by itself the way a pinned count did. */
 .mood { text-decoration: none; color: inherit; }
 .mood__label, .mood__note { text-decoration: none; }
 

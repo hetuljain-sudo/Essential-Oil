@@ -156,7 +156,7 @@
   --muted: #6b6b5f;
   --line: #ddd3c0;
   --radius: 14px;
-  --shadow: 0 10px 30px -12px rgba(35, 48, 31, .25);
+  --shadow: 0 18px 44px -26px rgba(35, 48, 31, .30);
   --serif: "Cormorant Garamond", Georgia, serif;
   --sans: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
 }
@@ -174,7 +174,7 @@ body {
 img, svg { display: block; }
 a { color: inherit; }
 button { font: inherit; cursor: pointer; }
-h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.1; margin: 0 0 .5em; }
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.1; margin: 0 0 .5em; letter-spacing: -.012em; }
 h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); }
 h2 { font-size: clamp(2rem, 4vw, 2.9rem); }
 h3 { font-size: 1.5rem; }
@@ -194,7 +194,7 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
   font-weight: 600; font-size: .94rem; text-decoration: none; transition: .2s ease;
 }
 .btn--primary { background: var(--forest); color: #fff; }
-.btn--primary:hover { background: var(--terracotta); }
+.btn--primary:hover { background: var(--ink); }
 .btn--ghost { border-color: var(--forest); color: var(--forest); }
 .btn--ghost:hover { background: var(--forest); color: #fff; }
 .btn--block { width: 100%; }
@@ -204,7 +204,7 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
 /* Announcement + header */
 .announce { background: var(--forest); color: #e9eedf; text-align: center; font-size: .8rem; padding: .55rem 1rem; letter-spacing: .02em; }
 .header { position: sticky; top: 0; z-index: 40; background: rgba(246, 241, 231, .92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-.header__inner { display: flex; align-items: center; gap: 2rem; height: 72px; }
+.header__inner { display: flex; align-items: center; gap: 2rem; height: 84px; }
 .logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; font-family: var(--serif); font-size: 1.55rem; font-weight: 600; color: var(--forest); }
 .logo--light { color: #fff; }
 .nav { display: flex; gap: 1.8rem; margin-left: auto; }
@@ -240,12 +240,12 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
 
 /* Trust */
 .trust { border-block: 1px solid var(--line); background: var(--paper); }
-.trust__inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 1.2rem 0; font-size: .88rem; font-weight: 500; }
+.trust__inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 1.5rem 0; font-size: .76rem; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .trust__inner div { display: flex; align-items: center; justify-content: center; gap: .6rem; }
-.trust__icon { color: var(--terracotta); font-size: 1.1rem; }
+.trust__icon { color: var(--terracotta); font-size: .95rem; opacity: .7; }
 
 /* Sections */
-.section { padding: clamp(4rem, 8vw, 6.5rem) 0; }
+.section { padding: clamp(4.5rem, 9vw, 8rem) 0; }
 .section--tint { background: var(--sand); }
 .section--dark { background: var(--forest); color: #e9eedf; }
 .section--dark h2 { color: #fff; }
@@ -263,12 +263,12 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
 .sort select { font: inherit; padding: .45rem .8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
 
 /* Product grid */
-.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 1.6rem; row-gap: 3.2rem; }
 /* position: relative is for the heart, which sits over the media but cannot
    live inside it — .card__media is an <a>, and a button inside an anchor is
    invalid markup that behaves differently in every browser. */
-.card { position: relative; background: var(--paper); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform .25s, box-shadow .25s; border: 1px solid #efe7d7; }
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.card { position: relative; background: none; display: flex; flex-direction: column; border: 0; }
+.card__media { border-radius: var(--radius); overflow: hidden; background: var(--paper); }
 .card__media { position: relative; aspect-ratio: 1 / 1.05; display: grid; place-items: center; cursor: pointer; border: 0; padding: 0; width: 100%; }
 .card__media .bottle { width: 42%; transition: transform .35s; }
 .card:hover .card__media .bottle { transform: translateY(-6px) rotate(-3deg); }
@@ -323,22 +323,27 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
 
 .saved__count { color: var(--muted); font-size: .9rem; margin: 0 0 1.2rem; }
 
-.card__body { padding: 1rem 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+.card__body { padding: 1.1rem .15rem 0; display: flex; flex-direction: column; gap: .3rem; flex: 1; }
 .card__meta { font-size: .74rem; color: var(--sage-text); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
-.card__title { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; margin: 0; cursor: pointer; }
+.card__title { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; margin: 0; cursor: pointer; letter-spacing: -.01em; }
 .card__desc { font-size: .84rem; color: var(--muted); margin: 0; }
 .card__rating { font-size: .8rem; color: var(--muted); }
 .card__rating b { color: #c48a2c; font-weight: 500; }
 .card__foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: .7rem; }
 .price { font-weight: 600; font-size: 1.05rem; color: var(--forest); }
 s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
-.add-btn { background: var(--forest); color: #fff; border: 0; border-radius: 999px; padding: .5rem 1rem; font-size: .82rem; font-weight: 600; transition: .2s; }
-.add-btn:hover { background: var(--terracotta); }
+.add-btn {
+  background: none; color: var(--forest); border: 1px solid var(--forest);
+  border-radius: 999px; padding: .5rem 1.05rem; font-size: .82rem; font-weight: 600;
+  text-decoration: none; display: inline-block; transition: background .2s, color .2s;
+}
+.add-btn:hover { background: var(--forest); color: #fff; }
+.add-btn:disabled { border-color: var(--line); color: var(--muted); }
 
 /* Moods */
-.moods { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; }
+.moods { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 1rem; }
 .mood { background: var(--paper); border: 1px solid transparent; border-radius: var(--radius); padding: 1.6rem 1rem; text-align: center; transition: .2s; }
-.mood:hover { border-color: var(--terracotta); transform: translateY(-3px); }
+.mood:hover { border-color: var(--sage); }
 .mood__dot { width: 56px; height: 56px; border-radius: 50%; margin: 0 auto .9rem; display: grid; place-items: center; font-size: 1.4rem; }
 .mood h4 { font-size: 1.25rem; margin: 0 0 .2rem; }
 .mood p { margin: 0; font-size: .78rem; color: var(--muted); }
@@ -481,7 +486,7 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
   .nav a { padding: .9rem 0; border-bottom: 1px solid var(--line); font-size: 1.05rem; }
   .hero__inner, .kit, .story, .faq { grid-template-columns: 1fr; gap: 2.5rem; }
   .hero__art { max-width: 380px; order: -1; }
-  .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .grid { grid-template-columns: repeat(2, 1fr); column-gap: 1rem; row-gap: 2.2rem; }
   .trust__inner { grid-template-columns: repeat(2, 1fr); }
   .trust__inner div { justify-content: flex-start; }
   .uses, .reviews { grid-template-columns: 1fr; }
@@ -492,9 +497,10 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 }
 @media (max-width: 520px) {
   .moods { grid-template-columns: repeat(2, 1fr); }
-  .card__body { padding: .8rem; }
+  .card__body { padding: .9rem .1rem 0; }
   .card__title { font-size: 1.15rem; }
   .card__desc { display: none; }
+  .card__sizes { display: none; }
   .card__foot { flex-direction: column; align-items: stretch; gap: .5rem; }
   .add-btn { width: 100%; }
   .hero__stats { gap: 1.4rem; }
@@ -802,8 +808,9 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
   .select__menu { animation: none; }
 }
 
-/* Collection tiles are links now, and there are four of them */
-.moods { grid-template-columns: repeat(4, 1fr); }
+/* Collection tiles are links now. How many columns they take is left to
+   the auto-fit rule in styles.css, so adding a collection cannot strand one
+   on a row by itself the way a pinned count did. */
 .mood { text-decoration: none; color: inherit; }
 .mood__label, .mood__note { text-decoration: none; }
 
