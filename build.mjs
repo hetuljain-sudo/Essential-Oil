@@ -669,7 +669,6 @@ for (const c of categories) {
             <div class="uses">
               ${hub.uses.map((u, i) => `
                 <article class="use">
-                  <div class="use__icon" aria-hidden="true">${["\u25CC", "\u270B", "\u2668"][i] || "\u25CC"}</div>
                   <h3>${esc(u.h)}</h3><p>${esc(u.p)}</p>
                 </article>`).join("")}
             </div>
