@@ -51,7 +51,7 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=e99da200" />
+  <link rel="stylesheet" href="/styles.css?v=a2631619" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://sarvha.com/#organization","name":"Sarvha","url":"https://sarvha.com","email":"hello@sarvha.com","telephone":["+91 93154 13515","+91 98735 44554"],"description":"Single-origin essential oils and cold-pressed carriers, bottled in small batches and shipped across India.","address":{"@type":"PostalAddress","streetAddress":"B-13, Rana Pratap Bagh, Nr. GT Road Industrial Area","addressLocality":"New Delhi","postalCode":"110007","addressRegion":"Delhi","addressCountry":"IN"}},{"@type":"WebSite","@id":"https://sarvha.com/#website","url":"https://sarvha.com","name":"Sarvha","inLanguage":"en-IN","publisher":{"@id":"https://sarvha.com/#organization"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://sarvha.com/shop/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"Store","@id":"https://sarvha.com/#store","name":"Sarvha","description":"Single-origin essential oils and cold-pressed carriers, bottled in small batches and shipped across India.","url":"https://sarvha.com","image":"https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900","parentOrganization":{"@id":"https://sarvha.com/#organization"},"email":"hello@sarvha.com","telephone":["+91 93154 13515","+91 98735 44554"],"priceRange":"₹₹","currenciesAccepted":"INR","areaServed":{"@type":"Country","name":"India"},"address":{"@type":"PostalAddress","streetAddress":"B-13, Rana Pratap Bagh, Nr. GT Road Industrial Area","addressLocality":"New Delhi","postalCode":"110007","addressRegion":"Delhi","addressCountry":"IN"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are your essential oils 100% pure?","acceptedAnswer":{"@type":"Answer","text":"Yes — all our oils are 100% pure, undiluted, and free from synthetic additives or fillers."}},{"@type":"Question","name":"How do I use essential oils safely?","acceptedAnswer":{"@type":"Answer","text":"Most essential oils should be diluted with a carrier oil before applying to skin, and are not meant for internal use unless specifically labelled. Every product page includes usage guidance — always patch-test before first use."}},{"@type":"Question","name":"What are the shipping charges?","acceptedAnswer":{"@type":"Answer","text":"Shipping is free on orders over ₹999. Below that it is a flat ₹79 anywhere in India."}},{"@type":"Question","name":"How long does delivery take?","acceptedAnswer":{"@type":"Answer","text":"Orders are dispatched within two business days. Delivery usually takes a further three to five days depending on where you are."}}]}]}</script>
 </head>
 <body>
@@ -418,6 +418,51 @@
       </div>
     </section>
 
+    
+    <section class="section section--tint" data-reveal id="dilution">
+      <div class="container">
+        <div class="section__head section__head--center">
+          <p class="eyebrow">Before you blend</p>
+          <h2>How much oil, in how much carrier</h2>
+        </div>
+
+        <div class="dil" data-dilution>
+          <div class="dil__controls">
+            <!-- aria-label on both: app.js upgrades every <select> into a
+                 styled listbox and takes its accessible name from the label's
+                 first text node, which here is whitespace before the <span>.
+                 Without these the control announces as "Select an option". -->
+            <label class="dil__field">
+              <span>Carrier oil</span>
+              <select data-dil-volume aria-label="Amount of carrier oil">
+                <option value="5">5 ml</option><option value="10">10 ml</option><option value="30" selected>30 ml</option><option value="50">50 ml</option><option value="100">100 ml</option>
+              </select>
+            </label>
+            <label class="dil__field">
+              <span>Strength</span>
+              <select data-dil-strength aria-label="Dilution strength">
+                <option value="0.5">0.5%</option><option value="1">1%</option><option value="2" selected>2%</option><option value="3">3%</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="dil__answer">
+            <strong data-dil-drops>12</strong>
+            <span data-dil-unit>drops</span>
+            <span class="dil__of">of essential oil</span>
+          </p>
+
+          <p class="dil__note" data-dil-note>One drop in a teaspoon of carrier is roughly 1%, which is the shortcut worth memorising.</p>
+        </div>
+
+        <div class="dil__foot">
+          <p class="dil__lower"><strong>Eight oils in the range need a lower ceiling than 2%.</strong>
+            <span class="dil__oil"><a href="/oils/clove-bud/">Clove Bud</a> <span class="muted">0.5%</span></span> · <span class="dil__oil"><a href="/oils/thyme/">Thyme</a> <span class="muted">0.5%</span></span> · <span class="dil__oil"><a href="/oils/cinnamon-leaf/">Cinnamon Leaf</a> <span class="muted">0.6%</span></span> · <span class="dil__oil"><a href="/oils/citronella/">Citronella</a> <span class="muted">1%</span></span> · <span class="dil__oil"><a href="/oils/lemongrass/">Lemongrass</a> <span class="muted">1%</span></span> · <span class="dil__oil"><a href="/oils/fennel/">Sweet Fennel</a> <span class="muted">1%</span></span> · <span class="dil__oil"><a href="/oils/tea-tree-shield/">Tea Tree Shield</a> <span class="muted">1%</span></span> · <span class="dil__oil"><a href="/oils/sweet-basil/">Sweet Basil</a> <span class="muted">1.5%</span></span></p>
+          <p class="note">These figures are for diluting before use on skin. Patch-test first, and not for internal use.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="section" data-reveal>
       <div class="container container--narrow">
         <div class="section__head section__head--center">
@@ -556,7 +601,7 @@
   </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=e99da200"></script>
-  <script src="/app.js?v=e99da200"></script>
+  <script src="/catalog.js?v=a2631619"></script>
+  <script src="/app.js?v=a2631619"></script>
 </body>
 </html>

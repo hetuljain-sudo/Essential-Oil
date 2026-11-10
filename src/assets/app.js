@@ -635,6 +635,50 @@ if (pdp) {
   refresh();
 }
 
+/* ----------------------------------------------------------- dilution */
+/**
+ * The homepage calculator.
+ *
+ * dropsFor and formatDrops are prepended from src/dilution.mjs — the same
+ * definitions the build used to render the default answer, so the number
+ * cannot change meaning the moment the script loads.
+ *
+ * The markup already holds the right answer for 30 ml at 2%, so this does
+ * nothing until a control moves.
+ */
+const dil = $("[data-dilution]");
+if (dil) {
+  const volume = $("[data-dil-volume]", dil);
+  const strength = $("[data-dil-strength]", dil);
+  const out = $("[data-dil-drops]", dil);
+  const unit = $("[data-dil-unit]", dil);
+  const note = $("[data-dil-note]", dil);
+
+  const SHORTCUT = "One drop in a teaspoon of carrier is roughly 1%, which is the shortcut worth memorising.";
+
+  const refresh = () => {
+    const ml = Number(volume.value);
+    const pct = Number(strength.value);
+    const drops = dropsFor(ml, pct);
+
+    out.textContent = formatDrops(drops);
+    // "1 drop", not "1 drops".
+    unit.textContent = drops === 1 ? "drop" : "drops";
+
+    // Under one drop the honest answer is to make up more at a time. Saying
+    // "0.5 drops" and leaving it there invites someone to round up, which
+    // doubles the strength of what goes on their skin.
+    const impractical = drops > 0 && drops < 1;
+    note.textContent = impractical
+      ? `Half a drop is not something you can measure. Make up a larger batch — ${ml * 2} ml at ${pct}% is ${formatDrops(dropsFor(ml * 2, pct))} drops.`
+      : SHORTCUT;
+    note.classList.toggle("is-warning", impractical);
+  };
+
+  volume.addEventListener("change", refresh);
+  strength.addEventListener("change", refresh);
+}
+
 /* --------------------------------------------------------- custom select */
 /**
  * A browser draws a <select>'s open option list itself, so CSS can't reach it

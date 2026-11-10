@@ -403,6 +403,49 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 .use p { color: var(--muted); margin: 0; }
 .note { text-align: center; font-size: .82rem; color: var(--muted); max-width: 40rem; margin: 2rem auto 0; }
 
+/* Dilution calculator
+   -------------------
+   The answer is the point of the section, so it is the only large thing in
+   it. Controls above, answer below, in the reading order of the question
+   someone is actually asking: "I have 30 ml — how much oil?" */
+.dil { max-width: 46rem; margin-inline: auto; text-align: center; }
+.dil__controls { display: flex; flex-wrap: wrap; gap: 1rem 1.6rem; justify-content: center; }
+.dil__field { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; text-align: left; }
+.dil__field > span {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .14em;
+  font-weight: 600; color: var(--sage-text);
+}
+.dil__field select {
+  font: inherit; font-size: 1rem; padding: .6rem 1rem; min-width: 8.5rem;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper); color: var(--ink); cursor: pointer;
+}
+.dil__answer {
+  margin: 1.8rem 0 .4rem; font-family: var(--serif); color: var(--forest);
+  line-height: 1; display: flex; align-items: baseline; justify-content: center; gap: .5rem; flex-wrap: wrap;
+}
+.dil__answer strong { font-size: clamp(3rem, 9vw, 4.6rem); font-weight: 600; letter-spacing: -.02em; }
+.dil__answer [data-dil-unit] { font-size: 1.6rem; }
+/* tabular-nums so the number does not jostle the word beside it as it changes */
+.dil__answer strong { font-variant-numeric: tabular-nums; }
+.dil__of { font-family: var(--sans); font-size: .9rem; color: var(--muted); }
+.dil__note { margin: 0 auto; max-width: 34rem; font-size: .9rem; color: var(--muted); }
+.dil__note.is-warning { color: var(--terracotta-dark); font-weight: 500; }
+
+.dil__foot { max-width: 52rem; margin: 2.6rem auto 0; text-align: center; }
+.dil__lower { font-size: .9rem; margin: 0 0 .6rem; line-height: 1.9; }
+.dil__lower strong { display: block; margin-bottom: .5rem; font-weight: 600; }
+.dil__lower a { color: var(--terracotta-dark); text-underline-offset: 3px; }
+/* An oil and its ceiling are one fact; letting the line break between them
+   leaves a stray "1.5%" starting the next line, belonging to nothing. */
+.dil__oil { white-space: nowrap; }
+.dil__foot .note { margin-top: 1rem; }
+
+@media (max-width: 520px) {
+  .dil__controls { flex-direction: column; align-items: stretch; }
+  .dil__field select { width: 100%; }
+}
+
 /* FAQ */
 .faq { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; }
 .faq__list details { border-bottom: 1px solid var(--line); padding: 1.1rem 0; }

@@ -25,6 +25,7 @@ import {
   setAssetStamp,
 } from "./src/templates.mjs";
 
+import { VOLUMES, STRENGTHS, dropsFor, formatDrops } from "./src/dilution.mjs";
 import { guides } from "./src/content.mjs";
 import { hubs } from "./src/collections.mjs";
 import { guidePages, liveGuides } from "./src/guides.mjs";
@@ -43,7 +44,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/fonts.css", "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs", "src/dilution.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -190,6 +191,73 @@ const shippingDetails = [
   },
 ];
 
+
+/**
+ * "How much oil, in how much carrier" — the homepage calculator.
+ *
+ * Rendered complete, with the default answer already in the markup, so it
+ * reads correctly before app.js runs and for anyone who never gets it. The
+ * script only changes the number when a control moves.
+ *
+ * The list of oils that need a lower ceiling is built from the catalogue's
+ * own `safety.maxDilution`, so it cannot claim a limit an oil's page does
+ * not also print, and an oil added later appears here without being named.
+ */
+function dilutionSection() {
+  const defaultMl = 30;
+  const defaultPct = 2;
+  const lower = products
+    .filter((p) => typeof p.safety?.maxDilution === "number")
+    .sort((a, b) => a.safety.maxDilution - b.safety.maxDilution || a.name.localeCompare(b.name));
+
+  const option = (v, sel, label) =>
+    `<option value="${v}"${v === sel ? " selected" : ""}>${label}</option>`;
+
+  return `
+    <section class="section section--tint" data-reveal id="dilution">
+      <div class="container">
+        <div class="section__head section__head--center">
+          <p class="eyebrow">Before you blend</p>
+          <h2>How much oil, in how much carrier</h2>
+        </div>
+
+        <div class="dil" data-dilution>
+          <div class="dil__controls">
+            <!-- aria-label on both: app.js upgrades every <select> into a
+                 styled listbox and takes its accessible name from the label's
+                 first text node, which here is whitespace before the <span>.
+                 Without these the control announces as "Select an option". -->
+            <label class="dil__field">
+              <span>Carrier oil</span>
+              <select data-dil-volume aria-label="Amount of carrier oil">
+                ${VOLUMES.map((v) => option(v, defaultMl, `${v} ml`)).join("")}
+              </select>
+            </label>
+            <label class="dil__field">
+              <span>Strength</span>
+              <select data-dil-strength aria-label="Dilution strength">
+                ${STRENGTHS.map((s) => option(s, defaultPct, `${s}%`)).join("")}
+              </select>
+            </label>
+          </div>
+
+          <p class="dil__answer">
+            <strong data-dil-drops>${formatDrops(dropsFor(defaultMl, defaultPct))}</strong>
+            <span data-dil-unit>drops</span>
+            <span class="dil__of">of essential oil</span>
+          </p>
+
+          <p class="dil__note" data-dil-note>One drop in a teaspoon of carrier is roughly 1%, which is the shortcut worth memorising.</p>
+        </div>
+
+        <div class="dil__foot">
+          <p class="dil__lower"><strong>${titleCase(numberWord(lower.length))} oils in the range need a lower ceiling than 2%.</strong>
+            ${lower.map((p) => `<span class="dil__oil"><a href="${productUrl(p)}">${esc(p.name)}</a> <span class="muted">${p.safety.maxDilution}%</span></span>`).join(" · ")}</p>
+          <p class="note">These figures are for diluting before use on skin. Patch-test first, and not for internal use.</p>
+        </div>
+      </div>
+    </section>`;
+}
 
 const isCarrier = (p) => !!p.carrier;
 const isSet = (p) => p.kind === "set";
@@ -384,6 +452,8 @@ page("/", layout({
         </div>
       </div>
     </section>
+
+    ${dilutionSection()}
 
     <section class="section" data-reveal>
       <div class="container container--narrow">
@@ -1840,7 +1910,7 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
 const sharedForBrowser = (await Promise.all(
-  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs", "src/dilution.mjs"].map((f) => readFile(join(root, f), "utf8"))
 )).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),
