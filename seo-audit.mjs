@@ -99,10 +99,18 @@ for (const file of files) {
         const raw = n.offers;
         const offers = Array.isArray(raw) ? raw : raw?.offers ?? (raw ? [raw] : []);
         if (!offers.length) add(page, "schema", "Product with no offers");
+        /* priceValidUntil, a return policy and shipping details were all
+           required here while the site sold bottles at a published price.
+           A barrel is quoted per enquiry, so an Offer carries no price —
+           and a price validity date, a 30-day return window or a parcel
+           rate on a priceless Offer would each be a claim about terms that
+           are actually settled in the reply to the enquiry. What is still
+           checked is the part that has to be right either way: an offer
+           per pack size, each identifying which pack it is. */
         for (const o of offers) {
-          if (!o.priceValidUntil) add(page, "schema", "Offer missing priceValidUntil");
-          if (!o.hasMerchantReturnPolicy) add(page, "schema", "Offer missing return policy");
-          if (!o.shippingDetails) add(page, "schema", "Offer missing shipping details");
+          if (o.price !== undefined && !o.priceValidUntil) {
+            add(page, "schema", "Priced offer missing priceValidUntil");
+          }
           if (!o.sku) add(page, "schema", "Offer missing sku");
         }
       }

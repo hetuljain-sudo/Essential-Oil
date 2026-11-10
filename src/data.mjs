@@ -69,15 +69,6 @@ export const categories = [
     color: "#e0eef1",
   },
   {
-    id: "sets",
-    label: "Sets",
-    blurb: "Two or three oils that belong together, boxed.",
-    intro:
-      "The same bottles we sell singly, chosen to go together and priced below what they cost apart. A reasonable way to start if fifty oils is too many to choose from.",
-    icon: "❑",
-    color: "#efe8dd",
-  },
-  {
     id: "skincare",
     label: "Skincare",
     blurb: "Treatments and carriers for face and body.",
@@ -89,8 +80,13 @@ export const categories = [
 ];
 
 /**
- * variants: [{ size, price, stock }] — stock 0 marks that size sold out.
- * image: product photography; falls back to generated bottle art if it fails.
+ * variants: [{ size }] — the barrel sizes this oil is filled into.
+ *
+ * No price and no stock count. Bulk prices move with the crop and are quoted
+ * per enquiry, and what is in the tank at any moment is not something this
+ * file can know. Both used to live here because the site took card payments.
+ *
+ * image: product photography; falls back to generated art if it fails.
  */
 const oils = [
   {
@@ -108,7 +104,7 @@ const oils = [
     origin: "Provence, France", method: "Steam distilled",
     swatch: ["#9a8fc4", "#6d5fa3"], bg: "#ece6f4",
     image: { src: "https://images.unsplash.com/photo-1693567397897-61ea5c665078?auto=format&fit=crop&q=70&w=900", alt: "Amber dropper bottle of lavender oil on cream linen with dried lavender sprigs behind it" },
-    variants: [{ size: "15 ml", price: 699, stock: 24 }, { size: "30 ml", price: 1299, stock: 11 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "roman-chamomile", family: "Herbaceous", name: "Roman Chamomile", botanical: "Chamaemelum nobile",
@@ -125,7 +121,7 @@ const oils = [
     origin: "Norfolk, England", method: "Steam distilled",
     swatch: ["#d9d08f", "#a89a4e"], bg: "#f2f0d8",
     image: { src: "https://images.unsplash.com/photo-1676803704427-496b1de33baa?auto=format&fit=crop&q=70&w=900", alt: "Open amber dropper bottle on wood with small white blossoms and green leaves behind" },
-    variants: [{ size: "10 ml", price: 1499, stock: 6 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "cedarwood-grounding", family: "Woods & roots", name: "Cedarwood Grounding", botanical: "Cedrus atlantica",
@@ -142,7 +138,7 @@ const oils = [
     origin: "Middle Atlas, Morocco", method: "Steam distilled",
     swatch: ["#c1a184", "#8a6a4e"], bg: "#efe6d8",
     image: { src: "https://images.unsplash.com/photo-1581514439794-f9777f7c22eb?auto=format&fit=crop&q=70&w=900", alt: "Amber dropper bottle on weathered wood with a conifer sprig behind it" },
-    variants: [{ size: "15 ml", price: 599, stock: 18 }, { size: "30 ml", price: 1099, stock: 9 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "sweet-orange-sunrise", family: "Citrus", name: "Sweet Orange Sunrise", botanical: "Citrus sinensis",
@@ -159,7 +155,7 @@ const oils = [
     origin: "Sicily, Italy", method: "Cold pressed",
     swatch: ["#f0a85c", "#d97b2b"], bg: "#f8e7d4",
     image: { src: "https://images.unsplash.com/photo-1608571423539-e951b9b3871e?auto=format&fit=crop&q=70&w=900", alt: "Amber dropper bottle on a wooden pedestal against a cream wall patterned with leaf shadows" },
-    variants: [{ size: "15 ml", price: 449, stock: 40 }, { size: "30 ml", price: 799, stock: 17 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "peppermint-spark",
@@ -178,7 +174,7 @@ const oils = [
     swatch: ["#8fd0bf", "#3d9b86"], bg: "#e1f1ea",
     image: { src: "https://images.unsplash.com/photo-1605039982749-c2fe1dd2a588?auto=format&fit=crop&q=70&w=900", alt: "Glass dropper of golden oil on dark wood with fresh green leaves behind" },
     warning: "Not suitable for babies or young children, and best kept away from cats. Keep it below the brow line and wash your hands after use.",
-    variants: [{ size: "15 ml", price: 499, stock: 31 }, { size: "30 ml", price: 899, stock: 8 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "lemon-clarity",
@@ -197,7 +193,7 @@ const oils = [
     swatch: ["#f2d97a", "#d4ac2e"], bg: "#f2f0d8",
     image: { src: "https://images.unsplash.com/photo-1633423411797-9a7317784d2b?auto=format&fit=crop&q=70&w=900", alt: "Dropper releasing bright yellow citrus oil onto a cream surface patterned with leaf shadows" },
     warning: "Phototoxic. Cold-pressed lemon reacts with sunlight — keep below 2% on skin that will see sun within twelve hours, or use after dark.",
-    variants: [{ size: "15 ml", price: 449, stock: 22 }, { size: "30 ml", price: 799, stock: 0 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "eucalyptus-clearing",
@@ -216,7 +212,7 @@ const oils = [
     swatch: ["#7fb8a4", "#3f8570"], bg: "#e0eef1",
     image: { src: "https://images.unsplash.com/photo-1674906027853-4bd48f476244?auto=format&fit=crop&q=70&w=900", alt: "Essential oil bottle surrounded by eucalyptus sprigs and blooms on a pale background" },
     warning: "High in 1,8-cineole — not suitable for babies or young children.",
-    variants: [{ size: "15 ml", price: 499, stock: 27 }, { size: "30 ml", price: 899, stock: 9 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "tea-tree-shield",
@@ -235,7 +231,7 @@ const oils = [
     swatch: ["#a3c48b", "#5f8a4c"], bg: "#e8eedd",
     image: { src: "https://images.unsplash.com/photo-1671493234842-6e600f721982?auto=format&fit=crop&q=70&w=900", alt: "Amber essential oil bottle resting on natural woven linen" },
     warning: "Genuinely toxic to cats and dogs, including as vapour in a closed room. Dilute to 1% or below on skin; never apply it neat.",
-    variants: [{ size: "15 ml", price: 549, stock: 18 }, { size: "30 ml", price: 999, stock: 6 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "ginger-warmth", family: "Warm spices", name: "Ginger Warmth", botanical: "Zingiber officinale",
@@ -252,7 +248,7 @@ const oils = [
     origin: "Kerala, India", method: "Steam distilled",
     swatch: ["#e6b06a", "#b87a33"], bg: "#f5eed8",
     image: { src: "https://images.unsplash.com/photo-1671493235081-5842463637cd?auto=format&fit=crop&q=70&w=900", alt: "Warm amber essential oil bottle lying on natural woven linen" },
-    variants: [{ size: "10 ml", price: 749, stock: 14 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "rosehip-renewal", family: "Carrier oils", carrier: true, name: "Rosehip Renewal", botanical: "Rosa canina",
@@ -269,7 +265,7 @@ const oils = [
     origin: "Bío Bío, Chile", method: "Cold pressed",
     swatch: ["#e2947e", "#bf5f4c"], bg: "#f5e3e8",
     image: { src: "https://images.unsplash.com/photo-1624454002302-36b824d7bd0a?auto=format&fit=crop&q=70&w=900", alt: "Amber dropper bottle and jar on hessian with green leaves resting behind" },
-    variants: [{ size: "30 ml", price: 899, stock: 25 }, { size: "100 ml", price: 2299, stock: 10 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "frankincense-quiet", family: "For skin & hair", name: "Frankincense Quiet", botanical: "Boswellia carterii",
@@ -286,7 +282,7 @@ const oils = [
     origin: "Dhofar, Oman", method: "Steam distilled",
     swatch: ["#d8bd8e", "#a8834a"], bg: "#efe6d8",
     image: { src: "https://images.unsplash.com/photo-1512867957657-38dbae50a35b?auto=format&fit=crop&q=70&w=900", alt: "Open amber oil bottle in warm light with foliage softly blurred behind" },
-    variants: [{ size: "10 ml", price: 1299, stock: 7 }, { size: "15 ml", price: 1799, stock: 3 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "geranium-balance", family: "For skin & hair", name: "Geranium Balance", botanical: "Pelargonium graveolens",
@@ -303,7 +299,7 @@ const oils = [
     origin: "Beni Suef, Egypt", method: "Steam distilled",
     swatch: ["#dba0b4", "#b26586"], bg: "#f5e3e8",
     image: { src: "https://images.unsplash.com/photo-1676852148076-7a92002419f3?auto=format&fit=crop&q=70&w=900", alt: "Amber oil bottles on linen beside a bowl of dried florals and a pink rose" },
-    variants: [{ size: "15 ml", price: 899, stock: 12 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   /* ---------------------------------------------------------------------
@@ -327,7 +323,7 @@ const oils = [
     origin: "Tamil Nadu, India", method: "Steam distilled",
     swatch: ["#e8d58f", "#c0a23f"], bg: "#f4eed6",
     image: { src: "https://images.unsplash.com/photo-1710260715197-d43a51dbd2fa?auto=format&fit=crop&q=70&w=900", alt: "The drooping yellow petals of a ylang ylang flower on the branch" },
-    variants: [{ size: "15 ml", price: 449, stock: 20 }, { size: "30 ml", price: 799, stock: 9 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "vetiver-khus", family: "Woods & roots", name: "Vetiver (Khus)", short: "Vetiver", botanical: "Vetiveria zizanioides",
@@ -344,7 +340,7 @@ const oils = [
     origin: "Uttar Pradesh, India", method: "Steam distilled",
     swatch: ["#9a8766", "#6b5a3c"], bg: "#ece5d6",
     image: { src: "https://images.unsplash.com/photo-1685491455970-fcf003cba14d?auto=format&fit=crop&q=70&w=900", alt: "Tall green grass bending in the wind" },
-    variants: [{ size: "10 ml", price: 899, stock: 11 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "sandalwood-mysore", family: "Woods & roots", name: "Sandalwood", botanical: "Santalum album",
@@ -361,7 +357,7 @@ const oils = [
     origin: "Karnataka, India", method: "Steam distilled",
     swatch: ["#e0c9a0", "#b08f5c"], bg: "#f3e9d8",
     image: { src: "https://images.unsplash.com/photo-1583418007992-a8e33a92e7ad?auto=format&fit=crop&q=70&w=900", alt: "Close-up of fine-grained brown heartwood" },
-    variants: [{ size: "5 ml", price: 2499, stock: 4 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "lemongrass",
@@ -380,7 +376,7 @@ const oils = [
     swatch: ["#cfd46a", "#8f9a2e"], bg: "#eef1d8",
     warning: "More irritating to skin than its freshness suggests — keep to 1% or below.",
     image: { src: "https://images.unsplash.com/photo-1777723915762-31069e8e737b?auto=format&fit=crop&q=70&w=900", alt: "Tall green and white lemongrass blades against a blue sky" },
-    variants: [{ size: "15 ml", price: 449, stock: 34 }, { size: "30 ml", price: 799, stock: 15 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "bergamot",
@@ -399,7 +395,7 @@ const oils = [
     swatch: ["#bcd47e", "#7d9a3c"], bg: "#e9f0d8",
     warning: "Phototoxic. Bergapten in cold-pressed bergamot reacts with sunlight — keep below 0.4% on skin that will be exposed, or use after dark.",
     image: { src: "https://images.unsplash.com/photo-1760293049500-f68afa079549?auto=format&fit=crop&q=70&w=900", alt: "A green bergamot-type citrus fruit ripening on a leafy branch" },
-    variants: [{ size: "15 ml", price: 549, stock: 16 }, { size: "30 ml", price: 999, stock: 7 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "grapefruit",
@@ -418,7 +414,7 @@ const oils = [
     swatch: ["#f0a894", "#cf6a58"], bg: "#f8e4de",
     warning: "Mildly phototoxic. Keep below 4% on skin that will see direct sun within 12 hours.",
     image: { src: "https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?auto=format&fit=crop&q=70&w=900", alt: "Pink grapefruit halves cut open, showing the blush flesh" },
-    variants: [{ size: "15 ml", price: 499, stock: 23 }, { size: "30 ml", price: 899, stock: 11 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "clove-bud",
@@ -437,7 +433,7 @@ const oils = [
     swatch: ["#c89a63", "#8f6433"], bg: "#f0e5d5",
     warning: "A strong skin sensitiser. Keep to 0.5% or below on skin, avoid in pregnancy, and keep well away from children and pets.",
     image: { src: "https://images.unsplash.com/photo-1701191310584-3f319e0e6c59?auto=format&fit=crop&q=70&w=900", alt: "A glass jar of dried clove buds on a white table" },
-    variants: [{ size: "10 ml", price: 549, stock: 13 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "cinnamon-leaf",
@@ -456,7 +452,7 @@ const oils = [
     swatch: ["#c58a5c", "#8b5630"], bg: "#f1e2d6",
     warning: "A skin sensitiser. Keep to 0.6% or below on skin and avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1758657996518-e67bd328854e?auto=format&fit=crop&q=70&w=900", alt: "A pile of rolled cinnamon quills on a dark surface" },
-    variants: [{ size: "10 ml", price: 449, stock: 17 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "rosemary",
@@ -475,7 +471,7 @@ const oils = [
     swatch: ["#8fb08a", "#4f7a4c"], bg: "#e4eee2",
     warning: "Avoid during pregnancy and if you have epilepsy or high blood pressure.",
     image: { src: "https://images.unsplash.com/photo-1582745741856-1a5d68158ba3?auto=format&fit=crop&q=70&w=900", alt: "Close-up of fresh rosemary needles on the stem" },
-    variants: [{ size: "15 ml", price: 499, stock: 29 }, { size: "30 ml", price: 899, stock: 14 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "jojoba", family: "Carrier oils", carrier: true, name: "Jojoba Carrier Oil", short: "Jojoba", botanical: "Simmondsia chinensis",
@@ -492,7 +488,7 @@ const oils = [
     origin: "Rajasthan, India", method: "Cold pressed",
     swatch: ["#e8cf84", "#c2a542"], bg: "#f6efd9",
     image: { src: "https://images.unsplash.com/photo-1621958180509-74e9a29b3758?auto=format&fit=crop&q=70&w=900", alt: "A clear glass bottle of pale golden oil" },
-    variants: [{ size: "100 ml", price: 649, stock: 30 }, { size: "250 ml", price: 1399, stock: 12 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "sweet-almond",
@@ -511,7 +507,7 @@ const oils = [
     swatch: ["#f0dfb8", "#cbb279"], bg: "#f7f0e0",
     warning: "Derived from tree nuts. Avoid if you have a nut allergy.",
     image: { src: "https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&q=70&w=900", alt: "Whole almonds in a white ceramic bowl" },
-    variants: [{ size: "100 ml", price: 449, stock: 36 }, { size: "250 ml", price: 899, stock: 18 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "basil-holy",
@@ -530,7 +526,7 @@ const oils = [
     swatch: ["#a7bd7e", "#67803f"], bg: "#e9efdc",
     warning: "Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1615041443219-2a63ee45bb60?auto=format&fit=crop&q=70&w=900", alt: "Holy basil in flower, purple spikes above green leaves" },
-    variants: [{ size: "10 ml", price: 549, stock: 21 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   /* Second batch from the same suppliers. */
@@ -552,7 +548,7 @@ const oils = [
     swatch: ["#b8c49a", "#7d8f5c"], bg: "#eaf0df",
     warning: "Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1764098979813-4c2f8eba5057?auto=format&fit=crop&q=70&w=900", alt: "Close-up of a purple and white clary sage flower" },
-    variants: [{ size: "10 ml", price: 699, stock: 12 }, { size: "15 ml", price: 899, stock: 7 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "patchouli", family: "Woods & roots", name: "Patchouli", botanical: "Pogostemon cablin",
@@ -569,7 +565,7 @@ const oils = [
     origin: "Indonesia", method: "Steam distilled",
     swatch: ["#a08a6a", "#6b5538"], bg: "#eee6da",
     image: { src: "https://images.unsplash.com/photo-1519053772743-2548b859cef2?auto=format&fit=crop&q=70&w=900", alt: "Broad soft green leaves filling the frame" },
-    variants: [{ size: "15 ml", price: 849, stock: 15 }, { size: "30 ml", price: 1549, stock: 6 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "marjoram",
@@ -588,7 +584,7 @@ const oils = [
     swatch: ["#a9bd8e", "#6f8651"], bg: "#ebf0e0",
     warning: "Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1726923153013-20e5d7076130?auto=format&fit=crop&q=70&w=900", alt: "Marjoram in flower, small pale blooms above green leaves" },
-    variants: [{ size: "15 ml", price: 549, stock: 19 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "jasmine-sambac",
@@ -607,7 +603,7 @@ const oils = [
     swatch: ["#e6dfc0", "#b9ad72"], bg: "#f5f1e0",
     warning: "An absolute, not an essential oil — it is solvent extracted, so trace residue is inherent to the process. Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1781707533179-9c296c975a04?auto=format&fit=crop&q=70&w=900", alt: "White jasmine flowers with yellow centres against a blue sky" },
-    variants: [{ size: "5 ml", price: 2999, stock: 5 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   {
@@ -625,7 +621,7 @@ const oils = [
     origin: "Nagpur, India", method: "Cold pressed",
     swatch: ["#f4b268", "#d4812e"], bg: "#f9e8d4",
     image: { src: "https://images.unsplash.com/photo-1557800636-894a64c1696f?auto=format&fit=crop&q=70&w=900", alt: "Ripe mandarin oranges" },
-    variants: [{ size: "15 ml", price: 449, stock: 28 }, { size: "30 ml", price: 799, stock: 13 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "lime",
@@ -644,7 +640,7 @@ const oils = [
     swatch: ["#c3d672", "#86a033"], bg: "#eef2da",
     warning: "Strongly phototoxic. Cold-pressed lime is among the most reactive citrus oils — keep below 0.7% on skin that will see sun within twelve hours, or use after dark.",
     image: { src: "https://images.unsplash.com/photo-1578855691621-8a08ea00d1fb?auto=format&fit=crop&q=70&w=900", alt: "Fresh green limes" },
-    variants: [{ size: "15 ml", price: 499, stock: 24 }, { size: "30 ml", price: 899, stock: 10 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "spearmint", family: "Mints", name: "Spearmint", botanical: "Mentha spicata",
@@ -661,7 +657,7 @@ const oils = [
     origin: "Uttar Pradesh, India", method: "Steam distilled",
     swatch: ["#9fd4a8", "#4f9460"], bg: "#e4f2e6",
     image: { src: "https://images.unsplash.com/photo-1709132301602-b001c50aa459?auto=format&fit=crop&q=70&w=900", alt: "Spearmint leaves beaded with water" },
-    variants: [{ size: "15 ml", price: 449, stock: 30 }, { size: "30 ml", price: 799, stock: 12 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   {
@@ -679,7 +675,7 @@ const oils = [
     origin: "Kerala, India", method: "Steam distilled",
     swatch: ["#9c8f7a", "#605645"], bg: "#ece7dd",
     image: { src: "https://images.unsplash.com/photo-1649951806971-ad0e00408773?auto=format&fit=crop&q=70&w=900", alt: "A bowl of black peppercorns" },
-    variants: [{ size: "10 ml", price: 549, stock: 16 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "juniper-berry",
@@ -698,7 +694,7 @@ const oils = [
     swatch: ["#8fae9c", "#4d7360"], bg: "#e3ede7",
     warning: "Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1782845988762-a1cd0a45033e?auto=format&fit=crop&q=70&w=900", alt: "A juniper branch carrying ripe blue and unripe green berries" },
-    variants: [{ size: "15 ml", price: 649, stock: 14 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "thyme",
@@ -717,7 +713,7 @@ const oils = [
     swatch: ["#b0b47e", "#767a41"], bg: "#eef0dd",
     warning: "A strong skin irritant and sensitiser. Keep to 0.5% or below, avoid during pregnancy, and avoid entirely if you have high blood pressure. Not for children.",
     image: { src: "https://images.unsplash.com/photo-1679061584104-534b7ec4afe6?auto=format&fit=crop&q=70&w=900", alt: "Close-up of fresh thyme sprigs" },
-    variants: [{ size: "10 ml", price: 549, stock: 11 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   {
@@ -735,7 +731,7 @@ const oils = [
     origin: "Madhya Pradesh, India", method: "Steam distilled",
     swatch: ["#d7b89c", "#a8805c"], bg: "#f3e9df",
     image: { src: "https://images.unsplash.com/photo-1560705889-dc78ff46bbd6?auto=format&fit=crop&q=70&w=900", alt: "A clump of fine aromatic grass seen from above" },
-    variants: [{ size: "15 ml", price: 499, stock: 26 }, { size: "30 ml", price: 899, stock: 11 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "carrot-seed",
@@ -754,7 +750,7 @@ const oils = [
     swatch: ["#d4b171", "#9c7736"], bg: "#f2e8d4",
     warning: "Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1596380134329-5a768bcd0475?auto=format&fit=crop&q=70&w=900", alt: "Wild carrot flowering in flat white umbels" },
-    variants: [{ size: "10 ml", price: 649, stock: 13 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "argan",
@@ -773,7 +769,7 @@ const oils = [
     swatch: ["#e8cf90", "#bd9b45"], bg: "#f6efdc",
     warning: "Pressed from tree nut kernels. Avoid if you have a nut allergy.",
     image: { src: "https://images.unsplash.com/photo-1600189020840-e9918c25269d?auto=format&fit=crop&q=70&w=900", alt: "Argan nuts and kernels, shelled and whole" },
-    variants: [{ size: "50 ml", price: 699, stock: 22 }, { size: "100 ml", price: 1199, stock: 9 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   /* Third batch. */
@@ -795,7 +791,7 @@ const oils = [
     swatch: ["#d98fa0", "#a44f68"], bg: "#f6e2e7",
     warning: "An absolute, not an essential oil — solvent extracted, so trace residue is inherent to the process. Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1531874824027-2a0d33bd6338?auto=format&fit=crop&q=70&w=900", alt: "Pink damask roses in bloom, still wet with dew" },
-    variants: [{ size: "5 ml", price: 9499, stock: 3 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "tuberose-absolute",
@@ -814,7 +810,7 @@ const oils = [
     swatch: ["#e8e0cd", "#b9ab84"], bg: "#f6f2e6",
     warning: "An absolute, not an essential oil — solvent extracted, so trace residue is inherent. Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1728046726861-b3b11e8f423b?auto=format&fit=crop&q=70&w=900", alt: "White tuberose blooms laid out on white cloth" },
-    variants: [{ size: "5 ml", price: 6499, stock: 4 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "davana",
@@ -833,7 +829,7 @@ const oils = [
     swatch: ["#c08a6a", "#8a5438"], bg: "#f1e3d8",
     warning: "Avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1789930271725-c59e7622acd5?auto=format&fit=crop&q=70&w=900", alt: "Delicate pale green foliage with tiny white buds" },
-    variants: [{ size: "10 ml", price: 1499, stock: 6 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   {
@@ -851,7 +847,7 @@ const oils = [
     origin: "Uttarakhand, India", method: "Steam distilled",
     swatch: ["#8aa894", "#4a6b58"], bg: "#e3ece6",
     image: { src: "https://images.unsplash.com/photo-1542969587-5b90477b65f4?auto=format&fit=crop&q=70&w=900", alt: "Close-up of dense evergreen cypress foliage" },
-    variants: [{ size: "15 ml", price: 599, stock: 20 }, { size: "30 ml", price: 1099, stock: 8 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "sweet-basil",
@@ -870,7 +866,7 @@ const oils = [
     swatch: ["#9dbd7e", "#5e8040"], bg: "#e9f0de",
     warning: "Avoid during pregnancy, and keep to 1.5% or below on skin.",
     image: { src: "https://images.unsplash.com/photo-1591495746097-8a92864d5c1f?auto=format&fit=crop&q=70&w=900", alt: "A single fresh basil leaf on a white surface" },
-    variants: [{ size: "15 ml", price: 399, stock: 27 }, { size: "30 ml", price: 699, stock: 12 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "citronella",
@@ -889,7 +885,7 @@ const oils = [
     swatch: ["#c7cf6a", "#8c9433"], bg: "#eff1d9",
     warning: "A known skin sensitiser — keep to 1% or below, and avoid during pregnancy.",
     image: { src: "https://images.unsplash.com/photo-1575032558058-683487d88fb1?auto=format&fit=crop&q=70&w=900", alt: "A clump of citronella grass growing in the ground" },
-    variants: [{ size: "15 ml", price: 399, stock: 31 }, { size: "30 ml", price: 699, stock: 14 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   {
@@ -909,7 +905,7 @@ const oils = [
     swatch: ["#9ec6b0", "#53876c"], bg: "#e6f0ea",
     warning: "High in 1,8-cineole — not suitable for babies or young children.",
     image: { src: "https://images.unsplash.com/photo-1686600662417-619469ba175c?auto=format&fit=crop&q=70&w=900", alt: "Fluffy white melaleuca blossom on the branch" },
-    variants: [{ size: "15 ml", price: 549, stock: 18 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "ravensara",
@@ -928,7 +924,7 @@ const oils = [
     swatch: ["#a9c49b", "#5f8650"], bg: "#e9f0e3",
     warning: "Not suitable for babies or young children.",
     image: { src: "https://images.unsplash.com/photo-1715258645043-40cc995a863c?auto=format&fit=crop&q=70&w=900", alt: "Glossy green leaves and buds of a camphor-family tree" },
-    variants: [{ size: "15 ml", price: 599, stock: 15 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "fennel",
@@ -947,7 +943,7 @@ const oils = [
     swatch: ["#d9cf8c", "#a3974a"], bg: "#f3f0da",
     warning: "High in trans-anethole. Avoid during pregnancy and while breastfeeding, avoid with oestrogen-sensitive conditions, and keep away from children. Keep to 1% on skin.",
     image: { src: "https://images.unsplash.com/photo-1701189975806-97b11541ec82?auto=format&fit=crop&q=70&w=900", alt: "A spoonful of dried fennel seeds" },
-    variants: [{ size: "10 ml", price: 799, stock: 10 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "coriander-seed", family: "Warm spices", name: "Coriander Seed", botanical: "Coriandrum sativum",
@@ -964,7 +960,7 @@ const oils = [
     origin: "Rajasthan, India", method: "Steam distilled",
     swatch: ["#cbb98c", "#95824a"], bg: "#f1ecdb",
     image: { src: "https://images.unsplash.com/photo-1508748169069-82590c9f26e6?auto=format&fit=crop&q=70&w=900", alt: "Dried coriander seeds" },
-    variants: [{ size: "10 ml", price: 649, stock: 13 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 
   {
@@ -983,7 +979,7 @@ const oils = [
     swatch: ["#f0ead9", "#c4b893"], bg: "#f8f4e8",
     warning: "Solidifies below roughly 24°C. It is also comedogenic for some people — patch-test before using it on your face.",
     image: { src: "https://images.unsplash.com/photo-1560769680-ba2f3767c785?auto=format&fit=crop&q=70&w=900", alt: "Whole coconuts in their brown husks" },
-    variants: [{ size: "100 ml", price: 449, stock: 34 }, { size: "250 ml", price: 899, stock: 16 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "grapeseed", family: "Carrier oils", carrier: true, name: "Grapeseed Carrier Oil", botanical: "Vitis vinifera",
@@ -1001,7 +997,7 @@ const oils = [
     swatch: ["#d6dba8", "#9aa15f"], bg: "#f0f2de",
     warning: "High in polyunsaturated fats, so it oxidises faster than jojoba or coconut. Refrigerate after opening and use within six months.",
     image: { src: "https://images.unsplash.com/photo-1659038025134-5f47bf7956c0?auto=format&fit=crop&q=70&w=900", alt: "A bunch of green grapes hanging on the vine" },
-    variants: [{ size: "100 ml", price: 649, stock: 21 }, { size: "250 ml", price: 1299, stock: 8 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
   {
     id: "neem",
@@ -1020,142 +1016,11 @@ const oils = [
     swatch: ["#b4a657", "#7c7030"], bg: "#efeccf",
     warning: "Avoid during pregnancy and while trying to conceive. Not for use on babies or young children.",
     image: { src: "https://images.unsplash.com/photo-1687945906634-25c66199d941?auto=format&fit=crop&q=70&w=900", alt: "Neem leaves after rain, beaded with water" },
-    variants: [{ size: "100 ml", price: 499, stock: 24 }],
+    variants: [{ size: "10 kg" }, { size: "20 kg" }, { size: "50 kg" }],
   },
 ];
 
-/* ------------------------------------------------------------------ sets */
-
-/**
- * Sets are products, not a new kind of thing.
- *
- * A set has an id, a price, a SKU and a stock count like everything else, so
- * the cart, the checkout, the stock table, the admin page, the CSV export and
- * the product schema all handle one without being taught anything. The
- * alternative — a bundle that expands into its parts in the cart — needs a
- * discount rule in pricing, and a shopper who then deletes one line from the
- * cart has bought the rest at the bundle price. There is no such edge here.
- *
- * It does mean a set is a physical thing you assemble and count on a shelf,
- * which is what actually happens when someone sends a gift box.
- *
- * `contains` is for the page and for honesty about what the saving is: the
- * component total is computed from the live catalogue below rather than typed
- * in, so a set cannot go on claiming a saving that the oils' own prices no
- * longer support.
- */
-const setDefs = [
-  {
-    id: "set-sleep", name: "Sleep & Unwind Set", badge: "Set",
-    tagline: "Three oils for the end of the day, in one box.",
-    desc: "The evening shelf, assembled: a soft Provençal lavender, dry Atlas cedarwood underneath it, and ylang ylang for the nights that want something richer. Enough of each to find out which one you reach for.",
-    contains: [
-      { id: "lavender-fields", size: "15 ml" },
-      { id: "cedarwood-grounding", size: "15 ml" },
-      { id: "ylang-ylang", size: "15 ml" },
-    ],
-    price: 1549, stock: 14,
-    swatch: ["#9a8fc4", "#6d5fa3"], bg: "#ece6f4",
-  },
-  {
-    id: "set-mornings", name: "Bright Mornings Set", badge: "Set",
-    tagline: "Citrus and cold mint, for the first half of the day.",
-    desc: "Sweet orange to start, peppermint for the hour that drags, lemon for a room that needs clearing. The three we diffuse most between breakfast and lunch.",
-    contains: [
-      { id: "sweet-orange-sunrise", size: "15 ml" },
-      { id: "peppermint-spark", size: "15 ml" },
-      { id: "lemon-clarity", size: "15 ml" },
-    ],
-    price: 1249, stock: 18,
-    swatch: ["#f2b25c", "#d07c24"], bg: "#f8e7d4",
-  },
-  {
-    id: "set-seasonal", name: "Seasonal Care Set", badge: "Set",
-    tagline: "The three bottles that come out when the weather turns.",
-    desc: "Eucalyptus, tea tree and rosemary — camphorous, green and medicinal in the best sense. A steam bowl, a diffuser by the bed, and a scalp oil, between them.",
-    contains: [
-      { id: "eucalyptus-clearing", size: "15 ml" },
-      { id: "tea-tree-shield", size: "15 ml" },
-      { id: "rosemary", size: "15 ml" },
-    ],
-    price: 1399, stock: 16,
-    swatch: ["#7fb8a4", "#3f7d66"], bg: "#e0eef1",
-  },
-  {
-    id: "set-carriers", name: "Carrier Oil Duo", badge: "Set",
-    tagline: "The two carriers worth keeping, in the sizes you will use.",
-    desc: "Jojoba and sweet almond, 100 ml of each. Nothing on this site goes on skin undiluted, and these are what you dilute into — jojoba for the face, sweet almond for everything else.",
-    contains: [
-      { id: "jojoba", size: "100 ml" },
-      { id: "sweet-almond", size: "100 ml" },
-    ],
-    price: 999, stock: 20,
-    swatch: ["#e7cf8e", "#bb9a48"], bg: "#f6efdc",
-  },
-];
-
-/** Component total at today's prices, in rupees. */
-const componentTotal = (def) =>
-  def.contains.reduce((sum, c) => {
-    const p = oils.find((x) => x.id === c.id);
-    const v = p?.variants.find((x) => x.size === c.size);
-    if (!v) throw new Error(`Set ${def.id} refers to ${c.id} ${c.size}, which is not in the catalogue.`);
-    return sum + v.price;
-  }, 0);
-
-const sets = setDefs.map((def) => {
-  const was = componentTotal(def);
-  const parts = def.contains.map((c) => {
-    const p = oils.find((x) => x.id === c.id);
-    return { ...c, name: p.name, botanical: p.botanical, url: `/oils/${p.id}/` };
-  });
-  return {
-    ...def,
-    kind: "set",
-    family: "Sets",
-    category: "sets",
-    contains: parts,
-    ingredients: parts.map((c) => `${c.name} ${c.size} — 100% pure ${c.botanical}`),
-    usage: [
-      "Each bottle is the same oil we sell on its own, in the same size.",
-      "Start at the dilution on the oil's own page; a set changes nothing about how much to use.",
-      "Keep the box out of sunlight — the bottles are amber, the box is not a cupboard.",
-    ],
-    notes: parts.map((c) => c.name),
-    origin: "Assembled in New Delhi",
-    method: "Boxed by hand",
-    /*
-     * The lead oil's own photograph, and the alt text says so.
-     *
-     * There is no photograph of a boxed set because no set has been boxed and
-     * photographed yet. A stock picture of someone else's gift box would be a
-     * picture of a thing we do not sell. Showing one of the oils that is
-     * genuinely in the box, and saying that is what it is, is the honest
-     * version until there is a real one — and it gives the page, the share
-     * card and the product schema an image, which they otherwise lack.
-     */
-    image: {
-      src: oils.find((x) => x.id === def.contains[0].id).image.src,
-      alt: `${parts[0].name} — one of the ${parts.length === 2 ? "two" : "three"} oils in this set. `
-        + `We have not photographed the boxed set yet.`,
-    },
-    /*
-     * The size reads "Box of 3", not "Set".
-     *
-     * A variant's size is printed straight after the product name wherever an
-     * order line appears — the confirmation email, the admin table, the CSV,
-     * the courier's packing list. "Set" gave "Sleep & Unwind Set Set". This
-     * also makes the SKU self-explanatory: SRV-SETSLEE-BOXOF3.
-     */
-    variants: [{
-      size: `Box of ${def.contains.length}`,
-      price: def.price, stock: def.stock, was,
-    }],
-  };
-});
-
-export const products = [...oils, ...sets];
-export const giftSets = sets;
+export const products = oils;
 
 /** The homepage "Oil Library" — five columns that expand on click. */
 /**
@@ -1302,8 +1167,7 @@ export const steps = [
 // ---------- Derived helpers, shared by the build and the browser ----------
 export const bySlug = (id) => products.find((p) => p.id === id);
 export const inCategory = (cat) => products.filter((p) => p.category === cat);
-export const fromPrice = (p) => Math.min(...p.variants.map((v) => v.price));
-export const inStock = (p) => p.variants.some((v) => v.stock > 0);
-export const firstAvailable = (p) => p.variants.find((v) => v.stock > 0) || p.variants[0];
+/** The smallest barrel, which is what a page leads with. */
+export const smallestPack = (p) => p.variants[0];
 export const categoryOf = (id) => categories.find((c) => c.id === id);
 export const money = (n) => site.currency + n.toLocaleString(site.locale);

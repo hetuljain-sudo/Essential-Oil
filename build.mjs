@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   site, categories, products, library, faqs, steps,
-  inCategory, bySlug, fromPrice, inStock, firstAvailable, categoryOf, money,
+  inCategory, bySlug, smallestPack, categoryOf, money,
 } from "./src/data.mjs";
 import { skuFor } from "./src/sku.mjs";
 
@@ -29,7 +29,6 @@ import { guides } from "./src/content.mjs";
 import { hubs } from "./src/collections.mjs";
 import { guidePages, liveGuides } from "./src/guides.mjs";
 import { policies } from "./src/policies.mjs";
-import { saleOn, bestSale } from "./src/sale.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = join(root, "dist");
@@ -43,7 +42,7 @@ const dist = join(root, "dist");
   const { createHash } = await import("node:crypto");
   const sources = [
     "src/assets/fonts.css", "src/assets/styles.css", "src/assets/pages.css",
-    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs", "src/data.mjs",
+    "src/assets/app.js", "src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/bottle.mjs", "src/data.mjs",
   ];
   const h = createHash("sha256");
   for (const f of sources) h.update(await readFile(join(root, f)));
@@ -111,8 +110,6 @@ const homeFaqs = HOME_FAQ_QUESTIONS.map((q) => {
 const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
-/** Offers need a price validity date; a year out is the usual convention. */
-const PRICE_VALID_UNTIL = new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10);
 
 const brand = { "@type": "Brand", name: site.name };
 
@@ -149,72 +146,33 @@ const website = {
   },
 };
 
-/** What the store promises, expressed the way rich results expect. */
-const returnPolicy = {
-  "@type": "MerchantReturnPolicy",
-  applicableCountry: "IN",
-  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-  merchantReturnDays: 30,
-  returnMethod: "https://schema.org/ReturnByMail",
-  returnFees: "https://schema.org/FreeReturn",
-};
-
-const deliveryTime = {
-  "@type": "ShippingDeliveryTime",
-  handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
-  transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 5, unitCode: "DAY" },
-};
-
-/* Two rates, because that is what we actually charge: free at or above the
-   threshold, a flat fee below it. This used to declare free shipping
-   unconditionally, which was a claim we would not have honoured on a ₹449
-   order once checkout went live. */
-const shippingDetails = [
-  {
-    "@type": "OfferShippingDetails",
-    shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
-    shippingRate: {
-      "@type": "MonetaryAmount", value: 0, currency: "INR",
-      eligibleTransactionVolume: {
-        "@type": "PriceSpecification",
-        minPrice: site.freeShippingAt, priceCurrency: "INR",
-      },
-    },
-    deliveryTime,
-  },
-  {
-    "@type": "OfferShippingDetails",
-    shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
-    shippingRate: { "@type": "MonetaryAmount", value: site.shippingFlat, currency: "INR" },
-    deliveryTime,
-  },
-];
+/* The return policy, delivery times and shipping rates that used to live here
+   all described a consumer parcel: 30 days, return by mail, free over ₹999.
+   None of it holds for a drum on a freight consignment, and the terms that
+   replace it are a trade agreement rather than a published promise, so there
+   is nothing here for a rich result to read. */
 
 
 const isCarrier = (p) => !!p.carrier;
-const isSet = (p) => p.kind === "set";
-const oilWord = (p) => (isSet(p) ? "Gift Set" : isCarrier(p) ? "Carrier Oil" : "Essential Oil");
+const oilWord = (p) => (isCarrier(p) ? "Carrier Oil" : "Essential Oil");
 
-/** A product title people actually search: name, what it is, sizes, brand. */
+/**
+ * A product title a buyer actually searches.
+ *
+ * The retail version led with the bottle sizes, because somebody choosing
+ * between 15 ml and 30 ml is choosing a bottle. A manufacturer sourcing a
+ * drum searches "bulk" and "wholesale" first and the quantity second, so
+ * that is what leads now.
+ */
 function productTitle(p) {
-  if (isSet(p)) return `${p.name} — ${p.contains.length} Oils`;
   const base = /oil$/i.test(p.name) ? p.name : `${p.name} ${oilWord(p)}`;
-  const sizes = p.variants.map((v) => v.size).join(" & ");
-  const withSizes = `${base} — ${sizes}`;
-  return withSizes.length <= 46 ? withSizes : base;
+  const bulk = `Bulk ${base}`;
+  return bulk.length <= 46 ? bulk : base;
 }
 
 function productDescription(p) {
-  // A set has no botanical name and one notional size, so the oil sentence
-  // reads "(undefined) ... in Set" for it. It gets its own.
-  if (isSet(p)) {
-    const names = p.contains.map((c) => c.name).join(", ");
-    return `${p.name} from Sarvha: ${names}, boxed together and priced below buying them apart. ` +
-      `100% pure and undiluted. Free shipping over ${money(site.freeShippingAt)}.`;
-  }
-  const sizes = p.variants.map((v) => v.size).join(" and ");
-  return `Buy ${p.name} ${isCarrier(p) ? "carrier oil" : "essential oil"} (${p.botanical}) online in India. ` +
-    `${p.tagline} 100% pure and undiluted, in ${sizes}. Free shipping over ${money(site.freeShippingAt)}.`;
+  return `${p.name} ${isCarrier(p) ? "carrier oil" : "essential oil"} (${p.botanical}) in bulk from Sarvha, India. ` +
+    `100% pure and undiluted, filled to order in 10, 20 and 50 kg barrels. Price on request.`;
 }
 
 const HOME = { href: "/", label: "Home" };
@@ -434,7 +392,7 @@ page("/shop/", layout({
         <div class="page-head">
           <p class="eyebrow">The collection</p>
           <h1>Every oil we make</h1>
-          <p class="lead">${products.length} bottles across ${categories.length} collections. Each one single-origin, undiluted, and sold in the sizes we actually use ourselves.</p>
+          <p class="lead">${products.length} oils across ${categories.length} collections. Each one single-origin and undiluted, filled to order in 10, 20 and 50 kg barrels.</p>
         </div>
 
         <div class="filters" data-filters role="group" aria-label="Filter by collection">
@@ -464,24 +422,9 @@ page("/shop/", layout({
               </select>
             </span>
             <span class="sort">
-              <span class="sort__label">Price</span>
-              <select data-price aria-label="Filter by price">
-                <option value="all">Any price</option>
-                <option value="0-499">Under ${money(500)}</option>
-                <option value="500-999">${money(500)} – ${money(999)}</option>
-                <option value="1000-1999">${money(1000)} – ${money(1999)}</option>
-                <option value="2000-">${money(2000)} and over</option>
-              </select>
-            </span>
-            <label class="toolbar__stock">
-              <input type="checkbox" data-instock /> In stock only
-            </label>
-            <span class="sort">
               <span class="sort__label">Sort</span>
               <select data-sort aria-label="Sort oils">
                 <option value="featured">Featured</option>
-                <option value="price-asc">Price: low to high</option>
-                <option value="price-desc">Price: high to low</option>
                 <option value="name">Name A–Z</option>
               </select>
             </span>
@@ -534,7 +477,7 @@ page("/collections/", layout({
               <div class="coll__body">
                 <p>${esc(c.intro)}</p>
                 <ul class="coll__oils">
-                  ${items.map((p) => `<li><a href="${productUrl(p)}">${esc(p.name)}</a> <span class="muted">${money(fromPrice(p))}</span></li>`).join("")}
+                  ${items.map((p) => `<li><a href="${productUrl(p)}">${esc(p.name)}</a> <span class="muted">${esc(p.botanical)}</span></li>`).join("")}
                 </ul>
                 <a class="btn btn--ghost" href="${categoryUrl(c)}">Shop ${c.label.toLowerCase()} (${items.length})</a>
               </div>
@@ -567,11 +510,11 @@ for (const c of categories) {
       : `${c.label} Essential Oils — Buy Online`,
     description: `${c.blurb} ${items.length} oils for ${c.label.toLowerCase()} from ${site.name}, 100% pure and shipped across India. ${c.intro}`,
     breadcrumb: catTrail,
-    ogImage: items.find((x) => x.image) ? { src: items.find((x) => x.image).image.src, alt: c.id === "sets" ? "Essential oil sets" : `${c.label} essential oils` } : defaultOg,
+    ogImage: items.find((x) => x.image) ? { src: items.find((x) => x.image).image.src, alt: `${c.label} essential oils` } : defaultOg,
     jsonLd: [
       {
         "@type": "CollectionPage",
-        name: c.id === "sets" ? "Essential oil sets" : `${c.label} essential oils`,
+        name: `${c.label} essential oils`,
         description: c.intro,
         url: site.url + categoryUrl(c),
         isPartOf: { "@id": site.url + "/#website" },
@@ -597,11 +540,11 @@ for (const c of categories) {
           <div class="page-head page-head--coll" style="--tint:${c.color}">
             <span class="coll__icon coll__icon--lg" aria-hidden="true">${c.icon}</span>
             <p class="eyebrow">Collection</p>
-            <h1>${c.id === "sets" ? "Essential oil sets" : `${c.label} essential oils`}</h1>
+            <h1>${`${c.label} essential oils`}</h1>
             <p class="lead">${esc(hub.lede || c.intro)}</p>
             <dl class="coll-facts">
               <div><dt>Oils</dt><dd>${items.length}</dd></div>
-              <div><dt>From</dt><dd>${money(Math.min(...items.map(fromPrice)))}</dd></div>
+              <div><dt>Barrels</dt><dd>10 / 20 / 50 kg</dd></div>
               <div><dt>Sizes</dt><dd>${sizeLabel}</dd></div>
               <div><dt>Dispatch</dt><dd>48 hrs</dd></div>
             </dl>
@@ -618,7 +561,6 @@ for (const c of categories) {
               <p class="latin">${esc(startHere.botanical)}</p>
               <p>${esc(hub.startHere.why)}</p>
               <p class="start-here__buy">
-                <span class="price">${money(fromPrice(startHere))}</span>
                 <a class="btn btn--primary" href="${productUrl(startHere)}">View this oil</a>
               </p>
             </div>
@@ -647,15 +589,14 @@ for (const c of categories) {
               <table>
                 <thead><tr>
                   <th>Oil</th><th>Botanical name</th><th>Character</th>
-                  <th>Sizes</th><th>From</th><th>Note</th>
+                  <th>Barrel sizes</th><th>Note</th>
                 </tr></thead>
                 <tbody>
                   ${items.map((p) => `<tr>
                     <td><a href="${productUrl(p)}">${esc(p.name)}</a></td>
-                    <td><em>${p.botanical ? esc(p.botanical) : `${p.contains.length} oils`}</em></td>
+                    <td><em>${esc(p.botanical)}</em></td>
                     <td>${esc(p.notes.join(", "))}</td>
                     <td>${p.variants.map((v) => v.size).join(", ")}</td>
-                    <td>${money(fromPrice(p))}</td>
                     <td>${p.warning ? `<span class="compare__flag">Safety note</span>` : "&mdash;"}</td>
                   </tr>`).join("")}
                 </tbody>
@@ -708,7 +649,7 @@ for (const p of products) {
   // One row only — the grid is four across, and a fifth card orphaned on its
   // own row reads as a mistake. "See all" covers the rest of the collection.
   const related = inCategory(p.category).filter((x) => x.id !== p.id).slice(0, 4);
-  const v = firstAvailable(p);
+  const v = smallestPack(p);
   const multi = p.variants.length > 1;
   const g = guides[p.id] || {};
   const faqs = faqsFor(p);
@@ -749,30 +690,20 @@ for (const p of products) {
           { "@type": "PropertyValue", name: "Aroma", value: p.notes.join(", ") },
           { "@type": "PropertyValue", name: "Purity", value: "100% pure and undiluted" },
         ],
+        /* No price and no availability. Google will not show a price rich
+           result without them, which is correct: we do not publish a price.
+           Claiming one we would not honour is the alternative, and worse. */
         offers: {
           "@type": "AggregateOffer",
-          priceCurrency: "INR",
-          lowPrice: Math.min(...p.variants.map((x) => x.price)),
-          highPrice: Math.max(...p.variants.map((x) => x.price)),
           offerCount: p.variants.length,
-          availability: inStock(p)
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
           offers: p.variants.map((x) => ({
             "@type": "Offer",
             name: `${p.name} — ${x.size}`,
             sku: skuFor(p, x),
-            price: x.price,
-            priceCurrency: "INR",
-            priceValidUntil: PRICE_VALID_UNTIL,
             url: site.url + productUrl(p),
             itemCondition: "https://schema.org/NewCondition",
-            availability: x.stock > 0
-              ? "https://schema.org/InStock"
-              : "https://schema.org/OutOfStock",
+            availability: "https://schema.org/MadeToOrder",
             seller: { "@id": site.url + "/#organization" },
-            hasMerchantReturnPolicy: returnPolicy,
-            shippingDetails,
           })),
         },
       },
@@ -802,51 +733,16 @@ ${breadcrumbs(trail)}
               <p class="pdp__tagline">${esc(p.tagline)}</p>
               <p class="pdp__desc">${esc(p.desc)}</p>
 
-              ${isSet(p) ? `
-              <ul class="pdp__contains">
-                ${p.contains.map((c) => `
-                  <li>
-                    <a href="${c.url}">${esc(c.name)}</a>
-                    <em>${esc(c.botanical)}</em>
-                    <span>${esc(c.size)}</span>
-                  </li>`).join("")}
-              </ul>`
-              : `<div class="tags">${p.notes.map((n) => `<span class="tag">${esc(n)}</span>`).join("")}</div>`}
+              <div class="tags">${p.notes.map((n) => `<span class="tag">${esc(n)}</span>`).join("")}</div>
 
-              ${multi ? `
-              <fieldset class="sizes">
-                <legend>Size</legend>
-                ${p.variants.map((x, i) => `
-                  <label class="size${i === p.variants.indexOf(v) ? " is-active" : ""}${x.stock <= 0 ? " is-sold" : ""}">
-                    <input type="radio" name="size" value="${x.size}" data-price="${x.price}" data-stock="${x.stock}"
-                      ${x === v ? "checked" : ""} ${x.stock <= 0 ? "disabled" : ""} data-size-pick />
-                    <span class="size__label">${x.size}</span>
-                    <span class="size__price">${x.stock > 0
-                      ? money(x.price) + (saleOn(x) ? ` <s class="price__was">${money(saleOn(x).was)}</s>` : "")
-                      : "Sold out"}</span>
-                  </label>`).join("")}
-              </fieldset>` : `<p class="pdp__single">${isSet(p)
-                ? `One box · ${p.contains.length} bottles`
-                : `${esc(v.size)} bottle`}</p>`}
-
-              <div class="pdp__buy">
-                <div class="qty qty--lg">
-                  <button data-mqty="-1" aria-label="Decrease quantity">−</button>
-                  <span data-qty-value aria-live="polite">1</span>
-                  <button data-mqty="1" aria-label="Increase quantity">+</button>
-                </div>
-                <div class="pdp__price"><span class="price" data-live-price>${money(v.price)}${
-                  saleOn(v) ? ` <s class="price__was">${money(saleOn(v).was)}</s>` : ""}</span></div>
-              </div>
-              <p class="stock-note" data-stock-note${v.stock > 8 ? " hidden" : ""}>${v.stock > 0 ? `Only ${v.stock} left` : ""}</p>
+              <p class="pdp__packs-label">Filled to order in</p>
+              <div class="tags tags--packs">${p.variants.map((x) => `<span class="tag">${esc(x.size)}</span>`).join("")}</div>
 
               <div class="pdp__cta">
-                <button class="btn btn--primary btn--block" data-pdp-add${inStock(p) ? "" : " disabled"}>
-                  ${inStock(p) ? "Add to cart" : "Sold out"}
-                </button>
+                <a class="btn btn--primary btn--block" href="/contact/?oil=${encodeURIComponent(p.id)}">Request a quote</a>
                 ${heart(p, "pdp")}
               </div>
-              <p class="muted small pdp__ship">Free shipping over ${money(site.freeShippingAt)} · Dispatched within 48 hours</p>
+              <p class="muted small pdp__ship">Priced per enquiry. Minimum order and lead time confirmed when we reply.</p>
 
               ${p.warning ? `
               <div class="warn" role="note">
@@ -977,7 +873,7 @@ function derivedTable(kind) {
       .sort((a, b) => a.safety.phototoxic - b.safety.phototoxic)
       .map((p) => `<tr>
         <td>${oilLink(p)}</td>
-        <td><em>${p.botanical ? esc(p.botanical) : `${p.contains.length} oils`}</em></td>
+        <td><em>${esc(p.botanical)}</em></td>
         <td>${esc(p.method)}</td>
         <td><strong>${p.safety.phototoxic}%</strong></td>
       </tr>`);
@@ -1010,7 +906,7 @@ function derivedTable(kind) {
   // pregnancy | children | pets | nutAllergy
   const rows = flagged(kind).map((p) => `<tr>
     <td>${oilLink(p)}</td>
-    <td><em>${p.botanical ? esc(p.botanical) : `${p.contains.length} oils`}</em></td>
+    <td><em>${esc(p.botanical)}</em></td>
     <td>${esc(categoryOf(p.category).label)}</td>
     ${kind === "pregnancy" && p.safety.conditions
       ? `<td>Also avoid with ${esc(p.safety.conditions.join(", "))}</td>`
@@ -1288,8 +1184,8 @@ page("/contact/", layout({
             <label>Email<input type="email" name="email" required /></label>
             <label>Subject
               <select name="subject">
+                <option>Request a quote</option>
                 <option>A question about an oil</option>
-                <option>Bulk or wholesale</option>
                 <option>An existing order</option>
                 <option>Something else</option>
               </select>
@@ -1333,39 +1229,6 @@ const accountPage = ({ path, title, description, label, body, wide = false }) =>
     </section>`,
   }));
 
-accountPage({
-  path: "/account/register/",
-  title: "Create an Account",
-  description: "Create a Sarvha account to keep your delivery details and see past orders. You can also check out without one.",
-  label: "Create account",
-  body: `
-    <div class="page-head">
-      <p class="eyebrow">Accounts</p>
-      <h1>Create an account</h1>
-      <p class="lead">Keeps your delivery details for next time and shows you what you've ordered before. You don't need one to buy — checkout works perfectly well without.</p>
-    </div>
-
-    <form class="auth-form" data-auth-form="register" novalidate>
-      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
-
-      <label>Your name
-        <input type="text" name="name" autocomplete="name" required />
-      </label>
-      <label>Email
-        <input type="email" name="email" autocomplete="email" required />
-      </label>
-      <label>Mobile <span class="muted">(optional)</span>
-        <input type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" />
-      </label>
-      <label>Password
-        <input type="password" name="password" autocomplete="new-password" required minlength="10" />
-      </label>
-      <p class="muted small">At least 10 characters. Length does more for you than punctuation does.</p>
-
-      <button class="btn btn--primary btn--block" type="submit">Create account</button>
-      <p class="muted small">Already have one? <a href="/account/login/">Log in</a>.</p>
-    </form>`,
-});
 
 accountPage({
   path: "/account/login/",
@@ -1389,8 +1252,7 @@ accountPage({
       </label>
 
       <button class="btn btn--primary btn--block" type="submit">Log in</button>
-      <p class="muted small">No account yet? <a href="/account/register/">Create one</a>.</p>
-      <p class="muted small"><a href="/account/forgot/">Forgotten your password?</a></p>
+      <p class="muted small">Accounts are for staff. Trade enquiries go through <a href="/contact/">the contact form</a>.</p>
     </form>`,
 });
 
@@ -1398,186 +1260,13 @@ accountPage({
    unfolds inside it, so the page someone lands on from a bookmark or a
    search is the one they wanted. */
 
-accountPage({
-  path: "/account/forgot/",
-  title: "Reset Your Password",
-  description: "Ask for a link to set a new password on your Sarvha account.",
-  label: "Forgotten password",
-  body: `
-    <div class="page-head">
-      <p class="eyebrow">Accounts</p>
-      <h1>Forgotten your password?</h1>
-    </div>
-
-    <form class="auth-form" data-forgot-form novalidate>
-      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
-
-      <p class="muted">Give us the address you ordered with and we'll send a link
-         to set a new password. It works once, and lasts an hour.</p>
-
-      <label>Email
-        <input type="email" name="email" autocomplete="email" required />
-      </label>
-
-      <button class="btn btn--primary btn--block" type="submit">Send me a link</button>
-      <p class="muted small">Remembered it? <a href="/account/login/">Log in</a>.</p>
-    </form>`,
-});
 
 /* Where the emailed link lands, with the token in the query string.
    accountPage marks every account page noindex, which this one needs more
    than most: a crawler following a link out of somebody's inbox would be
    worse than the token being in a URL at all. */
 
-accountPage({
-  path: "/account/reset/",
-  title: "Set a New Password",
-  description: "Set a new password on your Sarvha account.",
-  label: "Set a new password",
-  body: `
-    <div class="page-head">
-      <p class="eyebrow">Accounts</p>
-      <h1>Set a new password</h1>
-    </div>
 
-    <form class="auth-form" data-reset-form novalidate>
-      <div class="auth-form__error" data-auth-error hidden role="alert"></div>
-
-      <label>New password
-        <input type="password" name="password" autocomplete="new-password"
-          minlength="10" required />
-      </label>
-      <p class="muted small">At least ten characters. Length matters more than symbols.</p>
-
-      <button class="btn btn--primary btn--block" type="submit">Set password</button>
-      <p class="muted small"><a href="/account/forgot/">Ask for a new link</a> if this one has expired.</p>
-    </form>`,
-});
-
-accountPage({
-  path: "/account/",
-  wide: true,
-  title: "Your Account",
-  description: "Your Sarvha account: past orders and saved details.",
-  label: "Your account",
-  body: `
-    <!--
-      The h1 is served, the name is filled in.
-
-      Moving the whole header into the panel left this page with no <h1> at
-      all until JavaScript had run — invisible in search terms, since the
-      page is noindex, but a screen reader landing here was handed a
-      document with no heading to orient by. The customer's name still comes
-      from /api/auth/session, so it stays client-side; the page's own title
-      does not depend on knowing who you are, so it does not.
-    -->
-    <header class="acct__head">
-      <div>
-        <p class="eyebrow">Your account</p>
-        <h1 data-account-title>Your account</h1>
-        <p class="acct__email" data-account-email></p>
-      </div>
-      <button class="btn btn--ghost" data-logout hidden>Log out</button>
-    </header>
-
-    <div data-account-panel>
-      <p class="muted">Loading your account…</p>
-    </div>`,
-});
-
-/* ------------------------------------------------------------- checkout */
-
-/* Ordering requires an account. This page gates itself on load, but that is
-   only courtesy — api/checkout.js refuses a request without a session, which
-   is where the rule actually lives. */
-
-accountPage({
-  path: "/checkout/",
-  title: "Checkout",
-  description: "Complete your Sarvha order.",
-  label: "Checkout",
-  body: `
-    <div class="page-head">
-      <p class="eyebrow">Checkout</p>
-      <h1>Complete your order</h1>
-    </div>
-
-    <div data-checkout-gate>
-      <p class="muted">Checking your account…</p>
-    </div>
-
-    <div data-checkout-body hidden>
-      <div class="checkout__summary" data-checkout-summary></div>
-
-      <!-- Not a <form>: it sits inside the checkout form, and a nested form
-           is invalid markup whose submit button submits the outer one — in
-           this case paying for the order. The button is type="button" for
-           the same reason. -->
-      <div class="promo" data-promo>
-        <label class="promo__row">
-          <span class="promo__label">Discount code</span>
-          <input type="text" name="code" autocomplete="off" autocapitalize="characters"
-                 spellcheck="false" placeholder="e.g. DIWALI10" data-code-input />
-        </label>
-        <button class="btn btn--ghost" type="button" data-code-apply>Apply</button>
-        <p class="promo__note" data-code-note role="status" hidden></p>
-      </div>
-
-      <form class="auth-form" data-checkout-form novalidate>
-        <div class="auth-form__error" data-checkout-error hidden role="alert"></div>
-
-        <h2>Where should it go?</h2>
-        <label>Full name
-          <input type="text" name="name" autocomplete="name" required />
-        </label>
-        <label>Mobile
-          <input type="tel" name="phone" autocomplete="tel-national" inputmode="numeric" required />
-        </label>
-        <label>Address
-          <input type="text" name="line1" autocomplete="address-line1" placeholder="House and street" required />
-        </label>
-        <label>Area <span class="muted">(optional)</span>
-          <input type="text" name="line2" autocomplete="address-line2" />
-        </label>
-        <label>City
-          <input type="text" name="city" autocomplete="address-level2" required />
-        </label>
-        <label>State
-          <input type="text" name="state" autocomplete="address-level1" required />
-        </label>
-        <label>PIN code
-          <input type="text" name="postcode" autocomplete="postal-code" inputmode="numeric" required />
-        </label>
-        <label>Anything we should know? <span class="muted">(optional)</span>
-          <input type="text" name="notes" />
-        </label>
-
-        <button class="btn btn--primary btn--block" type="submit" data-pay>Pay securely</button>
-        <p class="muted small">Payment is handled by Razorpay. We never see your card details.</p>
-        <!-- The Rules expect the terms to be reachable at the point of
-             purchase. Stated quietly: this is a legal requirement, not
-             something to push anyone through. -->
-        <p class="muted small checkout__terms">By paying you agree to our
-          <a href="/terms/">Terms &amp; Conditions</a> and
-          <a href="/refunds/">Refund &amp; Cancellation Policy</a>.</p>
-      </form>
-    </div>`,
-});
-
-accountPage({
-  path: "/checkout/thanks/",
-  title: "Order Received",
-  description: "Thank you — your Sarvha order has been received.",
-  label: "Order received",
-  body: `
-    <div class="page-head">
-      <p class="eyebrow">Thank you</p>
-      <h1>Your order is in</h1>
-      <p class="lead">We've got it. You'll find it in <a href="/account/">your account</a>, and it leaves Delhi within two business days.</p>
-    </div>
-    <p data-order-ref class="muted"></p>
-    <p><a class="btn btn--ghost" href="/shop/">Keep shopping</a></p>`,
-});
 
 /* ---------------------------------------------------------------- saved */
 
@@ -1663,7 +1352,6 @@ page("/admin/", layout({
         <div data-panel="orders"></div>
         <div data-panel="messages" hidden></div>
         <div data-panel="stock" hidden></div>
-        <div data-panel="codes" hidden></div>
       </div>
     </div>`,
 }));
@@ -1778,7 +1466,6 @@ page("/404.html", layout({
 // Catalog data the browser needs for the cart drawer and shop filtering.
 const catalog = {
   currency: site.currency, locale: site.locale,
-  freeShippingAt: site.freeShippingAt, shippingFlat: site.shippingFlat,
   categories: categories.map(({ id, label }) => ({ id, label })),
   // The library rotates daily, so the browser needs all twelve entries.
   library: library.map((e) => {
@@ -1793,9 +1480,6 @@ const catalog = {
   }),
   products: products.map((p) => ({
     id: p.id, name: p.name, short: p.short || null, botanical: p.botanical || null, category: p.category,
-    // The grid re-renders client-side on every filter and sort, so a set's
-    // card needs the one fact that stands in for a species: how many bottles.
-    contains: p.contains ? p.contains.map((c) => ({ name: c.name, size: c.size })) : null,
     family: p.family,
     tagline: p.tagline, notes: p.notes, featured: !!p.featured, badge: p.badge || null,
     bg: p.bg, swatch: p.swatch, url: productUrl(p),
@@ -1841,7 +1525,7 @@ await writeFile(join(dist, "styles.css"), css.join("\n"), "utf8");
 // duplicate that drifts and takes the security property with it — the tested
 // module is prepended with its export keywords stripped.
 const sharedForBrowser = (await Promise.all(
-  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/sale.mjs", "src/bottle.mjs", "src/limits.mjs", "src/discount.mjs"].map((f) => readFile(join(root, f), "utf8"))
+  ["src/redirect.mjs", "src/csv.mjs", "src/image.mjs", "src/bottle.mjs"].map((f) => readFile(join(root, f), "utf8"))
 )).join("\n").replace(/^export /gm, "");
 await writeFile(
   join(dist, "app.js"),
