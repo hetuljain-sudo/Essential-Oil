@@ -379,7 +379,7 @@ page("/", layout({
           <p class="eyebrow">How we work</p>
           <h2>From grower to your shelf</h2>
         </div>
-        <div class="steps steps--light">
+        <div class="steps">
           ${steps.map((s) => `<div><span>${s.n}</span><h3>${s.h}</h3><p>${esc(s.p)}</p></div>`).join("")}
         </div>
       </div>
@@ -1189,7 +1189,7 @@ page("/about/", layout({
           <h2>On aromatherapy claims</h2>
           <p>We describe how our oils smell and how people like to use them. We don't make medical claims, because essential oils aren't medicine. If you're pregnant, nursing, on medication, or buying for a child, talk to a doctor first — and <a href="/faq/#usage-safety">read our safety notes</a>.</p>
         </div>
-        <div class="steps steps--light">
+        <div class="steps">
           ${steps.map((s) => `<div><span>${s.n}</span><h3>${s.h}</h3><p>${esc(s.p)}</p></div>`).join("")}
         </div>
       </div>

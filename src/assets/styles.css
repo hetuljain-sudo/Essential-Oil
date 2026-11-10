@@ -194,8 +194,6 @@ h1 em, h2 em, .logo em { font-style: italic; color: var(--terracotta); }
 .card__meta { font-size: .74rem; color: var(--sage-text); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 .card__title { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; margin: 0; cursor: pointer; letter-spacing: -.01em; }
 .card__desc { font-size: .84rem; color: var(--muted); margin: 0; }
-.card__rating { font-size: .8rem; color: var(--muted); }
-.card__rating b { color: #c48a2c; font-weight: 500; }
 .card__foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: .7rem; }
 .price { font-weight: 600; font-size: 1.05rem; color: var(--forest); }
 s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
@@ -207,31 +205,53 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 .add-btn:hover { background: var(--forest); color: #fff; }
 .add-btn:disabled { border-color: var(--line); color: var(--muted); }
 
-/* Moods */
-.moods { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 1rem; }
-.mood { background: var(--paper); border: 1px solid transparent; border-radius: var(--radius); padding: 1.6rem 1rem; text-align: center; transition: .2s; }
-.mood:hover { border-color: var(--sage); }
-.mood__dot { width: 56px; height: 56px; border-radius: 50%; margin: 0 auto .9rem; display: grid; place-items: center; font-size: 1.4rem; }
-.mood h4 { font-size: 1.25rem; margin: 0 0 .2rem; }
-.mood p { margin: 0; font-size: .78rem; color: var(--muted); }
+/* Collections
+   -----------
+   One definition, not two. There was a second .mood block further down the
+   file — "Moods are buttons now" — and between them they set the background,
+   the border and the padding twice. The later one won, so editing this one
+   did nothing and said nothing about why.
 
-/* Kit */
-.kit { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.kit__art { background: linear-gradient(145deg, #e6d3b3, #cfae80); border-radius: 24px; aspect-ratio: 5 / 4; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4% 6%; padding: 9% 12%; align-items: end; justify-items: center; }
-.kit__art .bottle { width: 64%; }
+   The tiles lose their white panel for the same reason the product cards
+   did: five boxes in a row are read as five boxes before they are read as
+   five collections. The coloured dot stays, smaller, because it is the only
+   colour in the section and it tells the five apart at a glance. A hairline
+   above each one does the separating the border used to do. */
+.moods { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); column-gap: 1.6rem; row-gap: 2rem; }
+.mood {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .1rem;
+  width: 100%; font: inherit; color: inherit; text-align: left;
+  background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0;
+  padding: 1.1rem 0 0;
+  transition: border-top-color .2s;
+}
+.mood:hover { border-top-color: var(--forest); }
+.mood:hover .mood__label { text-decoration: underline; text-underline-offset: 3px; }
+.mood__dot { width: 36px; height: 36px; border-radius: 50%; margin: 0 0 .8rem; display: grid; place-items: center; font-size: 1rem; }
+.mood__label { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; }
+.mood__note { margin: 0; font-size: .78rem; color: var(--muted); }
+
 .checks { list-style: none; padding: 0; margin: 1.2rem 0 1.6rem; }
 .checks li { padding-left: 1.8rem; position: relative; margin-bottom: .5rem; }
 .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--terracotta); font-weight: 700; }
-.kit__price { margin-bottom: 1.4rem; }
-.kit__price .price { font-size: 1.6rem; }
 
-/* Story */
-.story { display: grid; grid-template-columns: 1fr 1.3fr; gap: 4rem; }
-.story__body p { color: #cfd8c3; font-size: 1.04rem; }
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; margin-top: 2.4rem; border-top: 1px solid rgba(255,255,255,.15); padding-top: 2rem; }
-.steps span { font-family: var(--serif); font-size: 1.5rem; color: #e0a57f; }
-.steps h3 { color: #fff; font-size: 1.3rem; margin: .3rem 0; }
-.steps p { font-size: .84rem !important; margin: 0; }
+/* Steps
+   ------
+   Every rule here was once written for a dark green background, because the
+   four steps lived inside a .section--dark. They were moved onto the cream
+   page and given a .steps--light modifier to put the colours back; then the
+   heading outline was fixed and the <h4>s became <h3>s, which the modifier
+   did not follow. The result was #fff on #f6f1e7 — 1.13:1, four words on
+   the homepage and the about page that nobody could read.
+
+   So the base is light now, because light is the only way these are used.
+   There is no modifier to fall out of step with the markup, and no rule
+   keyed to a heading level that a later fix can rename. The !important on
+   the paragraph went with .story__body, the rule it was there to outrank. */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--line); padding-top: 2rem; }
+.steps span { font-family: var(--serif); font-size: 1.5rem; color: var(--terracotta); }
+.steps h3 { color: var(--ink); font-size: 1.3rem; margin: .3rem 0; }
+.steps p { font-size: .84rem; margin: 0; color: var(--muted); }
 
 /* Uses */
 .uses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
@@ -239,13 +259,6 @@ s { color: var(--muted); font-size: .88rem; margin-left: .3rem; }
 .use__icon { width: 52px; height: 52px; border-radius: 50%; background: var(--sand); display: grid; place-items: center; font-size: 1.3rem; color: var(--terracotta); margin-bottom: 1.2rem; }
 .use p { color: var(--muted); margin: 0; }
 .note { text-align: center; font-size: .82rem; color: var(--muted); max-width: 40rem; margin: 2rem auto 0; }
-
-/* Reviews */
-.reviews { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
-.review { margin: 0; background: var(--paper); padding: 2rem; border-radius: var(--radius); }
-.stars { color: #c48a2c; letter-spacing: .1em; margin-bottom: .8rem; }
-.review blockquote { margin: 0 0 1rem; font-family: var(--serif); font-size: 1.3rem; line-height: 1.35; }
-.review figcaption { font-size: .84rem; color: var(--muted); }
 
 /* FAQ */
 .faq { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; }
@@ -456,16 +469,6 @@ body.no-scroll { overflow: hidden; }
 }
 .no-results p { margin: 0 0 .4rem; }
 .no-results .btn { margin-top: 1rem; }
-
-/* Moods are buttons now */
-.mood {
-  display: flex; flex-direction: column; align-items: center; gap: .1rem;
-  width: 100%; border: 1px solid transparent; font: inherit; color: inherit;
-  background: var(--paper); border-radius: var(--radius); padding: 1.6rem 1rem; text-align: center;
-  transition: transform .2s, border-color .2s;
-}
-.mood__label { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; }
-.mood__note { font-size: .78rem; color: var(--muted); }
 
 /* Drawer line layout */
 .line__main { min-width: 0; }

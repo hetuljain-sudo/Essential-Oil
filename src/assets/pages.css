@@ -245,10 +245,9 @@ a.add-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .btn--light { background: #fff; color: var(--ink); }
 .btn--light:hover { background: var(--terracotta); color: #fff; }
 
-.steps--light { color: var(--ink); border-top-color: var(--line); }
-.steps--light span { color: var(--terracotta); }
-.steps--light h4 { color: var(--ink); }
-.steps--light p { color: var(--muted); }
+/* .steps--light is gone: .steps itself is light now, since that is the only
+   way it is used. The modifier is what broke — it reached for an <h4> that
+   the heading-outline fix had turned into an <h3>. */
 
 /* FAQ page */
 .faq-layout { display: grid; grid-template-columns: 240px 1fr; gap: 3rem; align-items: start; }
