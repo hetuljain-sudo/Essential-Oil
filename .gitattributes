@@ -1,0 +1,30 @@
+# Line endings are LF everywhere, in the repository and in the working tree.
+#
+# This is not housekeeping. Git on this machine has core.autocrlf=true set at
+# system level, so it rewrites LF to CRLF whenever it writes a file — which
+# means a checkout can change the bytes of a file whose content nobody
+# touched. build.mjs makes the asset cache-buster by hashing the bytes of
+# fonts.css, styles.css, pages.css, app.js and the shared modules, so a
+# checkout that flipped line endings changed the stamp on every page while
+# the code was identical. That is what happened when the wholesale pivot was
+# reverted: 25 files came back as CRLF, app.js among them, and the next
+# build renamed every asset URL for no reason.
+#
+# `eol=lf` overrides core.autocrlf for this repository, so the files git
+# writes match the files the build reads, on any machine.
+* text=auto eol=lf
+
+# Fonts are binary: never touch them.
+*.woff2 binary
+*.woff  binary
+*.ttf   binary
+*.otf   binary
+
+# Images, if any are ever committed rather than hotlinked.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico  binary
+*.pdf  binary
