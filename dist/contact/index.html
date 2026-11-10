@@ -51,13 +51,13 @@
        something needs them, which is the point of the unicode-range split. -->
   <link rel="preload" href="/fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/styles.css?v=429d1b70" />
+  <link rel="stylesheet" href="/styles.css?v=a6f3e6bb" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"ContactPage","name":"Contact Sarvha","url":"https://sarvha.com/contact/","isPartOf":{"@id":"https://sarvha.com/#website"},"about":{"@id":"https://sarvha.com/#organization"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://sarvha.com/"},{"@type":"ListItem","position":2,"name":"Contact"}]}]}</script>
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to content</a>
   
-  <div class="announce">Bulk supply in 10, 20 and 50 kg barrels · 100% pure, undiluted oils</div>
+  <div class="announce">Free shipping on orders over ₹999 · 100% pure, undiluted oils</div>
   <header class="header" data-header>
     <div class="container header__inner">
       <button class="icon-btn menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav" data-menu-toggle>
@@ -96,6 +96,10 @@
         <span class="cart-count" data-saved-count>0</span>
       </a>
 
+      <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8zM9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </button>
     </div>
   </header>
   <main id="main">
@@ -126,8 +130,8 @@
             <label>Email<input type="email" name="email" required /></label>
             <label>Subject
               <select name="subject">
-                <option>Request a quote</option>
                 <option>A question about an oil</option>
+                <option>Bulk or wholesale</option>
                 <option>An existing order</option>
                 <option>Something else</option>
               </select>
@@ -163,7 +167,7 @@
            thing is. -->
       <summary><h2>Shop</h2></summary>
       <nav aria-label="Shop">
-        <a href="/shop/">All oils<small>50</small></a><a href="/collections/relaxation/">Relaxation<small>13</small></a><a href="/collections/energy/">Energy<small>12</small></a><a href="/collections/immunity/">Immunity<small>13</small></a><a href="/collections/skincare/">Skincare<small>12</small></a>
+        <a href="/shop/">All oils<small>54</small></a><a href="/collections/relaxation/">Relaxation<small>13</small></a><a href="/collections/energy/">Energy<small>12</small></a><a href="/collections/immunity/">Immunity<small>13</small></a><a href="/collections/sets/">Sets<small>4</small></a><a href="/collections/skincare/">Skincare<small>12</small></a>
       </nav>
     </details>
 
@@ -176,7 +180,7 @@
            thing is. -->
       <summary><h2>By scent</h2></summary>
       <nav aria-label="By scent">
-        <a href="/collections/relaxation/#florals">Florals<small>5</small></a><a href="/collections/relaxation/#herbaceous">Herbaceous<small>4</small></a><a href="/collections/relaxation/#woods-roots">Woods &amp; roots<small>4</small></a><a href="/collections/energy/#citrus">Citrus<small>6</small></a><a href="/collections/energy/#mints">Mints<small>2</small></a><a href="/collections/immunity/#camphorous">Camphorous<small>4</small></a><a href="/collections/immunity/#warm-spices">Warm spices<small>6</small></a><a href="/collections/skincare/#carrier-oils">Carrier oils<small>7</small></a><a href="/collections/skincare/#for-skin-hair">For skin &amp; hair<small>5</small></a><a href="/collections/energy/#green-grassy">Green &amp; grassy<small>4</small></a><a href="/collections/immunity/#herbal">Herbal<small>3</small></a>
+        <a href="/collections/relaxation/#florals">Florals<small>5</small></a><a href="/collections/relaxation/#herbaceous">Herbaceous<small>4</small></a><a href="/collections/relaxation/#woods-roots">Woods &amp; roots<small>4</small></a><a href="/collections/energy/#citrus">Citrus<small>6</small></a><a href="/collections/energy/#mints">Mints<small>2</small></a><a href="/collections/immunity/#camphorous">Camphorous<small>4</small></a><a href="/collections/immunity/#warm-spices">Warm spices<small>6</small></a><a href="/collections/skincare/#carrier-oils">Carrier oils<small>7</small></a><a href="/collections/skincare/#for-skin-hair">For skin &amp; hair<small>5</small></a><a href="/collections/energy/#green-grassy">Green &amp; grassy<small>4</small></a><a href="/collections/immunity/#herbal">Herbal<small>3</small></a><a href="/collections/sets/#sets">Sets<small>4</small></a>
       </nav>
     </details>
 
@@ -223,9 +227,22 @@
   </footer>
   
   <div class="overlay" data-overlay></div>
+  <aside class="drawer" data-drawer role="dialog" aria-modal="true" aria-label="Shopping cart" tabindex="-1" hidden>
+    <div class="drawer__head">
+      <h3>Your cart</h3>
+      <button class="icon-btn" aria-label="Close cart" data-cart-close>✕</button>
+    </div>
+    <div class="ship-progress" data-ship-progress></div>
+    <div class="drawer__items" data-cart-items></div>
+    <div class="drawer__foot">
+      <div class="drawer__row"><span>Subtotal</span><strong data-subtotal></strong></div>
+      <p class="muted small">Shipping is free over ₹999, otherwise ₹79. Calculated at checkout.</p>
+      <button class="btn btn--primary btn--block" data-checkout>Checkout</button>
+    </div>
+  </aside>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
-  <script src="/catalog.js?v=429d1b70"></script>
-  <script src="/app.js?v=429d1b70"></script>
+  <script src="/catalog.js?v=a6f3e6bb"></script>
+  <script src="/app.js?v=a6f3e6bb"></script>
 </body>
 </html>

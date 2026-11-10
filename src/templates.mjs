@@ -2,7 +2,7 @@
 
 import {
   site, nav, categories, products, library, faqs, steps,
-  smallestPack, categoryOf, money,
+  fromPrice, inStock, firstAvailable, categoryOf, money,
 } from "./data.mjs";
 import { liveGuides } from "./guides.mjs";
 import { policies } from "./policies.mjs";
@@ -11,6 +11,7 @@ import { srcsetFor } from "./image.mjs";
 // now lives in bottle.mjs so the browser can share it.
 import { bottleSVG, shortLabel } from "./bottle.mjs";
 export { bottleSVG };
+import { bestSale, saleOn } from "./sale.mjs";
 
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -65,20 +66,33 @@ export const heart = (p, where = "card") => `<button class="heart heart--${where
 
 /** A card in any product grid. */
 export function productCard(p) {
-  return `<article class="card">
+  const v = firstAvailable(p);
+  const multi = p.variants.length > 1;
+  const sold = !inStock(p);
+  const low = !sold && v.stock > 0 && v.stock <= 8;
+  return `<article class="card${sold ? " is-sold" : ""}${bestSale(p) ? " is-sale" : ""}">
     <a class="card__media${mediaClass(p)}" style="background:${p.bg}" href="${productUrl(p)}" aria-label="View ${esc(p.name)}">
       ${p.badge ? `<span class="badge">${p.badge}</span>` : ""}
+      ${sold ? `<span class="badge badge--sold">Sold out</span>` : ""}
       ${productMedia(p)}
     </a>
     ${heart(p)}
     <div class="card__body">
       <span class="card__meta">${categoryOf(p.category).label}<span class="card__sizes"> · ${p.variants.map((x) => x.size).join(" / ")}</span></span>
       <h3 class="card__title"><a href="${productUrl(p)}">${esc(p.name)}</a></h3>
-      <p class="card__latin">${esc(p.botanical)}</p>
+      ${p.botanical
+        ? `<p class="card__latin">${esc(p.botanical)}</p>`
+        : `<p class="card__latin">${p.contains ? `${p.contains.length} oils` : ""}</p>`}
       <p class="card__desc">${esc(p.tagline)}</p>
+      ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">
-        <span class="card__price">Price on request</span>
-        <a class="add-btn" href="${productUrl(p)}">Request a quote</a>
+        <span class="card__price">${multi ? `<small>from </small>` : ""}<span class="price">${money(fromPrice(p))}</span>${
+          bestSale(p) ? `<s class="price__was">${money(bestSale(p).was)}</s>` : ""}</span>
+        ${sold
+          ? `<button class="add-btn" disabled>Sold out</button>`
+          : multi
+            ? `<a class="add-btn" href="${productUrl(p)}">Choose size</a>`
+            : `<button class="add-btn" data-add="${p.id}" data-size="${v.size}">Add to cart</button>`}
       </div>
     </div>
   </article>`;
@@ -140,6 +154,10 @@ function header(current) {
         <span class="cart-count" data-saved-count>0</span>
       </a>
 
+      <button class="icon-btn cart-btn" aria-label="Open cart" aria-expanded="false" data-cart-open>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8zM9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </button>
     </div>
   </header>`;
 }
@@ -244,10 +262,21 @@ function footer() {
   </footer>`;
 }
 
-/* The overlay is still here because the mobile menu uses it. The cart drawer
-   it used to sit behind is gone with the rest of retail. */
 const drawerAndModal = `
   <div class="overlay" data-overlay></div>
+  <aside class="drawer" data-drawer role="dialog" aria-modal="true" aria-label="Shopping cart" tabindex="-1" hidden>
+    <div class="drawer__head">
+      <h3>Your cart</h3>
+      <button class="icon-btn" aria-label="Close cart" data-cart-close>✕</button>
+    </div>
+    <div class="ship-progress" data-ship-progress></div>
+    <div class="drawer__items" data-cart-items></div>
+    <div class="drawer__foot">
+      <div class="drawer__row"><span>Subtotal</span><strong data-subtotal></strong></div>
+      <p class="muted small">Shipping is free over ${money(site.freeShippingAt)}, otherwise ${money(site.shippingFlat)}. Calculated at checkout.</p>
+      <button class="btn btn--primary btn--block" data-checkout>Checkout</button>
+    </div>
+  </aside>
 `;
 
 /**
@@ -281,6 +310,7 @@ const adminBar = () => `
         <button class="abar__tab is-on" role="tab" data-tab="orders">Orders</button>
         <button class="abar__tab" role="tab" data-tab="messages">Messages</button>
         <button class="abar__tab" role="tab" data-tab="stock">Stock</button>
+        <button class="abar__tab" role="tab" data-tab="codes">Codes</button>
       </nav>
       <div class="abar__side">
         <a class="abar__link" href="/" target="_blank" rel="noopener">View shop</a>
@@ -394,7 +424,7 @@ export function layout({
 <body${bodyClass ? ` class="${bodyClass}"` : ""}>
   <a href="#main" class="skip-link">Skip to content</a>
   ${chrome === "admin" ? adminBar() : `
-  <div class="announce">Bulk supply in 10, 20 and 50 kg barrels · 100% pure, undiluted oils</div>
+  <div class="announce">Free shipping on orders over ${money(site.freeShippingAt)} · 100% pure, undiluted oils</div>
   ${header(path)}`}
   <main id="main">${body}</main>
   ${chrome === "admin" ? "" : `${footer()}
@@ -531,4 +561,4 @@ export const safetyNote = () => `
     </div>
   </section>`;
 
-export { site, nav, categories, products, library, faqs, steps, money, smallestPack, categoryOf };
+export { site, nav, categories, products, library, faqs, steps, money, fromPrice, inStock, firstAvailable, categoryOf };

@@ -74,7 +74,10 @@ const isoDate = (value) => {
 export const ORDER_COLUMNS = [
   "Order ID", "Date", "Status", "Customer", "Phone", "Email",
   "Address", "City", "State", "PIN",
-  "Items", "Subtotal", "Shipping", "Total",
+  // Discount sits between Shipping and Total because without it the three
+  // money columns do not add up on a discounted order, and a spreadsheet
+  // that does not add up is one somebody reconciles by hand forever.
+  "Items", "Subtotal", "Shipping", "Discount", "Code", "Total",
   "Tracking", "Dispatched", "Notes",
 ];
 
@@ -105,6 +108,10 @@ export function ordersToRows(orders) {
       items,
       rupees(o.subtotal_paise),
       rupees(o.shipping_paise),
+      // Orders placed before codes existed have no column value at all,
+      // hence the fallback; they are genuinely zero, not unknown.
+      rupees(o.discount_paise ?? 0),
+      o.discount_code ?? "",
       rupees(o.total_paise),
       o.tracking ?? "",
       isoDate(o.shipped_at),

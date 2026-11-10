@@ -1,10 +1,13 @@
 /**
  * GET  /api/admin/orders            recent orders, newest first
  *      ?all=1                        every order, for the export and the sync
+ *      ?codes=1                      the discount codes instead
  * POST /api/admin/orders  { id, action: "ship", tracking? }
  *                         { id, action: "thank" }
  *                         { id, action: "resolve", note? }
  *                         { action: "sync" }     write them all to the sheet
+ *                         { action: "code-create", code, kind, value, … }
+ *                         { action: "code-retire" | "code-revive", code }
  *
  * The sync lives here rather than in its own file for a reason worth
  * recording: Vercel's Hobby plan caps how many Serverless Functions one
@@ -29,6 +32,7 @@ import { listOrders, countOrders } from "../_lib/order-list.mjs";
 import { sheetStatus, syncSheet } from "../_lib/sheets.mjs";
 import { ORDER_COLUMNS, ordersToRows } from "../../src/csv.mjs";
 import { thankYouEmail, dispatchEmail } from "../../src/emails.mjs";
+import { parseDefinition, readCode } from "../../src/discount.mjs";
 
 /** The order with its items, in the shape the email templates expect. */
 async function orderFor(sql, id) {
@@ -61,6 +65,18 @@ export default async function handler(req, res) {
       // ?all=1 lifts the page limit. The export and the sheet sync need
       // every order: a spreadsheet that stops at the hundredth is wrong in
       // a way nobody notices until the accounts do not add up.
+      /* ?codes=1 answers with the discount codes instead of the orders.
+         Another action on an existing handler rather than another file —
+         see the note at the top of this one about the twelve-function cap. */
+      if (/(^|[?&])codes=1(&|$)/.test(req.url ?? "")) {
+        const codes = await sql`
+          select code, kind, value, min_subtotal_paise, max_redemptions,
+                 times_redeemed, expires_at, active, note, created_at
+            from discount_codes
+           order by active desc, created_at desc`;
+        return json(res, 200, { codes });
+      }
+
       const wantsAll = /(^|[?&])all=1(&|$)/.test(req.url ?? "");
       const orders = await listOrders(sql, { limit: wantsAll ? null : 100 });
       const total = await countOrders(sql);
@@ -118,6 +134,42 @@ export default async function handler(req, res) {
         return json(res, 200, {
           ok: true, synced: true, rows: result.rows, tab: result.tab, url: result.url,
         });
+      }
+
+      /* --------------------------------------------------- discount codes */
+      /* Also before the id check: these act on a code, not on an order. */
+
+      if (action === "code-create") {
+        const { definition, errors } = parseDefinition(body);
+        if (errors) return json(res, 400, { error: errors[0], errors });
+
+        // `on conflict do nothing` rather than an upsert. Editing a live
+        // code in place silently changes what it is worth to everyone
+        // holding it, including people part-way through a checkout; the
+        // honest move is to retire it and issue another.
+        const [row] = await sql`
+          insert into discount_codes
+            (code, kind, value, min_subtotal_paise, max_redemptions, expires_at, note, created_by)
+          values (${definition.code}, ${definition.kind}, ${definition.value},
+                  ${definition.minSubtotalPaise}, ${definition.maxRedemptions},
+                  ${definition.expiresAt}, ${body.note ?? null}, ${gate.admin.id})
+          on conflict (code) do nothing
+          returning code`;
+
+        if (!row) return json(res, 409, { error: "That code already exists. Retire it first." });
+        return json(res, 200, { ok: true, code: row.code });
+      }
+
+      if (action === "code-retire" || action === "code-revive") {
+        const { code, error } = readCode(body.code);
+        if (error) return json(res, 400, { error });
+
+        const [row] = await sql`
+          update discount_codes set active = ${action === "code-revive"}
+           where code = ${code} returning code, active`;
+
+        if (!row) return json(res, 404, { error: "No such code." });
+        return json(res, 200, { ok: true, code: row.code, active: row.active });
       }
 
       if (typeof id !== "string" || !id) return json(res, 400, { error: "Which order?" });
