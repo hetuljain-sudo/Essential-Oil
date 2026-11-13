@@ -80,9 +80,7 @@ export function productCard(p) {
     <div class="card__body">
       <span class="card__meta">${categoryOf(p.category).label}<span class="card__sizes"> · ${p.variants.map((x) => x.size).join(" / ")}</span></span>
       <h3 class="card__title"><a href="${productUrl(p)}">${esc(p.name)}</a></h3>
-      ${p.botanical
-        ? `<p class="card__latin">${esc(p.botanical)}</p>`
-        : `<p class="card__latin">${p.contains ? `${p.contains.length} oils` : ""}</p>`}
+      <p class="card__latin">${esc(p.botanical)}</p>
       <p class="card__desc">${esc(p.tagline)}</p>
       ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">

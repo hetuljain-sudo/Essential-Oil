@@ -398,9 +398,7 @@ function productCard(p, i = 99) {
     <div class="card__body">
       <span class="card__meta">${catLabel(p.category)}<span class="card__sizes"> · ${p.variants.map((x) => x.size).join(" / ")}</span></span>
       <h3 class="card__title"><a href="${p.url}">${esc(p.name)}</a></h3>
-      <p class="card__latin">${p.botanical
-        ? esc(p.botanical)
-        : (p.contains ? `${p.contains.length} oils` : "")}</p>
+      <p class="card__latin">${esc(p.botanical)}</p>
       <p class="card__desc">${esc(p.tagline)}</p>
       ${low ? `<span class="stock-note">Only ${v.stock} left</span>` : ""}
       <div class="card__foot">

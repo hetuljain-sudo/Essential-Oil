@@ -15,6 +15,31 @@
       "continue": true
     },
     {
+      "src": "/oils/set-sleep/?",
+      "status": 301,
+      "headers": { "Location": "/collections/relaxation/" }
+    },
+    {
+      "src": "/oils/set-mornings/?",
+      "status": 301,
+      "headers": { "Location": "/collections/energy/" }
+    },
+    {
+      "src": "/oils/set-seasonal/?",
+      "status": 301,
+      "headers": { "Location": "/collections/immunity/" }
+    },
+    {
+      "src": "/oils/set-carriers/?",
+      "status": 301,
+      "headers": { "Location": "/collections/skincare/" }
+    },
+    {
+      "src": "/collections/sets/?",
+      "status": 301,
+      "headers": { "Location": "/collections/" }
+    },
+    {
       "handle": "filesystem"
     },
     {
