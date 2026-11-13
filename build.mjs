@@ -263,12 +263,27 @@ const isCarrier = (p) => !!p.carrier;
 const isSet = (p) => p.kind === "set";
 const oilWord = (p) => (isSet(p) ? "Gift Set" : isCarrier(p) ? "Carrier Oil" : "Essential Oil");
 
+/**
+ * How the pack sizes read in a sentence.
+ *
+ * Listing every size was fine while there were two of them. With three,
+ * "10 kg and 20 kg and 50 kg" is both clumsy and long enough to push the
+ * meta description past its limit, where it was being cut off mid-word at
+ * "...undiluted, in". A range says the same thing in less space, and it is
+ * the phrasing the collection pages already use for their Sizes fact.
+ */
+const sizePhrase = (p) => {
+  const sizes = p.variants.map((v) => v.size);
+  if (sizes.length === 1) return sizes[0];
+  if (sizes.length === 2) return sizes.join(" and ");
+  return `${sizes[0]} to ${sizes[sizes.length - 1]}`;
+};
+
 /** A product title people actually search: name, what it is, sizes, brand. */
 function productTitle(p) {
   if (isSet(p)) return `${p.name} — ${p.contains.length} Oils`;
   const base = /oil$/i.test(p.name) ? p.name : `${p.name} ${oilWord(p)}`;
-  const sizes = p.variants.map((v) => v.size).join(" & ");
-  const withSizes = `${base} — ${sizes}`;
+  const withSizes = `${base} — ${sizePhrase(p)}`;
   return withSizes.length <= 46 ? withSizes : base;
 }
 
@@ -280,9 +295,8 @@ function productDescription(p) {
     return `${p.name} from Sarvha: ${names}, boxed together and priced below buying them apart. ` +
       `100% pure and undiluted. Free shipping over ${money(site.freeShippingAt)}.`;
   }
-  const sizes = p.variants.map((v) => v.size).join(" and ");
   return `Buy ${p.name} ${isCarrier(p) ? "carrier oil" : "essential oil"} (${p.botanical}) online in India. ` +
-    `${p.tagline} 100% pure and undiluted, in ${sizes}. Free shipping over ${money(site.freeShippingAt)}.`;
+    `${p.tagline} 100% pure and undiluted, in ${sizePhrase(p)}. Free shipping over ${money(site.freeShippingAt)}.`;
 }
 
 const HOME = { href: "/", label: "Home" };

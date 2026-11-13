@@ -16,9 +16,16 @@ import { priceCart, shippingPaiseFor, skuOf, toPaise, CartError, MAX_QTY_PER_LIN
 import { products, site } from "../src/data.mjs";
 
 const lavender = products.find((p) => p.id === "lavender-fields");
-const LAV_15 = skuOf("lavender-fields", "15 ml");
-const LAV_30 = skuOf("lavender-fields", "30 ml");
-const price15 = lavender.variants.find((v) => v.size === "15 ml").price;
+
+/* Taken from the catalogue rather than typed in. These tests are about the
+   pricing rules, not about what the pack sizes happen to be called this
+   month — they used to say "15 ml" and broke the day the range moved to
+   barrels, which told us nothing about the money. */
+const SIZE_A = lavender.variants[0].size;
+const SIZE_B = lavender.variants[1].size;
+const LAV_A = skuOf("lavender-fields", SIZE_A);
+const LAV_B = skuOf("lavender-fields", SIZE_B);
+const priceA = lavender.variants[0].price;
 
 /** Plenty of everything, so stock is never the thing under test. */
 const ample = Object.fromEntries(
@@ -28,15 +35,15 @@ const ample = Object.fromEntries(
 test("prices from the catalogue, not from the request", () => {
   const out = priceCart(
     // A tampered cart: the client claims this costs one paisa.
-    [{ id: "lavender-fields", size: "15 ml", qty: 2, price: 1, unitPricePaise: 1 }],
+    [{ id: "lavender-fields", size: SIZE_A, qty: 2, price: 1, unitPricePaise: 1 }],
     ample,
   );
-  assert.equal(out.lines[0].unitPricePaise, toPaise(price15));
-  assert.equal(out.subtotalPaise, toPaise(price15) * 2);
+  assert.equal(out.lines[0].unitPricePaise, toPaise(priceA));
+  assert.equal(out.subtotalPaise, toPaise(priceA) * 2);
 });
 
 test("totals are whole paise", () => {
-  const out = priceCart([{ id: "lavender-fields", size: "15 ml", qty: 3 }], ample);
+  const out = priceCart([{ id: "lavender-fields", size: SIZE_A, qty: 3 }], ample);
   for (const n of [out.subtotalPaise, out.shippingPaise, out.totalPaise]) {
     assert.ok(Number.isInteger(n), `${n} is not an integer`);
   }
@@ -56,14 +63,14 @@ test("an empty cart buys nothing", () => {
 
 test("refuses more than we hold", () => {
   assert.throws(
-    () => priceCart([{ id: "lavender-fields", size: "15 ml", qty: 3 }], { [LAV_15]: 2 }),
+    () => priceCart([{ id: "lavender-fields", size: SIZE_A, qty: 3 }], { [LAV_A]: 2 }),
     (e) => e instanceof CartError && e.code === "insufficient_stock",
   );
 });
 
 test("a sku missing from the stock table counts as zero, not as unlimited", () => {
   assert.throws(
-    () => priceCart([{ id: "lavender-fields", size: "15 ml", qty: 1 }], {}),
+    () => priceCart([{ id: "lavender-fields", size: SIZE_A, qty: 1 }], {}),
     (e) => e.code === "insufficient_stock",
   );
 });
@@ -72,9 +79,9 @@ test("the same size twice cannot be split past the stock check", () => {
   // Two lines of 2 against stock of 3: each passes alone, together they oversell.
   assert.throws(
     () => priceCart(
-      [{ id: "lavender-fields", size: "15 ml", qty: 2 },
-       { id: "lavender-fields", size: "15 ml", qty: 2 }],
-      { [LAV_15]: 3 },
+      [{ id: "lavender-fields", size: SIZE_A, qty: 2 },
+       { id: "lavender-fields", size: SIZE_A, qty: 2 }],
+      { [LAV_A]: 3 },
     ),
     (e) => e.code === "duplicate_line",
   );
@@ -82,9 +89,9 @@ test("the same size twice cannot be split past the stock check", () => {
 
 test("different sizes of one oil are separate lines", () => {
   const out = priceCart(
-    [{ id: "lavender-fields", size: "15 ml", qty: 1 },
-     { id: "lavender-fields", size: "30 ml", qty: 1 }],
-    { [LAV_15]: 1, [LAV_30]: 1 },
+    [{ id: "lavender-fields", size: SIZE_A, qty: 1 },
+     { id: "lavender-fields", size: SIZE_B, qty: 1 }],
+    { [LAV_A]: 1, [LAV_B]: 1 },
   );
   assert.equal(out.lines.length, 2);
 });
@@ -92,7 +99,7 @@ test("different sizes of one oil are separate lines", () => {
 test("rejects quantities that are not whole positive numbers", () => {
   for (const qty of [0, -1, 1.5, "2", NaN, undefined]) {
     assert.throws(
-      () => priceCart([{ id: "lavender-fields", size: "15 ml", qty }], ample),
+      () => priceCart([{ id: "lavender-fields", size: SIZE_A, qty }], ample),
       CartError,
       `qty ${String(qty)} should have been rejected`,
     );
@@ -101,14 +108,14 @@ test("rejects quantities that are not whole positive numbers", () => {
 
 test("caps how many of one size an order can hold", () => {
   assert.throws(
-    () => priceCart([{ id: "lavender-fields", size: "15 ml", qty: MAX_QTY_PER_LINE + 1 }], ample),
+    () => priceCart([{ id: "lavender-fields", size: SIZE_A, qty: MAX_QTY_PER_LINE + 1 }], ample),
     (e) => e.code === "qty_too_high",
   );
 });
 
 test("rejects an oil or size we do not sell", () => {
   assert.throws(
-    () => priceCart([{ id: "no-such-oil", size: "15 ml", qty: 1 }], ample),
+    () => priceCart([{ id: "no-such-oil", size: SIZE_A, qty: 1 }], ample),
     (e) => e.code === "unknown_item",
   );
   assert.throws(
@@ -125,7 +132,7 @@ test("every catalogue variant has a unique sku", () => {
 
 test("the total is the subtotal plus shipping, always", () => {
   for (const qty of [1, 2, 5]) {
-    const out = priceCart([{ id: "lavender-fields", size: "15 ml", qty }], ample);
+    const out = priceCart([{ id: "lavender-fields", size: SIZE_A, qty }], ample);
     assert.equal(out.totalPaise, out.subtotalPaise + out.shippingPaise);
   }
 });

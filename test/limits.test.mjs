@@ -15,6 +15,16 @@ import assert from "node:assert/strict";
 
 import { MAX_LINES, MAX_QTY_PER_LINE, maxForVariant, limitReason } from "../src/limits.mjs";
 import * as pricing from "../api/_lib/pricing.mjs";
+import { products } from "../src/data.mjs";
+import { skuFor } from "../src/sku.mjs";
+
+/* Size and sku come from the catalogue. These tests are about the cap, not
+   about what a pack happens to be called — hard-coding "15 ml" and
+   "SRV-LAVENDE-15ML" meant they failed when the range moved to barrels,
+   which said nothing about the limits they exist to check. */
+const LAV = products.find((p) => p.id === "lavender-fields");
+const SIZE = LAV.variants[0].size;
+const LAV_SKU = skuFor(LAV, LAV.variants[0]);
 
 test("the server and the shared module agree", () => {
   // If these ever diverge, the cart is buildable and the order is not.
@@ -37,24 +47,24 @@ test("sold out caps at zero, never below", () => {
 
 test("the reason given is the one that is true", () => {
   // Plenty in stock, so the rule is what stops you.
-  assert.match(limitReason({ stock: 24 }, "Lavender", "15 ml"), /most of any one size/);
+  assert.match(limitReason({ stock: 24 }, "Lavender", SIZE), /most of any one size/);
   // Nearly gone, so the shelf is what stops you.
-  assert.match(limitReason({ stock: 3 }, "Lavender", "15 ml"), /Only 3 of Lavender 15 ml/);
-  assert.match(limitReason({ stock: 0 }, "Lavender", "15 ml"), /sold out/);
+  assert.match(limitReason({ stock: 3 }, "Lavender", SIZE), new RegExp(`Only 3 of Lavender ${SIZE}`));
+  assert.match(limitReason({ stock: 0 }, "Lavender", SIZE), /sold out/);
 });
 
 test("a cart at the cap is one priceCart accepts", () => {
   // The point of the whole module: what the browser allows, the server takes.
-  const stock = { "SRV-LAVENDE-15ML": 24 };
+  const stock = { [LAV_SKU]: 24 };
   const qty = maxForVariant({ stock: 24 });
   assert.doesNotThrow(() =>
-    pricing.priceCart([{ id: "lavender-fields", size: "15 ml", qty }], stock));
+    pricing.priceCart([{ id: "lavender-fields", size: SIZE, qty }], stock));
 });
 
 test("one more than the cap is what priceCart refuses", () => {
-  const stock = { "SRV-LAVENDE-15ML": 24 };
+  const stock = { [LAV_SKU]: 24 };
   assert.throws(
-    () => pricing.priceCart([{ id: "lavender-fields", size: "15 ml", qty: MAX_QTY_PER_LINE + 1 }], stock),
+    () => pricing.priceCart([{ id: "lavender-fields", size: SIZE, qty: MAX_QTY_PER_LINE + 1 }], stock),
     /up to 10/,
   );
 });
